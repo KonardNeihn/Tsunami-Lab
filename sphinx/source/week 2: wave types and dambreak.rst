@@ -9,13 +9,12 @@ Solver switching and Insanity Check
 
 Our first tsk this week was to implement a switch between the roe- and fwave-solvers, which we accomplished by implementing them in *main.cpp* and *WavePropagation1d.cpp*.
 Now whenever you run a new simulation, you can specify which solver it should use (the default is currently fwave) as the third argument.
- - ./build/tsunami_lab 2 roe     for example will run the default Dambreak simulation with two cells and the roe solver
- - ./build/tsunami_lab 4         will run the default Dambreak simulation with four cells and the fwave solver
+- ./build/tsunami_lab 2 roe     for example will run the default Dambreak simulation with two cells and the roe solver
+- ./build/tsunami_lab 4         will run the default Dambreak simulation with four cells and the fwave solver
 
 The sanity check is far more complicated and only implemented in part. If you use this input:
- - ./build/tsunami_lab 2 insanity   the simulation will use the first set of values from the provided middle_states.csv
+- ./build/tsunami_lab 2 insanity   the simulation will use the first set of values from the provided middle_states.csv
 The provided values in the first timestep seem to produce a slightly different result than expected (expected: 8899.739847378269, output: 8899.33).
-
 
 Continous Integration
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,15 +41,14 @@ These inputs are currently unused and any actual values in these places don't ch
 
 To answer the question from 2.1.2.: yes there is a connection to the wave speeds.
 𝜆1/2 =𝑢 ∓ √𝑔⁡ℎ, the formula has two main parts: 
-   - 𝑢 is essentially the current velocity of the water itself 
-   - and √𝑔⁡ℎ is the new wave adding or subtracting its speed from the water movement. 
+- 𝑢 is essentially the current velocity of the water itself 
+- and √𝑔⁡ℎ is the new wave adding or subtracting its speed from the water movement. 
 Now if we look at the values we input into the calculation:
-   - by increasing the height of the water (effectively increasing √𝑔⁡ℎ), we increase the strength of the waves and therefore both fronts of the water travel faster in their respective directions (apart from each other)
-   - if we change 𝑢, we apply the same directional force to both wave fronts which means:
-      - if 𝑢 is positive, the wave traveling right is sped up, while the one traveling left is slowed down
-      - if 𝑢 is negative, the wave traveling right is slowed down, while the one traveling left is sped up
-      - if the power of 𝑢 is greater than the waves directional power then the respective wave's direction inverses (if the wave moves left at 2 m/s but the water itself moves right at 7 m/s, the water still moves right just at 5 m/s)
-
+- by increasing the height of the water (effectively increasing √𝑔⁡ℎ), we increase the strength of the waves and therefore both fronts of the water travel faster in their respective directions (apart from each other)
+- if we change 𝑢, we apply the same directional force to both wave fronts which means:
+   - if 𝑢 is positive, the wave traveling right is sped up, while the one traveling left is slowed down
+   - if 𝑢 is negative, the wave traveling right is slowed down, while the one traveling left is sped up
+   - if the power of 𝑢 is greater than the waves directional power then the respective wave's direction inverses (if the wave moves left at 2 m/s but the water itself moves right at 7 m/s, the water still moves right just at 5 m/s)
 
 Dam-Break
 ~~~~~~~~~~~~~~~~~~
