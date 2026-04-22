@@ -10,3 +10,6 @@ build/*
 
 # ignore all createt solutions and the visualization but do not ignore the folder itself
 solutions/*
+
+# ignore the build of shpinx
+sphinx/build
