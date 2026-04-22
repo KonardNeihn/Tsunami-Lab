@@ -13,3 +13,7 @@ solutions/*
 
 # ignore the build of shpinx
 sphinx/build
+
+# ignore the build of doxygen
+docs/html
+docs/latex
