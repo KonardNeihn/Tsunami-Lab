@@ -13,7 +13,7 @@ TEST_CASE( "Test the one-dimensional rare-rare wave problem setup.", "[RareRare1
                                                5,
                                                3 );
 
-  // "someone" designed these functions two work in 2 Dimensions so the second input is technically a y-coordinate that currently doesn't do anything
+  // "someone" designed these functions to work in 2 Dimensions so the second input is technically a y-coordinate that currently doesn't do anything
   // left side moves away from the middle - so it moves left (negative momentum)
   REQUIRE( l_rarerare.getHeight( 2, 0 ) == 25 );
 

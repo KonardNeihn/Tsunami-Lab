@@ -75,13 +75,12 @@ l_dt        = 0.5 * l_dxy * 1000 / l_speedMax    (Time for each timestep, l_dxy 
 Every solution shows the update of 25 timesteps. The Wave hits the village in solution_86.csv after about 25 * 86 = 2150 timesteps. 
 This means the village has about 1.066 * 2150 = 2291.9 second or 38.20 minutes to evacuate.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
 Continous Integration
 ~~~~~~~~~~~~~~~~~~
 
 To set up a runner for the CI/CD pipeline we had to switch to GitHub because shared runners are disabled for our University Accounts.
 The test wich are performed every push and pull-request are declared in .github/workflows/main.yaml and can be watched here: https://github.com/KonardNeihn/Tsunami-Lab/actions.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
