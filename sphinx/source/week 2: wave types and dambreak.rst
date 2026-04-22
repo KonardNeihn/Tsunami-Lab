@@ -4,6 +4,25 @@ Tsunami Lab Week Two
 Project Report
 -----------------
 
+Solver switching and Insanity Check
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Our first tsk this week was to implement a switch between the roe- and fwave-solvers, which we accomplished by implementing them in *main.cpp* and *WavePropagation1d.cpp*.
+Now whenever you run a new simulation, you can specify which solver it should use (the default is currently fwave) as the third argument.
+ - ./build/tsunami_lab 2 roe     for example will run the default Dambreak simulation with two cells and the roe solver
+ - ./build/tsunami_lab 4         will run the default Dambreak simulation with four cells and the fwave solver
+
+The sanity check is far more complicated and only implemented in part. If you use this input:
+ - ./build/tsunami_lab 2 insanity   the simulation will use the first set of values from the provided middle_states.csv
+The provided values in the first timestep seem to produce a slightly different result than expected (expected: 8899.739847378269, output: 8899.33).
+
+
+Continous Integration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To set up a runner for the CI/CD pipeline we had to switch to GitHub because shared runners are disabled for our University Accounts.
+The test wich are performed every push and pull-request are declared in .github/workflows/main.yaml and can be watched here: `new Github link <https://github.com/KonardNeihn/Tsunami-Lab/actions>`_ .
+
 Creating setups for rare-rare and shock-shock problems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -57,7 +76,7 @@ This probably occurs because the water moves to the right, so that it flows "out
 When a velocity of 5 is applied on the right side, the water flows faster than the simulation can redistribute the water. Using tests, this happens if the velocity is higher than 4.
  
 Time to evacuate the village:
-The simulation ran with the following paramters (changed localy in the file, not pushed to the repository):
+The simulation ran with the following parameters (changed locally in the file, not pushed to the repository):
 q_l         = [14, 0]
 q_r         = [3.5, 0.7]
 l_endTime   = 2500
@@ -73,13 +92,7 @@ l_dt        = 0.5 * l_dxy * 1000 / l_speedMax    (Time for each timestep, l_dxy 
    Simulation for the village task.
 
 Every solution shows the update of 25 timesteps. The Wave hits the village in solution_86.csv after about 25 * 86 = 2150 timesteps. 
-This means the village has about 1.066 * 2150 = 2291.9 second or 38.20 minutes to evacuate.
-
-Continous Integration
-~~~~~~~~~~~~~~~~~~
-
-To set up a runner for the CI/CD pipeline we had to switch to GitHub because shared runners are disabled for our University Accounts.
-The test wich are performed every push and pull-request are declared in .github/workflows/main.yaml and can be watched here: https://github.com/KonardNeihn/Tsunami-Lab/actions.
+This means the village has about 1.066 * 2150 = 2291.9 seconds or 38.20 minutes (0.2 Minutes is 12 seconds, so 38 minutes and 12 seconds) to evacuate.
 
 .. toctree::
    :maxdepth: 2

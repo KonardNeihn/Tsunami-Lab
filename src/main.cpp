@@ -6,6 +6,8 @@
  **/
 #include "patches/WavePropagation1d.h"
 #include "setups/DamBreak1d.h"
+#include "setups/ShockShock1d.h"
+#include "setups/RareRare1d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
@@ -25,6 +27,8 @@ int main( int   i_argc,
 
   // string of selected solver
   std::string l_solver = "fwave";
+  // possible insanity
+  std::string l_sanity = "true";
 
   std::cout << "####################################" << std::endl;
   std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -35,11 +39,11 @@ int main( int   i_argc,
   if( i_argc < 2 || i_argc > 3 ) {
     std::cerr << "invalid number of arguments, usage:" << std::endl;
     std::cerr << "  ./build/tsunami_lab N_CELLS_X [solver_name]" << std::endl;
-    std::cerr << "where N_CELLS_X is the number of cells in x-direction." << std::endl;
+    std::cerr << "where N_CELLS_X is the number of cells in x-direction and solver_name is either fwave or roe." << std::endl;
     return EXIT_FAILURE;
   }
   else {
-    // selct solver with potential 3rd argument in command line
+    // select solver with potential 3rd argument in command line
     // default is f-wave solver
     if( i_argc == 3 ) { 
       std::string solver_arg = i_argv[2];
@@ -48,7 +52,12 @@ int main( int   i_argc,
       }
       else if (solver_arg == "roe") {
         l_solver = "roe";
-      }else {
+      }
+      else if (solver_arg == "insanity") {
+        l_solver = "fwave";
+        l_sanity = "false";
+      }
+      else {
         std::cerr << "invalid solver name, usage:" << std::endl;
         std::cerr << "  ./build/tsunami_lab N_CELLS_X [solver_name]" << std::endl;
         std::cerr << "where N_CELLS_X is the number of cells in x-direction and solver_name is either fwave or roe." << std::endl;
@@ -94,9 +103,20 @@ int main( int   i_argc,
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
+  if (l_sanity == "true"){
   l_setup = new tsunami_lab::setups::DamBreak1d( 10,
                                                  5,
                                                  5 );
+  }
+  // very rudimentary sanity-check, to be expanded later
+  else if (l_sanity == "false") {
+  l_setup = new tsunami_lab::setups::ShockShock1d( 8899.326826472694,
+                                                   122.0337839252433,
+                                                   5 );
+  } else {
+        std::cerr << "Still sane?" << std::endl;
+        return EXIT_FAILURE;
+      }
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
   l_waveProp = new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver);
