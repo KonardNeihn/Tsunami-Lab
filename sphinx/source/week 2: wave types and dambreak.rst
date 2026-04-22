@@ -79,3 +79,9 @@ This means the village has about 1.066 * 2150 = 2291.9 second or 38.20 minutes t
    :maxdepth: 2
    :caption: Contents:
 
+
+Continous Integration
+~~~~~~~~~~~~~~~~~~
+
+To set up a runner for the CI/CD pipeline we had to switch to GitHub because shared runners are disabled for our University Accounts.
+The test wich are performed every push and pull-request are declared in .github/workflows/main.yaml and can be watched here: https://github.com/KonardNeihn/Tsunami-Lab/actions.
