@@ -5,10 +5,10 @@
 config.log
 .sconf_temp
 
-# ignore all build (compiled) files but keep the folder itself
+# ignore all build (compiled) files
 build/*
 
-# ignore all createt solutions and the visualization but do not ignore the folder itself
+# ignore all createt solutions and the visualization
 solutions/*
 
 # ignore the build of shpinx
