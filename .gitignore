@@ -4,3 +4,9 @@
 # When configure fails, SCons outputs these
 config.log
 .sconf_temp
+
+# ignore all build (compiled) files but keep the folder itself
+build/*
+
+# ignore all createt solutions and the visualization but do not ignore the folder itself
+solutions/*

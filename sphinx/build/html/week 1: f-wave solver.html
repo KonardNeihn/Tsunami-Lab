@@ -1,0 +1,180 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tsunami Lab Week One &mdash; Tsunami Lab  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tsunami Lab documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Tsunami Lab
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tsunami Lab Week One</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-build-the-current-code">How to build the current code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-report">Project Report</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-the-gitlab-repository">Creating the GitLab Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-the-new-f-wave-calculations">Writing the new F-Wave calculations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implementing-tests-for-the-new-f-wave-calculations">Implementing tests for the new F-Wave calculations</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Tsunami Lab</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tsunami Lab Week One</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/week 1: f-wave solver.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tsunami-lab-week-one">
+<h1>Tsunami Lab Week One<a class="headerlink" href="#tsunami-lab-week-one" title="Link to this heading"></a></h1>
+<section id="how-to-build-the-current-code">
+<h2>How to build the current code<a class="headerlink" href="#how-to-build-the-current-code" title="Link to this heading"></a></h2>
+<p>Run the following commands:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>nix-shell -p python3Packages.sphinx python3Packages.sphinx_rtd_theme doxygen pkgs.scons</dt><dd><ul>
+<li><p><strong>nothing works without it</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scons</dt><dd><ul>
+<li><p>builds the project</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>./build/tests</dt><dd><ul>
+<li><p>runs the implemented tests <em>unclear</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>To generate the Documentation in Sphinx:</p>
+<ul class="simple">
+<li><p>run: “make html” in the sphinx folder</p></li>
+<li><p>this generates html-files in sphinx&gt;build&gt;html</p></li>
+</ul>
+</section>
+<section id="project-report">
+<h2>Project Report<a class="headerlink" href="#project-report" title="Link to this heading"></a></h2>
+<section id="creating-the-gitlab-repository">
+<h3>Creating the GitLab Repository<a class="headerlink" href="#creating-the-gitlab-repository" title="Link to this heading"></a></h3>
+<p>Using the University URZ-ID and corresponding passwords we can access and host our code on <a class="reference external" href="https://git.uni-jena.de/">Gitlab Uni Jena</a>.
+By registering all team members as owners to the Repository everyone can use it to see and contribute code.</p>
+</section>
+<section id="writing-the-new-f-wave-calculations">
+<h3>Writing the new F-Wave calculations<a class="headerlink" href="#writing-the-new-f-wave-calculations" title="Link to this heading"></a></h3>
+<p>Our new F-Wave solver functions similarly to the Roe Riemann solver we were given as reference, therefore we can reuse the <em>waveSpeeds</em>-function entirely.
+The F-Wave calculations however replace waveStrength in favor of calculating flux directly (instead of calculating the water height and then multiplying by speed to get flux).
+We achieve this by calculating the two flux-vectors for both of our Water columns via the formula given in <a class="reference external" href="https://scalable.uni-jena.de/opt/tsunami/chapters/assignment_1.html#equation-eq-swe1d">1.1</a>.
+We then subtract them from eachother to receive the respective jumps in flux or Δ⁢𝑓, that we need later.
+The third function for the F-Wave solver is also similar to the one from the Roe Riemann solver, in that it calls the other two functions declared before (waveSpeed and waveFlux) and and it then
+calculate eigenvector α[2] in as in αL = (matrix inversion prefix) * (sR * Δf(h) - 1 * Δf(hu)) and αR =  (matrix inversion prefix) * (-sL * Δf(h) + 1 * Δf(hu)), by first calculating the prefix consisting of
+one divided by the determinant of the inversed matrix (ad-bc for 2x2 matrices). The two α’s are declared as α1 and α2 in the notes of this task and are equivalent to αL and αR respectively.
+Since Δf is the sum of both waves we can now decomposit it into those two waves using the formula Δf(h) = αL + αR (top part of the vectors) and Δf(hu) = αL * sL + αR * sR (bottom part of the vector).
+Finally we calculate the netUpdates similarly to the Roe Riemann solver by first initializing the values with zero and then checking if the wave speeds are negative or not
+(this determines which way, or more precisely, to which column the water flows) and then adding the waves corresponding values to the correct columns iteratively with the for-loop.</p>
+</section>
+<section id="implementing-tests-for-the-new-f-wave-calculations">
+<h3>Implementing tests for the new F-Wave calculations<a class="headerlink" href="#implementing-tests-for-the-new-f-wave-calculations" title="Link to this heading"></a></h3>
+<p>Due to the Roe solver and f wave solver should calculate the same derivation of speeds we can reuse the test from Roe for f_wave with identical iputs.
+For the flux computation, we verify that the f-wave solver correctly calculates the flux difference between the left and right states. The test uses simple input values where the expected flux difference can be derived manually.
+For the net-updates, we test both a supersonic case and a steady-state case. In the supersonic case, we check that updates occur only on one side, while the other side remains zero.
+In the steady-state case with identical inputs, we ensure that the net updates vanish up to machine precision.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Tsunami Lab documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 1980, Filip, Lukas, Konrad.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
