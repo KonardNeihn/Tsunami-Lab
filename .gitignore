@@ -6,10 +6,10 @@ config.log
 .sconf_temp
 
 # ignore all build (compiled) files
-build/*
+build
 
 # ignore all createt solutions and the visualization
-solutions/*
+solutions
 
 # ignore the build of shpinx
 sphinx/build
@@ -17,3 +17,6 @@ sphinx/build
 # ignore the build of doxygen
 docs/html
 docs/latex
+
+# ignore mad data
+src/data_input
