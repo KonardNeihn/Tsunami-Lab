@@ -34,6 +34,8 @@ void tsunami_lab::solvers::f_wave::waveFlux( t_real   i_hL,
                                                t_real   i_hR,
                                                t_real   i_huL,
                                                t_real   i_huR,
+                                               t_real   i_bL,
+                                               t_real   i_bR,
                                                t_real & o_fluxdiffH,
                                                t_real & o_fluxdiffHu ) {
   // compute particle velocities 
@@ -51,9 +53,14 @@ void tsunami_lab::solvers::f_wave::waveFlux( t_real   i_hL,
   l_fluxR[0] = i_huR;
   l_fluxR[1] = i_huR * l_uR + 0.5f * m_g * i_hR * i_hR;     // h*u^2 + 1/2*g*h^2
 
+  // calculate effect of the bathymetry:
+  t_real l_dx[2];
+  l_dx[0] = 0;
+  l_dx[1] = -m_g * (i_bR - i_bL) * (i_hL + i_hR) * 1/2; 
+
   // calculate differernces (essentially Δf)
-  o_fluxdiffH = l_fluxR[0] - l_fluxL[0];   //this could have been i_huL-i_huR
-  o_fluxdiffHu = l_fluxR[1] - l_fluxL[1]; 
+  o_fluxdiffH = l_fluxR[0] - l_fluxL[0] - l_dx[0];   //subtracting l_dx to include bathymetry effect
+  o_fluxdiffHu = l_fluxR[1] - l_fluxL[1] - l_dx[1]; 
 }
 
 // actual changes in calculation
