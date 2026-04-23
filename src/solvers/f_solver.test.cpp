@@ -59,6 +59,8 @@ TEST_CASE( "Test the F-WaveFlux.", "[FWaveFlux]" ) {
                                         8,
                                         0,
                                         0,
+                                        0, // needs to be changed
+                                        0, // needs to be changed
                                         l_fluxdiffH,
                                         l_fluxdiffHu);
 

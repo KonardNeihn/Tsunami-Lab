@@ -93,6 +93,8 @@ void tsunami_lab::solvers::f_wave::netUpdates( t_real i_hL,
             i_hR,
             i_huL,
             i_huR,
+            0, //needs to be changed
+            0, //needs to be changed
             l_fdH,
             l_fdHu );
 
