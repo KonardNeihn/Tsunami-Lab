@@ -6,7 +6,7 @@
 
 # EXAMPLE
 # be in tsunami-lab/
-# nix-shell -p python3Packages.sphinx python3Packages.pandas python3Packages.matplotlib python3Packages.imageio python3Packages.sphinx_rtd_theme doxygen pkgs.scons
+# nix-shell
 # scons
 # ./build/tsunami_lab
 # python3 vis.py
@@ -14,7 +14,7 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import imageio
+import imageio.v2 as imageio
 import glob
 import re
 import os
@@ -71,7 +71,7 @@ for file in files:
     images.append(imageio.imread(filename))
 
 # GIF erstellen
-imageio.mimsave(f"{folder}/simulation.gif", images, fps=2, loop=0)
+imageio.mimsave(f"{folder}/simulation.gif", images, fps=2, loop=0) # irgendwie die fps dynamisch an die realen fps anpassen l_dt in main
 
 # remove artefact
 if os.path.exists(f"{folder}/temp.png"):
