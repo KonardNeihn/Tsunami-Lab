@@ -16,19 +16,31 @@
 #include <limits>
 #include <filesystem>
 
+int is_number(char* input);
+
 int main( int   i_argc,
           char *i_argv[] ) {
   // number of cells in x- and y-direction
-  tsunami_lab::t_idx l_nx = 0;
+  tsunami_lab::t_idx l_nx = 100;
   tsunami_lab::t_idx l_ny = 1;
 
+  // width of the observed space
+  tsunami_lab::t_real l_w = 10.0;
+
+  // time until abortion
+  tsunami_lab::t_real l_endTime = 1.25;
+
   // set cell size
-  tsunami_lab::t_real l_dxy = 1;
+  tsunami_lab::t_real l_dxy = l_w / l_nx;
 
   // string of selected solver
   std::string l_solver = "fwave";
+
   // possible insanity
   std::string l_sanity = "true";
+
+  // string of selected setup
+  std::string l_setup_selection = "DamBreak1d";
 
   std::cout << "####################################" << std::endl;
   std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -36,49 +48,108 @@ int main( int   i_argc,
   std::cout << "### https://scalable.uni-jena.de ###" << std::endl;
   std::cout << "####################################" << std::endl;
 
-  if( i_argc < 2 || i_argc > 3 ) {
-    std::cerr << "invalid number of arguments, usage:" << std::endl;
-    std::cerr << "  ./build/tsunami_lab N_CELLS_X [solver_name]" << std::endl;
-    std::cerr << "where N_CELLS_X is the number of cells in x-direction and solver_name is either fwave or roe." << std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-    // select solver with potential 3rd argument in command line
-    // default is f-wave solver
-    if( i_argc == 3 ) { 
-      std::string solver_arg = i_argv[2];
-      if (solver_arg == "fwave") {
-        l_solver = "fwave";
+  // Handling input options
+
+  for (int i = 1; i < i_argc; i++) {
+    std::string arg = i_argv[i];
+
+    // check if help is needed
+    if (arg == "-h" || arg == "--help") {
+      std::cout << "__________Manual__________" << std::endl;
+      std::cout << std::endl;
+      std::cout << "Usage: ./build/tsunami_lab <N_CELLS_X> [OPTIONS]" << std::endl;
+      std::cerr << "where N_CELLS_X is the number of cells in x-direction" << std::endl;
+      std::cout << std::endl;
+      std::cout << "  Option       Long option       Meaning" << std::endl;
+      std::cout << "  -h,          --help            Display this help and exit." << std::endl;
+      std::cout << "  -s <name>,   --solver=<name>   Select a solver. Possible is {fwave, roe}. Default is fwave." << std::endl;
+      std::cout << "  -i,          --insanity        Set flag for insanity. Default is sanity" << std::endl; // oder --sanity=true  ?
+      std::cout << "  -n <number>, --ncells=<number> Set number of cells. Default is 100." << std::endl;
+      std::cout << "  -w <number>, --width=<number>  Set width of the observed space in meters. default is 10" << std::endl;
+      std::cout << "  -t <number>, --time=<number>   Set time until aborting in s. default is 1.25" << std::endl;
+      std::cout << "  -S <name>,   --setup=<name>    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d}. Default is DamBreak1d" << std::endl;
+      return EXIT_SUCCESS;
+    }
+    // check if N_CELLS_X is passed
+    else if (is_number(i_argv[i])) {
+      l_nx = atoi( i_argv[i] );
+      if( l_nx < 1 ) {
+        std::cerr << "invalid number of cells, must be > 0" << std::endl;
+        return EXIT_FAILURE;
       }
-      else if (solver_arg == "roe") {
-        l_solver = "roe";
-      }
-      else if (solver_arg == "insanity") {
-        l_solver = "fwave";
-        l_sanity = "false";
-      }
-      else {
-        std::cerr << "invalid solver name, usage:" << std::endl;
-        std::cerr << "  ./build/tsunami_lab N_CELLS_X [solver_name]" << std::endl;
-        std::cerr << "where N_CELLS_X is the number of cells in x-direction and solver_name is either fwave or roe." << std::endl;
+      l_dxy = l_w / l_nx;
+    }
+    // ckeck if a solver is specified
+    else if (arg == "-s" && i + 1 < i_argc) {  // || arg == "--solver=<>"
+      l_solver = i_argv[++i]; // nächstes argument lesen
+
+      if (l_solver != "fwave" && l_solver != "roe") {
+        std::cout << "tsunami_lab: invalid solver '" << i_argv[i] << "'" << std::endl;
+        std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
         return EXIT_FAILURE;
       }
     }
-
-    l_nx = atoi( i_argv[1] );
-    if( l_nx < 1 ) {
-      std::cerr << "invalid number of cells" << std::endl;
+    // ckeck if number of cells is specified
+    else if (arg == "-n" && i + 1 < i_argc) {  // || arg == "--ncells=<>"
+      if (is_number(i_argv[++i])) {
+        l_nx = atoi( i_argv[i] );
+        if( l_nx < 1 ) {
+          std::cerr << "invalid number of cells, must be > 0" << std::endl;
+          return EXIT_FAILURE;
+        }
+        l_dxy = l_w / l_nx;
+      }
+    }
+    // ckeck if observed width is specified
+    else if (arg == "-w" && i + 1 < i_argc) {  // || arg == "--width=<>"
+      if (is_number(i_argv[++i])) {
+        l_w = atoi( i_argv[i] );
+        if( l_w <= 0 ) {
+          std::cerr << "invalid width, must be > 0" << std::endl;
+          return EXIT_FAILURE;
+        }
+        l_dxy = l_w / l_nx;
+      }
+    }
+    // ckeck if max time is specified
+    else if (arg == "-t" && i + 1 < i_argc) {  // || arg == "--time=<>"
+      if (is_number(i_argv[++i])) {
+        l_endTime = atoi( i_argv[i] );
+        if( l_endTime <= 0 ) {
+          std::cerr << "invalid time, must be > 0" << std::endl;
+          return EXIT_FAILURE;
+        }
+      }
+    }
+    // ckeck if a setup is specified
+    else if (arg == "-S" && i + 1 < i_argc) {  // || arg == "--solver=<>"
+      l_setup_selection = i_argv[++i]; // nächstes argument lesen
+      if (l_setup_selection != "DamBreak1d" && l_setup_selection != "RareRare1d" && l_setup_selection != "ShockShock1d") {
+        std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
+        std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
+    // check if insanity is wanted
+    else if (arg == "-i" || arg == "--insanity") {
+      l_sanity = "false";
+    }
+    // handling unknown argument
+    else {
+      std::cout << "tsunami_lab: invalid option '" << i_argv[i] << "'" << std::endl;
+      std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
       return EXIT_FAILURE;
     }
-    l_dxy = 10.0 / l_nx;
   }
+
+  // notify user about selectet configuration
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
   std::cout << "  number of cells in y-direction: " << l_ny << std::endl;
   std::cout << "  cell size:                      " << l_dxy << std::endl;
-
-  // notify user about selected solver
+  std::cout << "  sanity:                         " << l_sanity << std::endl;
   std::cout << "  selected solver:                " << l_solver << std::endl;
+  std::cout << "  selected time:                  " << l_endTime << std::endl;
 
   // set output directory
   std::filesystem::path outDir = "solutions";
@@ -100,13 +171,25 @@ int main( int   i_argc,
     }
   }
 
-
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
   if (l_sanity == "true"){
-  l_setup = new tsunami_lab::setups::DamBreak1d( 10,
-                                                 5,
-                                                 5 );
+    if (l_setup_selection == "DamBreak1d") { // könnte man auch gleich oben in der argumentübergabe machen?
+      l_setup = new tsunami_lab::setups::DamBreak1d( 10,
+                                                      5,
+                                                      5 ); 
+    } else if (l_setup_selection == "RareRare1d") {
+      l_setup = new tsunami_lab::setups::RareRare1d( 10,
+                                                     10,
+                                                     (l_w / 2) );
+    } else if (l_setup_selection == "ShockShock1d") {
+      l_setup = new tsunami_lab::setups::ShockShock1d( 10,
+                                                       10,
+                                                        5 );
+    } else {
+      std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
+      return EXIT_FAILURE;
+    }
   }
   // very rudimentary sanity-check, to be expanded later
   else if (l_sanity == "false") {
@@ -169,7 +252,7 @@ int main( int   i_argc,
   // set up time and print control
   tsunami_lab::t_idx  l_timeStep = 0;
   tsunami_lab::t_idx  l_nOut = 0;
-  tsunami_lab::t_real l_endTime = 1.25;
+  //tsunami_lab::t_real l_endTime = 1.25; is set above
   tsunami_lab::t_real l_simTime = 0;
 
   std::cout << "entering time loop" << std::endl;
@@ -214,4 +297,18 @@ int main( int   i_argc,
 
   std::cout << "finished, exiting" << std::endl;
   return EXIT_SUCCESS;
+}
+
+int is_number(char* input) {
+  char* end;
+  errno = 0;
+
+  //long val = std::strtol(input, &end, 10);
+  std::strtol(input, &end, 10);
+
+  // Validierung
+  if (end == input || *end != '\0' || errno != 0) {
+    return 0;
+  }
+  return 1;
 }
