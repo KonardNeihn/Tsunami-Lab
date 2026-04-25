@@ -33,6 +33,9 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     //! string of selected solver
     std::string m_solver;
 
+    //! bathymetry values for all cells (initialized empty)
+    t_real * m_b = nullptr;
+
   public:
     /**
      * Constructs the 1d wave propagation solver.
@@ -77,6 +80,15 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      */
     t_real const * getHeight(){
       return m_h[m_step]+1;
+    }
+
+    /**
+     * Gets cells' floor heights.
+     *
+     * @return floor heights.
+     */
+    t_real const * getBathymetry(){
+      return m_b+1;
     }
 
     /**
@@ -125,6 +137,18 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     void setMomentumY( t_idx,
                        t_idx,
                        t_real ) {};
+
+    /**
+     * Sets the bathyetry in x-direction to the given value.
+     *
+     * @param i_ix id of the cell in x-direction.
+     * @param i_b bathymetry of the given cell in x-direction.
+     **/
+    void setBathymetry( t_idx  i_ix,
+                        t_idx,
+                        t_real i_b ) {
+      m_b[i_ix+1] = i_b;
+    }
 };
 
 #endif
