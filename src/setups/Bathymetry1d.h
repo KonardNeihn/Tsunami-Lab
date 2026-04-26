@@ -67,6 +67,15 @@ class tsunami_lab::setups::Bathymetry1d::Bathymetry1d: public Setup {
      **/
     t_real getMomentumY( t_real,
                          t_real ) const;
+
+    /**
+    * Gets the bathymetry at a given point.
+    *
+    * @return bathymetry at the given point.
+     *
+    **/
+    t_real getBathymetry( t_real i_x,
+                          t_real      ) const;
 };
 
 #endif
