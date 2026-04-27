@@ -8,6 +8,7 @@
 #include "setups/DamBreak1d.h"
 #include "setups/ShockShock1d.h"
 #include "setups/RareRare1d.h"
+#include "setups/Bathymetry1d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
