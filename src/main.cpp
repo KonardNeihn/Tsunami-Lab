@@ -186,7 +186,15 @@ int main( int   i_argc,
       l_setup = new tsunami_lab::setups::ShockShock1d( 10,
                                                        10,
                                                         5 );
-    } else {
+    } else if (l_setup_selection == "Bathymetry1d") {
+      l_setup = new tsunami_lab::setups::Bathymetry1d( 15,
+                                                       10,
+                                                       5,
+                                                       0,
+                                                       5,
+                                                       7 );
+    }
+    else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
     }
