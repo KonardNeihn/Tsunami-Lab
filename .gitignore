@@ -20,3 +20,9 @@ docs/latex
 
 # ignore mad data
 src/data_input
+
+# ignore the big GEBCO dataset
+src/bathymetry/data_in
+src/bathymetry/gmt.history
+src/bathymetry/data_tmp
+
