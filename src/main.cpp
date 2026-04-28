@@ -9,6 +9,7 @@
 #include "setups/ShockShock1d.h"
 #include "setups/RareRare1d.h"
 #include "setups/Bathymetry1d.h"
+#include "setups/SubcriticalFlow1d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
@@ -68,7 +69,7 @@ int main( int   i_argc,
       std::cout << "  -n <number>, --ncells=<number> Set number of cells. Default is 100." << std::endl;
       std::cout << "  -w <number>, --width=<number>  Set width of the observed space in meters. default is 10" << std::endl;
       std::cout << "  -t <number>, --time=<number>   Set time until aborting in s. default is 1.25" << std::endl;
-      std::cout << "  -S <name>,   --setup=<name>    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d}. Default is DamBreak1d" << std::endl;
+      std::cout << "  -S <name>,   --setup=<name>    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, SubcriticalFlow1d}. Default is DamBreak1d" << std::endl;
       return EXIT_SUCCESS;
     }
     // check if N_CELLS_X is passed
@@ -125,7 +126,10 @@ int main( int   i_argc,
     // ckeck if a setup is specified
     else if (arg == "-S" && i + 1 < i_argc) {  // || arg == "--solver=<>"
       l_setup_selection = i_argv[++i]; // nächstes argument lesen
-      if (l_setup_selection != "DamBreak1d" && l_setup_selection != "RareRare1d" && l_setup_selection != "ShockShock1d"  && l_setup_selection != "Bathymetry1d") {
+      if (l_setup_selection != "DamBreak1d" && l_setup_selection != "RareRare1d" 
+                                            && l_setup_selection != "ShockShock1d"  
+                                            && l_setup_selection != "Bathymetry1d"
+                                            && l_setup_selection != "SubcriticalFlow1d") {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
         return EXIT_FAILURE;
@@ -194,6 +198,14 @@ int main( int   i_argc,
                                                        0,
                                                        5,
                                                        7 );
+    } else if (l_setup_selection == "SubcriticalFlow1d") {
+      l_setup = new tsunami_lab::setups::SubcriticalFlow1d(
+        l_w / 2,   // bump location in the middle of the simulation
+        0.8,       // bump height: 0.8m 
+        0.5,       // bump width: 0.5m
+        2.0,       // water surface at 2m, well above the 0.8m bump
+        1.5        // constant momentum (positive means left to right)
+      );
     }
     else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
@@ -300,10 +312,10 @@ int main( int   i_argc,
     }
 
     // instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
-    // checks if bathymetry of the left boundary is higher than waterlevel
-    bool l_leftReflecting  = l_setup->getBathymetry( 0, 0 )    >= l_setup->getHeight( 0, 0 );
-    // checks if bathymetry of the right boundary is higher than waterlevel
-    bool l_rightReflecting = l_setup->getBathymetry( l_w, 0 )  >= l_setup->getHeight( l_w, 0 );
+    // checks if bathymetry of the left boundary is higher than waterlevel, by checking the middle of the left-outermost cell
+    bool l_leftReflecting  = l_setup->getBathymetry( 0.5 * l_dxy, 0 )    >= l_setup->getHeight( 0.5 * l_dxy, 0 );
+    // checks if bathymetry of the right boundary is higher than waterlevel, by checking the middle of the right-outermost cell
+    bool l_rightReflecting = l_setup->getBathymetry( (l_nx - 0.5) * l_dxy, 0 )  >= l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 );
 
     l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
 
