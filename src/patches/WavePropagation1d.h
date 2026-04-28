@@ -34,7 +34,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     std::string m_solver;
 
     //! bathymetry values for all cells (initialized empty)
-    t_real * m_b = new t_real[m_nCells + 2];
+    t_real * m_b = nullptr;
 
   public:
     /**
@@ -46,7 +46,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     WavePropagation1d(  t_idx i_nCells, 
                         const std::string &i_solver_model);
 
-    std::string solver;
+    //std::string solver;
     /**
      * Destructor which frees all allocated memory.
      **/
