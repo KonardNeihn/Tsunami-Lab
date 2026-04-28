@@ -202,7 +202,7 @@ int main( int   i_argc,
       }
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
-  l_waveProp = new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver);
+  l_waveProp = new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver );
 
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
@@ -290,7 +290,14 @@ int main( int   i_argc,
       l_nOut++;
     }
 
-    l_waveProp->setGhostOutflow();
+    // instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
+    // checks if bathymetry of the left boundary is higher than waterlevel
+    bool l_leftReflecting  = l_setup->getBathymetry( 0, 0 )    >= l_setup->getHeight( 0, 0 );
+    // checks if bathymetry of the right boundary is higher than waterlevel
+    bool l_rightReflecting = l_setup->getBathymetry( l_w, 0 )  >= l_setup->getHeight( l_w, 0 );
+
+    l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
+
     l_waveProp->timeStep( l_scaling );
 
     l_timeStep++;

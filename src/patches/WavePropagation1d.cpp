@@ -13,6 +13,8 @@
 tsunami_lab::patches::WavePropagation1d::WavePropagation1d( t_idx i_nCells, const std::string &i_solver_model ) {
   m_nCells = i_nCells;
   solver = i_solver_model;
+  i_leftReflecting = leftReflecting;
+  i_rightReflecting = rightReflecting;
 
   std::string m_solver = i_solver_model;
 
@@ -107,17 +109,19 @@ void tsunami_lab::patches::WavePropagation1d::timeStep( t_real i_scaling ) {
   }
 }
 
-void tsunami_lab::patches::WavePropagation1d::setGhostOutflow() {
-  t_real * l_h = m_h[m_step];
+  // set boundary states
+  void tsunami_lab::patches::WavePropagation1d::setGhostCells( bool i_leftReflecting,
+                                                               bool i_rightReflecting ) {
+  t_real * l_h  = m_h[m_step];
   t_real * l_hu = m_hu[m_step];
 
-  // set left boundary
-  l_h[0] = l_h[1];
-  l_hu[0] = l_hu[1];
-  m_b[0] = m_b[1];
+  // left boundary
+  l_h[0]  = l_h[1];
+  l_hu[0] = i_leftReflecting ? -l_hu[1] : l_hu[1];
+  m_b[0]  = m_b[1];
 
-  // set right boundary
-  l_h[m_nCells+1] = l_h[m_nCells];
-  l_hu[m_nCells+1] = l_hu[m_nCells];
-  m_b[m_nCells+1] = m_b[m_nCells];
+  // right boundary
+  l_h[m_nCells+1]  = l_h[m_nCells];
+  l_hu[m_nCells+1] = i_rightReflecting ? -l_hu[m_nCells] : l_hu[m_nCells];
+  m_b[m_nCells+1]  = m_b[m_nCells];
 }

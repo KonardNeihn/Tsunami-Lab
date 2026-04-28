@@ -30,9 +30,10 @@ class tsunami_lab::patches::WavePropagation {
     virtual void timeStep( t_real i_scaling ) = 0;
 
     /**
-     * Sets the values of the ghost cells according to outflow boundary conditions.
+     * Sets the values of the ghost cells according to outflow OR REFLECTING boundary conditions.
      **/
-    virtual void setGhostOutflow() = 0;
+    virtual void setGhostCells( bool i_leftReflecting,
+                                bool i_rightReflecting ) = 0;
 
     /**
      * Gets the stride in y-direction. x-direction is stride-1.
@@ -61,6 +62,15 @@ class tsunami_lab::patches::WavePropagation {
      * @return momenta in y-direction.
      **/
     virtual t_real const * getMomentumY() = 0;
+
+    /**
+     * Gets the cells' bathymetry.
+     *
+     * @return bathymetry data.
+     **/
+    virtual t_real const * getBathymetry() {
+      return nullptr;
+    }
 
     /**
      * Sets the height of the cell to the given value.
@@ -94,6 +104,17 @@ class tsunami_lab::patches::WavePropagation {
     virtual void setMomentumY( t_idx  i_ix,
                                t_idx  i_iy,
                                t_real i_hv ) = 0;
+
+    /**
+     * Sets the bathyetry in x-direction to the given value.
+     *
+     * @param i_ix id of the cell in x-direction.
+     * @param i_b bathymetry of the given cell in x-direction.
+     **/
+    virtual void setBathymetry( t_idx i_ix,
+                                t_idx,
+                                t_real i_b ) {};
+
 };
 
 #endif
