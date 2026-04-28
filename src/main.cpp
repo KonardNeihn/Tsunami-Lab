@@ -183,24 +183,24 @@ int main( int   i_argc,
   tsunami_lab::setups::Setup *l_setup;
   if (l_sanity == "true"){
     if (l_setup_selection == "DamBreak1d") { // könnte man auch gleich oben in der argumentübergabe machen?
-      l_setup = new tsunami_lab::setups::DamBreak1d( 10,
-                                                      5,
-                                                      5 ); 
+      l_setup = new tsunami_lab::setups::DamBreak1d( 10,    // height left
+                                                      5,    // height right
+                                                      5 );  // dam location
     } else if (l_setup_selection == "RareRare1d") {
-      l_setup = new tsunami_lab::setups::RareRare1d( 10,
-                                                     10,
-                                                     (l_w / 2) );
+      l_setup = new tsunami_lab::setups::RareRare1d( 10,    // height 
+                                                     10,    // momentum
+                                                     (l_w / 2) );   // middle location
     } else if (l_setup_selection == "ShockShock1d") {
-      l_setup = new tsunami_lab::setups::ShockShock1d( 10,
-                                                       10,
-                                                        5 );
+      l_setup = new tsunami_lab::setups::ShockShock1d( 10,    // height
+                                                       10,    // momentum
+                                                        5 );  // impact location
     } else if (l_setup_selection == "Bathymetry1d") {
-      l_setup = new tsunami_lab::setups::Bathymetry1d( 15,
-                                                       10,
-                                                       (l_w / 3),
-                                                       0,
-                                                       5,
-                                                       ((2 * l_w) / 3) );
+      l_setup = new tsunami_lab::setups::Bathymetry1d( 15,          // height left
+                                                       10,          // height right
+                                                       (l_w / 3),   // dam location
+                                                       0,           // bathymetry left
+                                                       5,           // bathymetry right
+                                                       ((2 * l_w) / 3) );   // bathymetry change location
     } else if (l_setup_selection == "SubcriticalFlow1d") {
       l_setup = new tsunami_lab::setups::SubcriticalFlow1d(
         l_w / 2,   // bump location in the middle of the simulation
