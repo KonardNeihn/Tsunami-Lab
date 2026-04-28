@@ -8,6 +8,8 @@ Solver Bathymetry and reflecting boundaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+Hydraulic Jumps - Subcritical to Supercritical Flow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. toctree::

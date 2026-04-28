@@ -210,9 +210,9 @@ int main( int   i_argc,
         1.5        // constant momentum (positive means left to right)
       );
     } else if (l_setup_selection == "HydraulicJump1d") {
-      l_setup = new tsunami_lab::setups::HydraulicJump1d( -1.8, // obstacle height
-                                                          -2.0, // base height of the bathymetry
-                                                          4.42  // momentum of the water
+      l_setup = new tsunami_lab::setups::HydraulicJump1d( -0.13, // obstacle height
+                                                          -0.33, // base height of the bathymetry
+                                                          0.18  // momentum of the water
                                                         );
     }
     else {

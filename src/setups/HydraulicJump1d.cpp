@@ -17,7 +17,7 @@ tsunami_lab::setups::HydraulicJump1d::HydraulicJump1d( t_real i_obstacle,
 
 tsunami_lab::t_real tsunami_lab::setups::HydraulicJump1d::getHeight( t_real i_x,
                                                                     t_real      ) const {
-  if( i_x < 12 || i_x > 8 ) { 
+  if( i_x < 12 && i_x > 8 ) { 
     return -(m_bObstacle - 0.05 * ((i_x -10) * (i_x - 10)));
   }
   else {
@@ -37,7 +37,7 @@ tsunami_lab::t_real tsunami_lab::setups::HydraulicJump1d::getMomentumY( t_real,
 
 tsunami_lab::t_real tsunami_lab::setups::HydraulicJump1d::getBathymetry( t_real i_x,
                                                                         t_real ) const {
-  if( i_x < 12 || i_x > 8 ) { 
+  if( i_x < 12 && i_x > 8 ) { 
     return m_bObstacle - 0.05 * ((i_x -10) * (i_x - 10));
   }
   else {
