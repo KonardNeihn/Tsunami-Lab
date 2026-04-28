@@ -17,7 +17,7 @@ namespace tsunami_lab {
 }
 
 // to test bathymetry, we use damn break with bathymetry
-class tsunami_lab::setups::Bathymetry1d::Bathymetry1d: public Setup {
+class tsunami_lab::setups::Bathymetry1d: public Setup {
     private:
         t_real m_heightLeft = 0;
         t_real m_heightRight = 0;

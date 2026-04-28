@@ -8,6 +8,7 @@
 #include "setups/DamBreak1d.h"
 #include "setups/ShockShock1d.h"
 #include "setups/RareRare1d.h"
+#include "setups/Bathymetry1d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
@@ -124,7 +125,7 @@ int main( int   i_argc,
     // ckeck if a setup is specified
     else if (arg == "-S" && i + 1 < i_argc) {  // || arg == "--solver=<>"
       l_setup_selection = i_argv[++i]; // nächstes argument lesen
-      if (l_setup_selection != "DamBreak1d" && l_setup_selection != "RareRare1d" && l_setup_selection != "ShockShock1d") {
+      if (l_setup_selection != "DamBreak1d" && l_setup_selection != "RareRare1d" && l_setup_selection != "ShockShock1d"  && l_setup_selection != "Bathymetry1d") {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
         return EXIT_FAILURE;
@@ -186,7 +187,15 @@ int main( int   i_argc,
       l_setup = new tsunami_lab::setups::ShockShock1d( 10,
                                                        10,
                                                         5 );
-    } else {
+    } else if (l_setup_selection == "Bathymetry1d") {
+      l_setup = new tsunami_lab::setups::Bathymetry1d( 15,
+                                                       10,
+                                                       5,
+                                                       0,
+                                                       5,
+                                                       7 );
+    }
+    else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
     }
