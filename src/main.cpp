@@ -10,6 +10,7 @@
 #include "setups/RareRare1d.h"
 #include "setups/Bathymetry1d.h"
 #include "setups/SubcriticalFlow1d.h"
+#include "setups/HydraulicJump1d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
@@ -129,7 +130,9 @@ int main( int   i_argc,
       if (l_setup_selection != "DamBreak1d" && l_setup_selection != "RareRare1d" 
                                             && l_setup_selection != "ShockShock1d"  
                                             && l_setup_selection != "Bathymetry1d"
-                                            && l_setup_selection != "SubcriticalFlow1d") {
+                                            && l_setup_selection != "SubcriticalFlow1d"
+                                            && l_setup_selection != "HydraulicJump1d"
+                                          ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
         return EXIT_FAILURE;
@@ -206,6 +209,11 @@ int main( int   i_argc,
         2.0,       // water surface at 2m, well above the 0.8m bump
         1.5        // constant momentum (positive means left to right)
       );
+    } else if (l_setup_selection == "HydraulicJump1d") {
+      l_setup = new tsunami_lab::setups::HydraulicJump1d( -1.8, // obstacle height
+                                                          -2.0, // base height of the bathymetry
+                                                          4.42  // momentum of the water
+                                                        );
     }
     else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
