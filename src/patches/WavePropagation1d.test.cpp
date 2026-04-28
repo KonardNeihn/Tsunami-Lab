@@ -46,7 +46,7 @@ TEST_CASE( "Test the 1d wave propagation solver.", "[WaveProp1d]" ) {
   }
 
   // set outflow boundary condition
-  m_waveProp.setGhostOutflow();
+  m_waveProp.setGhostCells( 0, 0 );
 
   // perform a time step
   m_waveProp.timeStep( 0.1 );

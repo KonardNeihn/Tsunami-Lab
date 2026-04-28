@@ -13,8 +13,6 @@
 tsunami_lab::patches::WavePropagation1d::WavePropagation1d( t_idx i_nCells, const std::string &i_solver_model ) {
   m_nCells = i_nCells;
   solver = i_solver_model;
-  i_leftReflecting = leftReflecting;
-  i_rightReflecting = rightReflecting;
 
   std::string m_solver = i_solver_model;
 
