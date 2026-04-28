@@ -63,14 +63,14 @@ int main( int   i_argc,
       std::cout << "Usage: ./build/tsunami_lab <N_CELLS_X> [OPTIONS]" << std::endl;
       std::cerr << "where N_CELLS_X is the number of cells in x-direction" << std::endl;
       std::cout << std::endl;
-      std::cout << "  Option       Long option       Meaning" << std::endl;
-      std::cout << "  -h,          --help            Display this help and exit." << std::endl;
-      std::cout << "  -s <name>,   --solver=<name>   Select a solver. Possible is {fwave, roe}. Default is fwave." << std::endl;
-      std::cout << "  -i,          --insanity        Set flag for insanity. Default is sanity" << std::endl; // oder --sanity=true  ?
-      std::cout << "  -n <number>, --ncells=<number> Set number of cells. Default is 100." << std::endl;
-      std::cout << "  -w <number>, --width=<number>  Set width of the observed space in meters. default is 10" << std::endl;
-      std::cout << "  -t <number>, --time=<number>   Set time until aborting in s. default is 1.25" << std::endl;
-      std::cout << "  -S <name>,   --setup=<name>    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, SubcriticalFlow1d}. Default is DamBreak1d" << std::endl;
+      std::cout << "  Option       Long option         Meaning" << std::endl;
+      std::cout << "  -h,          --help              Display this help and exit." << std::endl;
+      std::cout << "  -s <name>,   (--solver=<name>)   Select a solver. Possible is {fwave, roe}. Default is fwave." << std::endl;
+      std::cout << "  -i,          --insanity          Set flag for insanity. Default is sanity" << std::endl; // oder --sanity=true  ?
+      std::cout << "  -n <number>, (--ncells=<number>) Set number of cells. Default is 100." << std::endl;
+      std::cout << "  -w <number>, (--width=<number>)  Set width of the observed space in meters. default is 10" << std::endl;
+      std::cout << "  -t <number>, (--time=<number>)   Set time until aborting in s. default is 1.25" << std::endl;
+      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d}. Default is DamBreak1d" << std::endl;
       return EXIT_SUCCESS;
     }
     // check if N_CELLS_X is passed
@@ -197,10 +197,10 @@ int main( int   i_argc,
     } else if (l_setup_selection == "Bathymetry1d") {
       l_setup = new tsunami_lab::setups::Bathymetry1d( 15,
                                                        10,
-                                                       5,
+                                                       (l_w / 3),
                                                        0,
                                                        5,
-                                                       7 );
+                                                       ((2 * l_w) / 3) );
     } else if (l_setup_selection == "SubcriticalFlow1d") {
       l_setup = new tsunami_lab::setups::SubcriticalFlow1d(
         l_w / 2,   // bump location in the middle of the simulation
@@ -311,6 +311,7 @@ int main( int   i_argc,
                                    l_nx,
                                    1,
                                    1,
+                                   l_waveProp->getBathymetry(),
                                    l_waveProp->getHeight(),
                                    l_waveProp->getMomentumX(),
                                    nullptr,

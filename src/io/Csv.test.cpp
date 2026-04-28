@@ -13,6 +13,7 @@
 
 TEST_CASE( "Test the CSV-writer for 1D settings.", "[CsvWrite1d]" ) {
   // define a simple example
+  //tsunami_lab::t_real l_b[7]  = { 1, 2, 1, 2, 1, 2, 1 };
   tsunami_lab::t_real l_h[7]  = { 0, 1, 2, 3, 4, 5, 6 };
   tsunami_lab::t_real l_hu[7] = { 6, 5, 4, 3, 2, 1, 0 };
 
@@ -21,6 +22,7 @@ TEST_CASE( "Test the CSV-writer for 1D settings.", "[CsvWrite1d]" ) {
                                5,
                                1,
                                7,
+                               nullptr, //hier noch was machen
                                l_h+1,
                                l_hu+1,
                                nullptr,
@@ -58,6 +60,7 @@ TEST_CASE( "Test the CSV-writer for 2D settings.", "[CsvWrite2d]" ) {
                                2,
                                2,
                                4,
+                               nullptr,
                                l_h+4+1,
                                l_hu+4+1,
                                l_hv+4+1,

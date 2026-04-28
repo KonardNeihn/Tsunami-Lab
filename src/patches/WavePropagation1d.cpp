@@ -14,7 +14,8 @@ tsunami_lab::patches::WavePropagation1d::WavePropagation1d( t_idx i_nCells, cons
   m_nCells = i_nCells;
   solver = i_solver_model;
 
-  std::string m_solver = i_solver_model;
+  m_solver = i_solver_model;
+  //std::string m_solver = i_solver_model;
 
   // allocate memory including a single ghost cell on each side (height, momentum)
   for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
@@ -74,11 +75,11 @@ void tsunami_lab::patches::WavePropagation1d::timeStep( t_real i_scaling ) {
     t_real l_netUpdates[2][2];
 
     // initialize strings
-    std::string solver = m_solver;
+    //std::string solver = m_solver;
     std::string t = "roe";
 
     // check which solver to use
-    if( solver == "roe" ){
+    if( m_solver == "roe" ){
     solvers::Roe::netUpdates( l_hOld[l_ceL],
                               l_hOld[l_ceR],
                               l_huOld[l_ceL],

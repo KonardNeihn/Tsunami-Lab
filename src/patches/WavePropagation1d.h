@@ -34,7 +34,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     std::string m_solver;
 
     //! bathymetry values for all cells (initialized empty)
-    t_real * m_b = nullptr;
+    t_real * m_b = new t_real[m_nCells + 2];
 
   public:
     /**

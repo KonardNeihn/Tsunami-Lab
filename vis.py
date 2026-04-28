@@ -41,8 +41,13 @@ ymax = float("-inf")
 
 for file in files:
     df = pd.read_csv(file)
-    ymin = min(ymin, df["height"].min())
-    ymax = max(ymax, df["height"].max())
+
+    h = df["height"]
+    b = df["bathymetry"]
+    surface = h + b
+
+    ymin = min(ymin, b.min(), surface.min())
+    ymax = max(ymax, b.max(), surface.max())
 
 ymin = 0
 ymax = ymax + 1
@@ -53,9 +58,14 @@ for file in files:
 
     x = df["x"]
     height = df["height"]
+    bathymetry = df["bathymetry"]
+
+    surface = height + bathymetry
 
     plt.figure()
-    plt.plot(x, height)
+    plt.plot(x, bathymetry, color="saddlebrown", label="bathymetry")
+    plt.plot(x, surface, color="blue", label="water surface")
+    plt.fill_between(x, bathymetry, surface, alpha=0.3)
 
     # feste Skala
     plt.ylim(ymin, ymax)
