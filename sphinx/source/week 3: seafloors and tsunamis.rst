@@ -40,7 +40,84 @@ The implementation is abit more difficult, since we now have to track the dry/we
 
 
 Subcritical and Supercritical Flow
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
+
+Calculating the Location and Value of the Maximum Froude Number
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Froude number is defined as:
+
+.. math::
+
+   F = \frac{u}{\sqrt{g \cdot h}}
+
+Since the momentum is constant (at :math:`t = 0`), we get the maximum Froude number where the height of the water is the lowest.
+
+The lowest water height can be found at the top of the obstacle, which is at:
+
+.. math::
+
+   x = 10
+
+Subcritical Flow
+~~~~~~~~~~~~~~~~
+
+Height of the water at :math:`x = 10` is:
+
+.. math::
+
+   h = 1.8
+
+The Froude number is computed as:
+
+.. math::
+
+   F = \frac{4.42 / -b(10)}{\sqrt{0.5844578200955863 \cdot -b(10)}}
+
+with:
+
+.. math::
+
+   b(10) = -1.8
+
+Result:
+
+.. math::
+
+   F = 0.5844578200955863
+
+
+Supercritical Flow
+~~~~~~~~~~~~~~~~~~
+
+Height of the water at :math:`x = 10` is:
+
+.. math::
+
+   h = 0.13
+
+The Froude number is computed as:
+
+.. math::
+
+   F = \frac{0.18 / -b(10)}{\sqrt{0.5844578200955863 \cdot -b(10)}}
+
+with:
+
+.. math::
+
+   b(10) = -0.13
+
+Result:
+
+.. math::
+
+   F = 5.02320
+
+
+
+Simulation Results
+-------------------
 
 We implemented a new hydraulic jump setup. The values that do not change between the subcritical (3.3.1) and supercritical flow (3.3.2) 
 are hardcoded into the setup file, while the values that change can be specified as agrguments inside main.cpp.
