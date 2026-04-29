@@ -192,8 +192,7 @@ on the edges of the simulation is at or below 20 metres.
 After many unexpected Problems (for example: the ocean draining within seconds or distances in the .csv being in kilometers, while they are in meters everywhere else)
 this is the first somewhat reasonable simulation achieved (with ./build/tsunami_lab -S TsunamiEvent1d -w 50000 -t 2000).
 Something is still clearly wrong with the waves disappearing as they approach the shore, but i suspect this has something to do with the very large timesteps
-that are set at the beginning of the simulation itself. 
-
+that are set at the beginning of the simulation itself. This is despite increasing the displacement by 200%, since the results with original values were barely visible.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
