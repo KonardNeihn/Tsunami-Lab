@@ -183,11 +183,7 @@ int main( int   i_argc,
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
-
-  if (l_setup_selection == "TsunamiEvent1d") {
-      l_w = 500000.0;   // 500 km domain to match the bathymetry CSV x-range
-      l_dxy = l_w / l_nx;
-  }
+  tsunami_lab::setups::TsunamiEvent1d *l_tsunami = nullptr;                                                         
 
   if (l_sanity == "true"){
     if (l_setup_selection == "DamBreak1d") { // könnte man auch gleich oben in der argumentübergabe machen?
@@ -222,8 +218,7 @@ int main( int   i_argc,
                                                           0.18  // momentum of the water
                                                         );
     } else if (l_setup_selection == "TsunamiEvent1d") {
-    auto* l_tsunami = new tsunami_lab::setups::TsunamiEvent1d(
-        "src/bathymetry/output/03_dem_03.csv"
+      l_tsunami = new tsunami_lab::setups::TsunamiEvent1d( "src/bathymetry/output/03_dem_03.csv"
     );
     l_setup = l_tsunami;
     
@@ -256,8 +251,10 @@ int main( int   i_argc,
   for( tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++ ) {
     tsunami_lab::t_real l_y = l_cy * l_dxy; 
 
+    tsunami_lab::t_real l_domainStart = (l_tsunami != nullptr) ? l_tsunami->getDomainStart() : 0.0;
+
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
-      tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy;
+        tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStart;  
 
       // get initial values of the setup
       tsunami_lab::t_real l_h = l_setup->getHeight( l_x,
