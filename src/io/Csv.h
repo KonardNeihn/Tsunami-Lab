@@ -53,6 +53,7 @@ class tsunami_lab::io::Csv {
      **/
     static std::vector<t_real> read( const std::string & i_filename,
                                      t_idx               i_columnIndex );
+
 };
 
 #endif

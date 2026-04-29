@@ -71,7 +71,16 @@ std::vector<t_real> tsunami_lab::io::Csv::read( const std::string & i_filename,
         }
         currentColumnIndex++;
       }
-
-      return columnData;
     }
+    return columnData;
+}
+
+t_real* vectorToArray(const std::vector<t_real>& vec) {
+    t_real* arr = new t_real[vec.size()];
+
+    for (std::size_t i = 0; i < vec.size(); i++) {
+        arr[i] = vec[i];
+    }
+
+    return arr;
 }
