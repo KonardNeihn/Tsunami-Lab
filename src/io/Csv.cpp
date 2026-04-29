@@ -65,6 +65,8 @@ std::vector<tsunami_lab::t_real> tsunami_lab::io::Csv::read( const std::string &
 
       // go through every cell of the line, HAVE TO BE SEPERATED BY "," !
       while (std::getline(stringStream, cell, ',')) {
+        if (!cell.empty() && std::isalpha(cell[0])) continue;
+
         if (i_columnIndex == currentColumnIndex) {
           columnData.push_back(std::stod(cell)); // convert string to double and add to vector
           break; 
