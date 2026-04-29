@@ -51,7 +51,8 @@ setup::TsunamiEvent1d::getDisplacement( tsunami_lab::t_real i_x ) {
   //       = 0,                                            otherwise
   if( i_x > 175000 && i_x < 250000 ) {
     return static_cast<tsunami_lab::t_real>(
-      30.0 * std::sin( ( i_x - 175000.0 ) / 37500.0 * M_PI + M_PI )
+      // here the 10 is directly correspondent to the sealevel riseing by 10m, so it could be changed for dramatic effect
+      10.0 * std::sin( ( i_x - 175000.0 ) / 37500.0 * M_PI + M_PI )
     );
   }
   return static_cast<tsunami_lab::t_real>( 0 );
