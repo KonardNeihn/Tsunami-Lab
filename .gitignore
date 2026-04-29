@@ -23,6 +23,8 @@ src/data_input
 
 # ignore the big GEBCO dataset
 src/bathymetry/data_in
+src/data_in
+src/data_tmp
 src/bathymetry/gmt.history
 src/bathymetry/data_tmp
 

@@ -1,13 +1,7 @@
 /**
  * @section DESCRIPTION
  * One-dimensional subcritical flow over a bump.
- * Illustrates the effect of bathymetry on wave propagation.
- * 
- * The domain spans [0, l_w]. A smooth raised bump sits in the
- * centre of the domain. The water surface is initially flat,
- * meaning depth decreases above the bump. A small constant
- * momentum drives flow from left to right, producing partial
- * reflection and transmission at the bump.
+ * dhows the effect of bathymetry on wave propagation.
  **/
 #ifndef TSUNAMI_LAB_SETUPS_SUBCRITICAL_FLOW_1D_H
 #define TSUNAMI_LAB_SETUPS_SUBCRITICAL_FLOW_1D_H
