@@ -16,6 +16,9 @@ setup::TsunamiEvent1d::TsunamiEvent1d( const std::string & i_bathymetryFile ) {
   // bathymetry in 3rd column
   m_bathyX = tsunami_lab::io::Csv::read(i_bathymetryFile, 2);
   m_bathyB = tsunami_lab::io::Csv::read(i_bathymetryFile, 3);
+
+  // track_location is in km, convert to meters
+  for( auto & x : m_bathyX ) x *= 1000.0;
 }
 
 //------------------------------------------------------------------
@@ -48,7 +51,7 @@ setup::TsunamiEvent1d::getDisplacement( tsunami_lab::t_real i_x ) {
   //       = 0,                                            otherwise
   if( i_x > 175000 && i_x < 250000 ) {
     return static_cast<tsunami_lab::t_real>(
-      10.0 * std::sin( ( i_x - 175000.0 ) / 37500.0 * M_PI + M_PI )
+      30.0 * std::sin( ( i_x - 175000.0 ) / 37500.0 * M_PI + M_PI )
     );
   }
   return static_cast<tsunami_lab::t_real>( 0 );
@@ -59,11 +62,13 @@ setup::TsunamiEvent1d::getDisplacement( tsunami_lab::t_real i_x ) {
 //------------------------------------------------------------------
 tsunami_lab::t_real
 setup::TsunamiEvent1d::getHeight( tsunami_lab::t_real i_x,
-                                   tsunami_lab::t_real      ) const {
+                                   tsunami_lab::t_real ) const {
   tsunami_lab::t_real l_bIn = getBathymetryRaw( i_x );
+  tsunami_lab::t_real l_d   = getDisplacement( i_x ); 
+
   if( l_bIn < 0 ) {
-    // h = max( -b_in, delta )
-    return std::max( -l_bIn, m_delta );
+    // h = max( -b_in, delta ) + d   the surface should get pushed up with the floor
+    return std::max( -l_bIn, m_delta ) + l_d;
   }
   return static_cast<tsunami_lab::t_real>( 0 );
 }
