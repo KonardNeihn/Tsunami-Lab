@@ -39,8 +39,52 @@ If it is dry, it should reflect the wave exactly like in a shock-shock scenario.
 The implementation is abit more difficult, since we now have to track the dry/wet or outflow/reflecting states of both boundary cells individually.
 
 
-Hydraulic Jumps - Subcritical to Supercritical Flow
+Subcritical and Supercritical Flow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We implemented a new hydraulic jump setup. The values that do not change between the subcritical (3.3.1) and supercritical flow (3.3.2) 
+are hardcoded into the setup file, while the values that change can be specified as agrguments inside main.cpp.
+
+.. figure:: subcritical_flow.gif
+   :width: 600px
+
+   Subcritical Flow
+
+.. figure:: supercritical_flow.gif
+   :width: 600px
+
+   Supercritical Flow
+
+The hydraulic jump can clearly be observerd in the supercritical flow, at about x = 12.
+The f-solver fails to converge because the momentum does not stay constanc across the entire domain,
+as seen in the following output file (solution_11.csv).
+
+.. code-block:: text
+
+   x,y,bathymetry,height,momentum_x
+   ...
+   10.875,0.125,-0.158125,0.0803511,0.124853
+   11.125,0.125,-0.18,0.0719677,0.124853
+   11.375,0.125,-0.208125,0.0648907,0.124853
+   11.625,0.125,-0.2425,0.154886,0.156509
+   11.875,0.125,-0.283125,0.254801,0.124857
+   12.125,0.125,-0.33,0.305365,0.124857
+   12.375,0.125,-0.33,0.305365,0.124857
+   12.625,0.125,-0.33,0.305365,0.124858
+   12.875,0.125,-0.33,0.305365,0.124858
+   13.125,0.125,-0.33,0.305365,0.124858
+   13.375,0.125,-0.33,0.305365,0.124859
+   13.625,0.125,-0.33,0.305365,0.124859
+   13.875,0.125,-0.33,0.305365,0.124859
+   14.125,0.125,-0.33,0.305365,0.12486
+   14.375,0.125,-0.33,0.305365,0.12486
+   14.625,0.125,-0.33,0.305365,0.12486
+   14.875,0.125,-0.33,0.305365,0.12486
+   15.125,0.125,-0.33,0.305365,0.12486
+   15.375,0.125,-0.33,0.305366,0.124861
+   15.625,0.125,-0.33,0.305366,0.124861
+   15.875,0.125,-0.33,0.305366,0.124861
+   ...
 
 
 .. toctree::
