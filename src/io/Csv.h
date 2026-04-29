@@ -11,6 +11,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 
@@ -51,7 +52,7 @@ class tsunami_lab::io::Csv {
      * @param i_columnIndex index of the column to read.
      * @return vector containing the values from the specified column.
      **/
-    static std::vector<t_real> read( const std::string & i_filename,
+    static std::vector<tsunami_lab::t_real> read( const std::string & i_filename,
                                      t_idx               i_columnIndex );
 
 };
