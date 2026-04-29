@@ -143,7 +143,7 @@ are hardcoded into the setup file, while the values that change can be specified
    Supercritical Flow
 
 The hydraulic jump can clearly be observerd in the supercritical flow, at about x = 12.
-The f-solver fails to converge because the momentum does not stay constanc across the entire domain,
+The f-solver fails to converge because the momentum does not stay constant across the entire domain,
 as seen in the following output file (solution_11.csv).
 
 .. code-block:: text
