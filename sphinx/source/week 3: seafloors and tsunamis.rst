@@ -174,6 +174,16 @@ as seen in the following output file (solution_11.csv).
    ...
 
 
+The Tsunami Simulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Following the mathematical formulas laid out in (3.4.2) the new setup creates a one-dimensional tsunami-simulation based on the 
+bathymetry data, that was cut out of the GEBCO_2025.nc dataset or DEM. Specifically it takes a slice of seafloor on the coast 
+of Japan as a line between the two points 𝑝1 =(141.024949,37.316569) and 𝑝2 =(146.0,37.316569), with a 250m distance between each point.
+
+The check for the boundary cells is now hard-coded to set the respective cells to reflect waves if the depth of the water
+on the edges of the simulation is at or below 20 metres.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

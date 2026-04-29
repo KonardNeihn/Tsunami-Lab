@@ -11,6 +11,7 @@
 #include "setups/Bathymetry1d.h"
 #include "setups/SubcriticalFlow1d.h"
 #include "setups/HydraulicJump1d.h"
+#include "setups/TsunamiEvent1d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
@@ -70,7 +71,7 @@ int main( int   i_argc,
       std::cout << "  -n <number>, (--ncells=<number>) Set number of cells. Default is 100." << std::endl;
       std::cout << "  -w <number>, (--width=<number>)  Set width of the observed space in meters. default is 10" << std::endl;
       std::cout << "  -t <number>, (--time=<number>)   Set time until aborting in s. default is 1.25" << std::endl;
-      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d}. Default is DamBreak1d" << std::endl;
+      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d, TsunamiEvent1d}. Default is DamBreak1d" << std::endl;
       return EXIT_SUCCESS;
     }
     // check if N_CELLS_X is passed
@@ -132,6 +133,7 @@ int main( int   i_argc,
                                             && l_setup_selection != "Bathymetry1d"
                                             && l_setup_selection != "SubcriticalFlow1d"
                                             && l_setup_selection != "HydraulicJump1d"
+                                            && l_setup_selection != "TsunamiEvent1d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -202,19 +204,20 @@ int main( int   i_argc,
                                                        5,           // bathymetry right
                                                        ((2 * l_w) / 3) );   // bathymetry change location
     } else if (l_setup_selection == "SubcriticalFlow1d") {
-      l_setup = new tsunami_lab::setups::SubcriticalFlow1d(
-        l_w / 2,   // bump location in the middle of the simulation
-        0.8,       // bump height: 0.8m 
-        0.5,       // bump width: 0.5m
-        2.0,       // water surface at 2m, well above the 0.8m bump
-        1.5        // constant momentum (positive means left to right)
-      );
+      l_setup = new tsunami_lab::setups::SubcriticalFlow1d( l_w / 2,   // bump location in the middle of the simulation
+                                                            0.8,       // bump height: 0.8m 
+                                                            0.5,       // bump width: 0.5m
+                                                            2.0,       // water surface at 2m, well above the 0.8m bump
+                                                            1.5        // constant momentum (positive means left to right)
+                      );
     } else if (l_setup_selection == "HydraulicJump1d") {
       l_setup = new tsunami_lab::setups::HydraulicJump1d( -0.13, // obstacle height
                                                           -0.33, // base height of the bathymetry
                                                           0.18  // momentum of the water
                                                         );
-    }
+    } else if (l_setup_selection == "TsunamiEvent1d") {
+      l_setup = new tsunami_lab::setups::TsunamiEvent1d( Bathymetry vector , // extracted .csv bathymetry data                                                     
+                                                        );
     else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
@@ -322,12 +325,12 @@ int main( int   i_argc,
 
     /**  instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
     *    
-    *   CURRENTLY: it only checks if the actual depth of the water is lower than 5m.
+    *   CURRENTLY: it only checks if the actual depth of the water is lower than 20m.
     */
-    // checks if the depth of the water on the left is smaller than 5 meters, by checking the middle of the left-outermost cell
-    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 5;
-    // checks if the depth of the water on the left is smaller than 5 meters, by checking the middle of the right-outermost cell
-    bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 5;
+    // checks if the depth of the water on the left is smaller than 2ß meters, by checking the middle of the left-outermost cell
+    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 20;
+    // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the right-outermost cell
+    bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 20;
 
 
     /* 
