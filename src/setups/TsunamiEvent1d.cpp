@@ -14,7 +14,7 @@ namespace setup = tsunami_lab::setups;
 //------------------------------------------------------------------
 setup::TsunamiEvent1d::TsunamiEvent1d( const std::string & i_bathymetryFile ) {
   // bathymetry in 3rd column
-  m_bathyX = tsunami_lab::io::Csv::read(i_bathymetryFile, 3);
+  m_bathyX = tsunami_lab::io::Csv::read(i_bathymetryFile, 2);
   m_bathyB = tsunami_lab::io::Csv::read(i_bathymetryFile, 3);
 }
 
