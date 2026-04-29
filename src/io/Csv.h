@@ -10,6 +10,9 @@
 #include "../constants.h"
 #include <cstring>
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 
 namespace tsunami_lab {
   namespace io {
@@ -40,6 +43,16 @@ class tsunami_lab::io::Csv {
                        t_real       const * i_hu,
                        t_real       const * i_hv,
                        std::ostream       & io_stream );
+
+    /**
+     * Reads a column from a CSV file.
+     *
+     * @param i_filename name of the CSV file.
+     * @param i_columnIndex index of the column to read.
+     * @return vector containing the values from the specified column.
+     **/
+    static std::vector<t_real> read( const std::string & i_filename,
+                                     t_idx               i_columnIndex );
 };
 
 #endif

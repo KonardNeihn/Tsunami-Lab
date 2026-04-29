@@ -43,3 +43,35 @@ void tsunami_lab::io::Csv::write( t_real               i_dxy,
   }
   io_stream << std::flush;
 }
+
+std::vector<t_real> tsunami_lab::io::Csv::read( const std::string & i_filename,
+                                                 t_idx               i_columnIndex ) {
+  std::vector<t_real> columnData;
+
+  // Check if csv file can be opend 
+  std::ifstream file(i_filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << i_filename << std::endl;
+        return columnData;
+    }
+
+    std::string line;
+
+    // go through every line of the file
+    while (std::getLine(file, line)) {
+      std::stringsteam stringStream(line);
+      std::string cell;
+      t_idx currentColumnIndex = 0;
+
+      // go through every cell of the line, HAVE TO BE SEPERATED BY "," !
+      while (std::getLine(stringSteam, cell, ",")) {
+        if (col == currentColumnIndex) {
+          columnData.push_back(std::stod(cell)); // convert string to double and add to vector
+          break; 
+        }
+        currentColumnIndex++;
+      }
+
+      return columnData;
+    }
+}
