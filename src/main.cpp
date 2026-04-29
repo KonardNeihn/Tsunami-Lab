@@ -195,8 +195,8 @@ int main( int   i_argc,
                                                        10,    // momentum
                                                         5 );  // impact location
     } else if (l_setup_selection == "Bathymetry1d") {
-      l_setup = new tsunami_lab::setups::Bathymetry1d( 15,          // height left
-                                                       10,          // height right
+      l_setup = new tsunami_lab::setups::Bathymetry1d( 12,          // height left
+                                                       7,          // height right
                                                        (l_w / 3),   // dam location
                                                        0,           // bathymetry left
                                                        5,           // bathymetry right
@@ -320,12 +320,26 @@ int main( int   i_argc,
       l_nOut++;
     }
 
-    // instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
-    // checks if bathymetry of the left boundary is higher than waterlevel, by checking the middle of the left-outermost cell
-    bool l_leftReflecting  = l_setup->getBathymetry( 0.5 * l_dxy, 0 )    >= l_setup->getHeight( 0.5 * l_dxy, 0 );
-    // checks if bathymetry of the right boundary is higher than waterlevel, by checking the middle of the right-outermost cell
-    bool l_rightReflecting = l_setup->getBathymetry( (l_nx - 0.5) * l_dxy, 0 )  >= l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 );
+    /**  instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
+    *    
+    *   CURRENTLY: it only checks if the actual depth of the water is lower than 5m.
+    */
+    // checks if the depth of the water on the left is smaller than 5 meters, by checking the middle of the left-outermost cell
+    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 5;
+    // checks if the depth of the water on the left is smaller than 5 meters, by checking the middle of the right-outermost cell
+    bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 5;
 
+
+    /* 
+    //previous setup checks if the floor is higher than the water level
+    bool l_leftReflecting  = l_setup->getBathymetry( 0.5 * l_dxy, 0 )    
+                          >= l_setup->getHeight( 0.5 * l_dxy, 0 )
+                          + l_setup->getBathymetry( 0.5 * l_dxy, 0 );
+    // checks if bathymetry of the right boundary is higher than waterlevel, by checking the middle of the right-outermost cell
+    bool l_rightReflecting = l_setup->getBathymetry( (l_nx - 0.5) * l_dxy, 0 )  
+                          >= l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 )
+                          + l_setup->getBathymetry( (l_nx - 0.5) * l_dxy, 0 );
+    */
     l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
 
     l_waveProp->timeStep( l_scaling );

@@ -13,17 +13,17 @@ Bathymetry values also need to be included for ghost-cells in the wave-propagati
 to implement the reflecting bevavior for task 3.2.
 
 To illustrate the effects of the bathymetry, in this example we can see the bathymetry at work.
-The floor is not displayed but the sharp, stable fall in water height (5m, y-axis) at 7m (x-axis) is clearly representative of the same difference in floor height.
+Here we can see a wave of water moving to the right, impacting on the raised floor, which reflects a much smaller wave back in the opposite direction.
 
 .. figure:: Bathymetry_3_1_2.gif
-   :alt: Bathymetry example
+   :alt: Bathymetry example 1
    :width: 600px
 
-Bathymetry example with dam at 5m and change in floor height at 7m.
+Bathymetry example with dam at 3.3m(1/3) and change in floor height at 6.6m(2/3).
 
-Another example would be a simple subcritical flow with Water equal to the height of the floor bump piled on top of it.
-Since the water is affected by the same momentum, the resulting waves have different speeds (positive momentum means the wave going left is slower)
-and the scenario reaches an equilibrium with water above the raised floor being lower but faster.
+Another example would be a simple subcritical flow with the water moving left to right at constant momentumm and a small wave piled up on the left.
+The scenario reaches an equilibrium with water above the raised floor being slightly lower but faster.
+This looks weird, but is mathematically correct.
 
 .. figure:: Bathymetry_3_1_3.gif
    :alt: Bathymetry example 2
@@ -36,7 +36,17 @@ Boundary Reflections
 
 The basic idea of the reflecting boundary cells is very simple: if a boundary cell is wet, the outflow should behave like it already was.
 If it is dry, it should reflect the wave exactly like in a shock-shock scenario.
-The implementation is abit more difficult, since we now have to track the dry/wet or outflow/reflecting states of both boundary cells individually.
+The implementation is a bit more difficult, since we now have to track the dry/wet or outflow/reflecting states of both boundary cells individually.
+Currently the reflecting states are implemented in a way that sets a boundary cell to reflecting, if the depth of the water of the
+immediate inner neighbour is less than 5m (can easily be changed).
+
+In an actual example we can see the wave being reflected, just like a shock-shock setup.
+The example essentially shows 12m deep water filling a pocket of 2m deep water on a 5m high plateau.
+
+.. figure:: wavereflection.gif
+   :width: 600px
+
+   Example for reflecting boundary
 
 
 Subcritical and Supercritical Flow

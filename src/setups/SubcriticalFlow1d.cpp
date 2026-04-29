@@ -28,11 +28,15 @@ tsunami_lab::t_real tsunami_lab::setups::SubcriticalFlow1d::getBathymetry( t_rea
 
 tsunami_lab::t_real tsunami_lab::setups::SubcriticalFlow1d::getHeight( t_real i_x,
                                                                        t_real      ) const {
-  // water surface is flat: h(x) + b(x) = waterSurface
-  // therefore:             h(x) = waterSurface - b(x)
-  // prevent below zero to prevent negative depth above a very tall bump
-  t_real l_b = getBathymetry( i_x, 0 );
-  return std::max( t_real(0), m_waterSurface - l_b );
+
+  t_real l_surface = m_waterSurface;
+
+  // add a small pile to the water surface on the left
+  if( i_x < m_bumpCenter - 2.0 * m_bumpWidth ) {
+    l_surface += 0.1 * std::exp( -(i_x - 1.0) * (i_x - 1.0) );
+  }
+
+  return std::max( t_real(0), l_surface - getBathymetry( i_x, 0 ) );
 }
 
 tsunami_lab::t_real tsunami_lab::setups::SubcriticalFlow1d::getMomentumX( t_real,
