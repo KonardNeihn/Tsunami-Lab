@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include "../io/Csv.h"
 
 namespace setup = tsunami_lab::setups;
 
@@ -12,52 +13,9 @@ namespace setup = tsunami_lab::setups;
 // Constructor: load bathymetry CSV
 //------------------------------------------------------------------
 setup::TsunamiEvent1d::TsunamiEvent1d( const std::string & i_bathymetryFile ) {
-  std::ifstream l_file( i_bathymetryFile );
-  if( !l_file.is_open() ) {
-    throw std::runtime_error(
-      "TsunamiEvent1d: cannot open bathymetry file: " + i_bathymetryFile
-    );
-  }
-
-  std::string l_line;
-  // Skip header line if present, detected by checking whether first value is a number
-  if( std::getline( l_file, l_line ) ) {
-    std::istringstream l_ss( l_line );
-    tsunami_lab::t_real l_testVal;
-    if( !( l_ss >> l_testVal ) ) {
-      // First line is a header – already consumed, continue reading data
-    } else {
-      // if the first line was data, parse it
-      std::istringstream l_data( l_line );
-      tsunami_lab::t_real l_x = 0, l_b = 0;
-      char l_comma;
-      l_data >> l_x >> l_comma >> l_b;
-      m_bathyX.push_back( l_x );
-      m_bathyB.push_back( l_b );
-    }
-  }
-
-  // Read remaining lines
-  while( std::getline( l_file, l_line ) ) {
-    if( l_line.empty() ) continue;
-    std::istringstream l_ss( l_line );
-    tsunami_lab::t_real l_x = 0, l_b = 0;
-    char l_comma;
-    // supports both comma-separated and whitespace-separated files
-    if( l_line.find(',') != std::string::npos ) {
-      l_ss >> l_x >> l_comma >> l_b;
-    } else {
-      l_ss >> l_x >> l_b;
-    }
-    m_bathyX.push_back( l_x );
-    m_bathyB.push_back( l_b );
-  }
-
-  if( m_bathyX.empty() ) {
-    throw std::runtime_error(
-      "TsunamiEvent1d: no data found in bathymetry file: " + i_bathymetryFile
-    );
-  }
+  // bathymetry in 3rd column
+  m_bathyX = tsunami_lab::io::Csv::read(i_bathymetryFile, 3);
+  m_bathyB = tsunami_lab::io::Csv::read(i_bathymetryFile, 3);
 }
 
 //------------------------------------------------------------------

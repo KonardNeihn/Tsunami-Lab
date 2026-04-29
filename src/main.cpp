@@ -216,9 +216,9 @@ int main( int   i_argc,
                                                           0.18  // momentum of the water
                                                         );
     } else if (l_setup_selection == "TsunamiEvent1d") {
-      l_setup = new tsunami_lab::setups::TsunamiEvent1d( Bathymetry vector , // extracted .csv bathymetry data                                                     
+      l_setup = new tsunami_lab::setups::TsunamiEvent1d( "../bathymetry/output/03_dem_03.csv"  // extracted .csv bathymetry data                                                     
                                                         );
-    else {
+    }else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
     }
