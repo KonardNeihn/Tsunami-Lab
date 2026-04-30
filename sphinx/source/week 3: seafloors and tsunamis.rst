@@ -193,6 +193,15 @@ After many unexpected Problems (for example: the ocean draining within seconds o
 this is the first somewhat reasonable simulation achieved (with ./build/tsunami_lab -S TsunamiEvent1d -w 50000 -t 2000).
 Something is still clearly wrong with the waves disappearing as they approach the shore, but i suspect this has something to do with the very large timesteps
 that are set at the beginning of the simulation itself. This is despite increasing the displacement by 200%, since the results with original values were barely visible.
+
+The new simulation uses a 100 times stronger tsunami wave, that now reaches the shore and gets reflected.
+
+.. figure:: tsunami1000m.gif
+   :width: 600px
+
+   an attempt at tsunami simulation with 100 times the height of the wave
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
