@@ -337,10 +337,10 @@ int main( int   i_argc,
     *    
     *   CURRENTLY: it only checks if the actual depth of the water is lower than 20m.
     */
-    // checks if the depth of the water on the left is smaller than 2ß meters, by checking the middle of the left-outermost cell
-    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 20;
+    // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the left-outermost cell
+    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 200;
     // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the right-outermost cell
-    bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 20;
+    bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 200;
 
 
     /* 
