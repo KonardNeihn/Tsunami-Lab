@@ -12,5 +12,6 @@ pkgs.mkShell {
         pkgs.doxygen
         pkgs.gmt
         pkgs.scons
+        pkgs.paraview
     ];
 }
