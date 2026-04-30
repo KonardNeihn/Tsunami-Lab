@@ -205,3 +205,7 @@ The new simulation uses a 100 times stronger tsunami wave, that now reaches the 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+
+   original commit
+   jetzt ist amended commit
