@@ -5,7 +5,7 @@ pkgs.mkShell {
         (pkgs.python3.withPackages (python-pkgs: [
             python-pkgs.matplotlib
             python-pkgs.sphinx
-            python-pkgs.sphinx_rtd_theme
+            python-pkgs.sphinx-rtd-theme
             python-pkgs.pandas
             python-pkgs.imageio
         ]))

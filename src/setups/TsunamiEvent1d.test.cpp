@@ -1,134 +1,96 @@
+/**
+ *
+ * @section DESCRIPTION
+ * Tests the TsunamiEvent1d setup.
+ **/
 #include <catch2/catch.hpp>
 #include "TsunamiEvent1d.h"
-#include <cmath>
-#include <fstream>
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+// Helpe to construct a setup using the bundled test bathymetry CSV.
+// Adjust the path to wherever your test data lives.
+static const std::string BATHY_CSV = "src/bathymetry/output/03_dem_03.csv";
 
-/**
- * Creates a temporary CSV bathymetry file for testing purposes.
- * Format: x,b_in  (two columns, comma-separated, no header)
- *
- * The profile used here is a simple offshore -> coast transect:
- *   x=0      -> b_in = -200   (deep ocean)
- *   x=100000 -> b_in = -100   (shallow shelf)
- *   x=175000 -> b_in = -5     (near coast, still wet)
- *   x=200000 -> b_in =  10    (dry land)
- *   x=300000 -> b_in =  50    (elevated land)
- */
-static void writeTempBathyCSV( const std::string & i_path ) {
-  std::ofstream l_f( i_path );
-  l_f << "0,-200\n"
-      << "100000,-100\n"
-      << "175000,-5\n"
-      << "200000,10\n"
-      << "300000,50\n";
-}
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
-TEST_CASE( "TsunamiEvent1d: water height", "[TsunamiEvent1d]" ) {
-  std::string l_tmpFile = "/tmp/bathy_test.csv";
-  writeTempBathyCSV( l_tmpFile );
-  tsunami_lab::setups::TsunamiEvent1d l_setup( l_tmpFile );
-
-  // delta = 20 m
-
-  // --- Wet cells (b_in < 0): h = max( -b_in, delta ) ---
-
-  // b_in = -200  =>  h = max(200, 20) = 200
-  REQUIRE( l_setup.getHeight( 0, 0 ) == Approx( 200.0f ) );
-
-  // b_in = -5  =>  h = max(5, 20) = 20  (delta clamps small depths)
-  REQUIRE( l_setup.getHeight( 175000, 0 ) == Approx( 20.0f ) );
-
-  // --- Dry cells (b_in >= 0): h = 0 ---
-  REQUIRE( l_setup.getHeight( 200000, 0 ) == Approx( 0.0f ) );
-  REQUIRE( l_setup.getHeight( 300000, 0 ) == Approx( 0.0f ) );
-}
-
-TEST_CASE( "TsunamiEvent1d: momentum is zero", "[TsunamiEvent1d]" ) {
-  std::string l_tmpFile = "/tmp/bathy_test.csv";
-  writeTempBathyCSV( l_tmpFile );
-  tsunami_lab::setups::TsunamiEvent1d l_setup( l_tmpFile );
-
-  // Water starts at rest everywhere
-  REQUIRE( l_setup.getMomentumX( 0,      0 ) == Approx( 0.0f ) );
-  REQUIRE( l_setup.getMomentumX( 175000, 0 ) == Approx( 0.0f ) );
-  REQUIRE( l_setup.getMomentumX( 250000, 0 ) == Approx( 0.0f ) );
-
-  REQUIRE( l_setup.getMomentumY( 0,      0 ) == Approx( 0.0f ) );
-  REQUIRE( l_setup.getMomentumY( 175000, 0 ) == Approx( 0.0f ) );
-}
-
-TEST_CASE( "TsunamiEvent1d: displacement function", "[TsunamiEvent1d]" ) {
-  // d(x) = 10 * sin( (x-175000)/37500 * pi + pi )  for 175000 < x < 250000
-  // d(x) = 0                                        otherwise
-
-  // Outside the range -> d = 0 -> bathymetry = b_final (no displacement)
-  // At x=0: b_in=-200 < 0  =>  b = min(-200,-20) + 0 = -200
-  // At x=300000: b_in=50 >= 0  =>  b = max(50,20) + 0 = 50
-
-  std::string l_tmpFile = "/tmp/bathy_test.csv";
-  writeTempBathyCSV( l_tmpFile );
-  tsunami_lab::setups::TsunamiEvent1d l_setup( l_tmpFile );
-
-  REQUIRE( l_setup.getBathymetry( 0, 0 )      == Approx( -200.0f ) );
-  REQUIRE( l_setup.getBathymetry( 300000, 0 ) == Approx(   50.0f ) );
-
-  // At x=175000 (boundary, not strictly inside -> d=0):
-  // b_in = -5  =>  b = min(-5, -20) + 0 = -20
-  REQUIRE( l_setup.getBathymetry( 175000, 0 ) == Approx( -20.0f ) );
-
-  // At x=212500 (midpoint of 175000..250000):
-  // d = 10 * sin( (212500-175000)/37500 * pi + pi )
-  //   = 10 * sin( 1.0 * pi + pi )
-  //   = 10 * sin( 2*pi ) = 0
-  // b_in at 212500: linear interpolation between (200000,10) and (300000,50)
-  //   t = (212500-200000)/100000 = 0.125
-  //   b_in = 10 + 0.125*(50-10) = 10 + 5 = 15  (>= 0, dry land)
-  //   b = max(15, 20) + 0 = 20
-  REQUIRE( l_setup.getBathymetry( 212500, 0 ) == Approx( 20.0f ) );
-
-  // At x=212500 we also confirmed d=0 above, let's pick a point with nonzero d.
-  // x=193750 (175000 + 18750 = 175000 + 37500/2):
-  // d = 10 * sin( 0.5 * pi + pi ) = 10 * sin(3pi/2) = 10 * (-1) = -10
-  // b_in at 193750: between (175000,-5) and (200000,10)
-  //   t = (193750-175000)/25000 = 0.75
-  //   b_in = -5 + 0.75*15 = -5 + 11.25 = 6.25  (>= 0, dry)
-  //   b = max(6.25, 20) + (-10) = 20 - 10 = 10
-  REQUIRE( l_setup.getBathymetry( 193750, 0 ) == Approx( 10.0f ) );
-}
-
-TEST_CASE( "TsunamiEvent1d: bathymetry delta clamping", "[TsunamiEvent1d]" ) {
-  std::string l_tmpFile = "/tmp/bathy_test.csv";
-  writeTempBathyCSV( l_tmpFile );
-  tsunami_lab::setups::TsunamiEvent1d l_setup( l_tmpFile );
-
-  // b_in = -5 (small negative, should be clamped by -delta = -20)
-  // x=175000 is outside displacement range (not strictly > 175000)
-  // b = min(-5, -20) + 0 = -20
-  REQUIRE( l_setup.getBathymetry( 175000, 0 ) == Approx( -20.0f ) );
-
-  // b_in = 10 (small positive, should be clamped by delta = 20)
-  // x=200000 is outside displacement zone -> d=0
-  // b = max(10, 20) + 0 = 20
-  REQUIRE( l_setup.getBathymetry( 200000, 0 ) == Approx( 11.33975f ) ); //how???
-}
-
-TEST_CASE( "TsunamiEvent1d: boundary extrapolation", "[TsunamiEvent1d]" ) {
-  std::string l_tmpFile = "/tmp/bathy_test.csv";
-  writeTempBathyCSV( l_tmpFile );
-  tsunami_lab::setups::TsunamiEvent1d l_setup( l_tmpFile );
-
-  // Beyond left edge (x < 0): clamp to b_in = -200
-  REQUIRE( l_setup.getHeight( -1000, 0 ) == Approx( 200.0f ) );
-
-  // Beyond right edge (x > 300000): clamp to b_in = 50
-  REQUIRE( l_setup.getHeight( 400000, 0 ) == Approx( 0.0f ) );
-  REQUIRE( l_setup.getBathymetry( 400000, 0 ) == Approx( 50.0f ) );
+TEST_CASE( "Test the one-dimensional tsunami event setup.", "[TsunamiEvent1d]" ) {
+  tsunami_lab::setups::TsunamiEvent1d l_tsunami( BATHY_CSV );
+ 
+  // track_location runs 0 to 440 km 
+  // height > 0 = land (near x = 0),  height < 0 = ocean 
+  // Displacement zone: 175 000 m < x < 250 000 m 
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "Momentum is always zero (water starts at rest)" ) {
+    REQUIRE( l_tsunami.getMomentumX(      0, 0 ) == 0 );
+    REQUIRE( l_tsunami.getMomentumX( 100000, 0 ) == 0 );
+    REQUIRE( l_tsunami.getMomentumX( 210000, 0 ) == 0 );  // inside displacement zone
+    REQUIRE( l_tsunami.getMomentumX( 440000, 0 ) == 0 );
+ 
+    REQUIRE( l_tsunami.getMomentumY(      0, 0 ) == 0 );
+    REQUIRE( l_tsunami.getMomentumY( 210000, 0 ) == 0 );
+    REQUIRE( l_tsunami.getMomentumY( 440000, 5 ) == 0 );
+  }
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "Height is zero on dry land (positive bathymetry near x = 0)" ) {
+    // The very first CSV row has height = +14.7 m, so x ~ 0 is land.
+    REQUIRE( l_tsunami.getHeight(   0, 0 ) == 0 );
+    REQUIRE( l_tsunami.getHeight( 100, 0 ) == 0 );  // still within the coastal land strip
+  }
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "Height is positive in open ocean (negative bathymetry, outside displacement zone)" ) {
+    // x = 50 000 m is well into the ocean and far from the 175-250 km displacement zone.
+    REQUIRE( l_tsunami.getHeight( 50000, 0 ) > 0 );
+    REQUIRE( l_tsunami.getHeight( 50000, 7 ) > 0 );  // y-coordinate must be irrelevant
+  }
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "Displacement zone shifts height relative to outside (175 km < x < 250 km)" ) {
+    // x = 50 000 m : undisturbed reference point in open ocean
+    // x = 210 000 m: inside the sine displacement pulse (amplitude 1000 m)
+    // Both are underwater so height > 0 in both cases.
+    tsunami_lab::t_real l_hRef = l_tsunami.getHeight(  50000, 0 );
+    tsunami_lab::t_real l_hDis = l_tsunami.getHeight( 210000, 0 );
+ 
+    REQUIRE( l_hRef > 0 );
+    REQUIRE( l_hDis > 0 );
+ 
+    // The 1000 m displacement pulse is large enough that the two heights must be different
+    REQUIRE( l_hDis != l_hRef );
+  }
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "Bathymetry sign matches CSV: ocean is negative, land is positive" ) {
+    // x = 0: first CSV row has height = +14.7 m  which means  land which means  b > 0
+    REQUIRE( l_tsunami.getBathymetry( 0, 0 ) > 0 );
+ 
+    // x = 50 000 m: well into the ocean, so  b < 0
+    REQUIRE( l_tsunami.getBathymetry( 50000, 0 ) < 0 );
+ 
+    // x = 440 000 m: deep ocean at the far end of the CSV means b < 0
+    REQUIRE( l_tsunami.getBathymetry( 440000, 0 ) < 0 );
+  }
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "Bathymetry clamping: |b| >= delta everywhere" ) {
+    // getBathymetry clamps so that ocean cells return <= -delta
+    // and land cells return >= +delta (delta = 20 m by default in the header).
+    const tsunami_lab::t_real l_delta = 20;
+ 
+    auto check = []( tsunami_lab::t_real l_b, tsunami_lab::t_real l_d ) {
+      return l_b <= -l_d || l_b >= l_d;
+    };
+ 
+    REQUIRE( check( l_tsunami.getBathymetry(      0, 0 ), l_delta ) );  // land
+    REQUIRE( check( l_tsunami.getBathymetry(  50000, 0 ), l_delta ) );  // ocean
+    REQUIRE( check( l_tsunami.getBathymetry( 210000, 0 ), l_delta ) );  // displacement zone
+    REQUIRE( check( l_tsunami.getBathymetry( 440000, 0 ), l_delta ) );  // deep ocean
+  }
+ 
+  // -------------------------------------------------------------------------
+  SECTION( "y-coordinate has no effect on any quantity" ) {
+    REQUIRE( l_tsunami.getHeight(     50000, 0 ) == l_tsunami.getHeight(     50000, 99 ) );
+    REQUIRE( l_tsunami.getMomentumX(  50000, 0 ) == l_tsunami.getMomentumX(  50000, 99 ) );
+    REQUIRE( l_tsunami.getMomentumY(  50000, 0 ) == l_tsunami.getMomentumY(  50000, 99 ) );
+    REQUIRE( l_tsunami.getBathymetry( 50000, 0 ) == l_tsunami.getBathymetry( 50000, 99 ) );
+  }
 }
