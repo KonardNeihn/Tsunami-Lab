@@ -13,6 +13,7 @@
 #include "setups/HydraulicJump1d.h"
 #include "setups/TsunamiEvent1d.h"
 #include "io/Csv.h"
+#include "io/Station.h"
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
@@ -308,6 +309,9 @@ int main( int   i_argc,
 
   std::cout << "entering time loop" << std::endl;
 
+  // Test Station (for 1d)
+  tsunami_lab::io::Station station(5, 0, 0.1, "station_1", l_nx);
+
   // iterate over time
   while( l_simTime < l_endTime ){
     if( l_timeStep % 25 == 0 ) {
@@ -355,7 +359,12 @@ int main( int   i_argc,
     */
     l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
 
-    l_waveProp->timeStep( l_scaling );
+    std::cout << "before timestep" << std::endl;
+    l_waveProp->timeStep(l_scaling);
+    std::cout << "after timestep" << std::endl;
+
+    // Station Update
+    station.timeStep(l_dt, l_waveProp->getHeight(), l_waveProp->getMomentumX(), nullptr);
 
     l_timeStep++;
     l_simTime += l_dt;

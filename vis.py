@@ -49,8 +49,8 @@ for file in files:
     ymin = min(ymin, b.min(), surface.min())
     ymax = max(ymax, b.max(), surface.max())
 
-ymin = -8000
-ymax = ymax + 1250
+ymin = -1
+ymax = ymax + 10
 
 # Plotten
 for file in files:
