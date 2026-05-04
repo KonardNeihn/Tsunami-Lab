@@ -39,6 +39,8 @@ class tsunami_lab::io::Station {
     * @param i_yPosition y-position of the station in the grid.
     * @param i_recordingInterval time interval at which the station records data.
     * @param i_stationName name of the station
+    * @param i_nx Cells Amount.
+    * @param i_Path path the the folder where the csv files should be saved.
     **/
     Station(t_idx i_xPosition, 
         t_idx i_yPosition, 
