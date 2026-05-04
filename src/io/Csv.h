@@ -55,6 +55,11 @@ class tsunami_lab::io::Csv {
     static std::vector<tsunami_lab::t_real> read( const std::string & i_filename,
                                      t_idx               i_columnIndex );
 
+    static void writeStationData(t_real i_waterHeight,
+      t_real i_momentumX,
+      t_real i_momentumY,
+      std::ostream       & io_stream
+    );
 };
 
 #endif

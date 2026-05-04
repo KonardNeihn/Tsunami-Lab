@@ -86,3 +86,8 @@ tsunami_lab::t_real* vectorToArray(const std::vector<tsunami_lab::t_real>& vec) 
 
     return arr;
 }
+
+void tsunami_lab::io::Csv::writeStationData(t_real i_waterHeight, t_real i_momentumX, t_real i_momentumY, std::ostream       & io_stream) {
+  io_stream << i_waterHeight << "," << i_momentumX << "," << i_momentumY << "\n";
+  io_stream << std::flush;
+}
