@@ -44,7 +44,8 @@ class tsunami_lab::io::Station {
         t_idx i_yPosition, 
         float i_recordingInterval,
         std::string i_stationName,
-        t_idx i_nx);
+        t_idx i_nx,
+        std::string i_path);
 
     // Destructor
     ~Station() = default;

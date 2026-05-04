@@ -13,5 +13,12 @@ pkgs.mkShell {
         pkgs.gmt
         pkgs.scons
         pkgs.paraview
+        pkgs.pugixml
+        pkgs.pkg-config
     ];
+
+    shellHook = ''
+    export PUGIXML_INCLUDE=${pkgs.pugixml}/include
+    export PUGIXML_LIB=${pkgs.pugixml}/lib
+    '';
 }

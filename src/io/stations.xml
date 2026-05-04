@@ -1,0 +1,12 @@
+<tsunamilab>
+    <stations>
+        <station name="StationA" x="5" y="0"/>
+        <station name="StationB" x="2" y="0"/>
+    </stations>
+
+    <output>
+        <record_intervall>0.1</record_intervall>
+        <path>solutions/station_data/</path>
+    </output>
+</tsunamilab>
+

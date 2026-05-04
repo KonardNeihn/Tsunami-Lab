@@ -3,13 +3,15 @@
 #include <string>
 #include <filesystem>
 
-tsunami_lab::io::Station::Station(t_idx i_xPosition, t_idx i_yPosition, float i_recordingInterval, std::string i_stationName, t_idx i_nx) {
+tsunami_lab::io::Station::Station(t_idx i_xPosition, t_idx i_yPosition, float i_recordingInterval, std::string i_stationName, t_idx i_nx, std::string i_path) {
     m_xPosition = i_xPosition;
     m_yPosition = i_yPosition;
     m_recordingInterval = i_recordingInterval;
 
     std::filesystem::create_directories("solutions/station_data");
-    m_filePath = "solutions/station_data/" + i_stationName + ".csv";
+    m_filePath = i_path + i_stationName + ".csv";
+
+    std::ofstream l_file(m_filePath, std::ios::trunc);
 
     m_recordedHeight = 0.0;
     m_recordedMomentumX = 0.0;
@@ -38,6 +40,7 @@ void tsunami_lab::io::Station::timeStep(t_real i_deltaTimeStep,const t_real *i_h
         l_file.open(m_filePath, std::ios::app);
 
         if (l_file.tellp() == 0) {
+            // hier alte datei löschen 
             l_file << "height,momentum_x,momentum_y\n";
         }
 

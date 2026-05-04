@@ -14,6 +14,8 @@
 #include "setups/TsunamiEvent1d.h"
 #include "io/Csv.h"
 #include "io/Station.h"
+#include "io/XmlReader.h"
+#include <vector>
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
@@ -309,8 +311,21 @@ int main( int   i_argc,
 
   std::cout << "entering time loop" << std::endl;
 
-  // Test Station (for 1d)
-  tsunami_lab::io::Station station(5, 0, 0.1, "station_1", l_nx);
+  // Load stations from xml
+  std::vector<tsunami_lab::io::StationConfig> stationConfigs;
+  tsunami_lab::io::OutputConfig outputConfig;
+  std::string stationsXmlPath = "src/io/stations.xml";
+  tsunami_lab::io::loadXmlConfig(stationsXmlPath, stationConfigs, outputConfig);
+  std::vector<tsunami_lab::io::Station> stations;
+  for (const auto& stationConfig : stationConfigs) {
+    // construct Object directly into vector
+    stations.emplace_back(stationConfig.x,
+                          stationConfig.y,
+                          outputConfig.interval,
+                          stationConfig.name,
+                          l_nx,
+                          outputConfig.path);
+  }
 
   // iterate over time
   while( l_simTime < l_endTime ){
@@ -363,8 +378,11 @@ int main( int   i_argc,
     l_waveProp->timeStep(l_scaling);
     std::cout << "after timestep" << std::endl;
 
-    // Station Update
-    station.timeStep(l_dt, l_waveProp->getHeight(), l_waveProp->getMomentumX(), nullptr);
+    // Station Updates
+    for (auto& station : stations) {
+      // nullptr mit getMomentumY tasuchen sobald geht
+      station.timeStep(l_dt, l_waveProp->getHeight(), l_waveProp->getMomentumX(), nullptr);
+    }
 
     l_timeStep++;
     l_simTime += l_dt;

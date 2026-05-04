@@ -6,6 +6,8 @@
 ##
 Import('env')
 
+import os
+
 # gather sources
 l_sources = [ 'solvers/Roe.cpp',
               'solvers/f_solver.cpp',
@@ -18,12 +20,18 @@ l_sources = [ 'solvers/Roe.cpp',
               'setups/HydraulicJump1d.cpp',
               'setups/TsunamiEvent1d.cpp',
               'io/Csv.cpp', 
-              'io/Station.cpp']
+              'io/Station.cpp',
+              'io/XmlReader.cpp']
 
 for l_so in l_sources:
   env.sources.append( env.Object( l_so ) )
 
+
 env.standalone = env.Object( "main.cpp" )
+
+env.Append(CPPPATH=[os.environ["PUGIXML_INCLUDE"]])
+env.Append(LIBPATH=[os.environ["PUGIXML_LIB"]])
+env.Append(LIBS=["pugixml"])
 
 # gather unit tests
 l_tests = [ 'tests.cpp',
