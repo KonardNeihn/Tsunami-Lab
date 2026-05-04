@@ -21,7 +21,6 @@ l_sources = [ 'solvers/Roe.cpp',
               'setups/HydraulicJump1d.cpp',
               'setups/TsunamiEvent1d.cpp',
               'setups/CircularDamBreak2d.cpp',
-              'io/Csv.cpp' ]
               'io/Csv.cpp', 
               'io/Station.cpp',
               'io/XmlReader.cpp']
