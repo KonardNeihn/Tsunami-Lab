@@ -33,7 +33,9 @@ class tsunami_lab::patches::WavePropagation {
      * Sets the values of the ghost cells according to outflow OR REFLECTING boundary conditions.
      **/
     virtual void setGhostCells( bool i_leftReflecting,
-                                bool i_rightReflecting ) = 0;
+                                bool i_rightReflecting,
+                                bool i_bottomReflecting,
+                                bool i_topReflecting ) = 0;
 
     /**
      * Gets the stride in y-direction. x-direction is stride-1.

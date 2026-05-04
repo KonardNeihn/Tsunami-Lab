@@ -67,7 +67,13 @@ class tsunami_lab::setups::Setup {
       // returns 0 by default so it (hopefully) won't mess with the flat ground setups
       return 0;
     };
-      
+
+    // four virtual methods with false as defaults
+    virtual bool isLeftBoundaryReflecting()   const { return false; }
+    virtual bool isRightBoundaryReflecting()  const { return false; }
+    virtual bool isBottomBoundaryReflecting() const { return false; }
+    virtual bool isTopBoundaryReflecting()    const { return false; }
+          
 };
 
 #endif

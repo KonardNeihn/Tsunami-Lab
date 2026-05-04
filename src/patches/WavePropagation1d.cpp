@@ -108,9 +108,11 @@ void tsunami_lab::patches::WavePropagation1d::timeStep( t_real i_scaling ) {
   }
 }
 
-  // set boundary states
-  void tsunami_lab::patches::WavePropagation1d::setGhostCells( bool i_leftReflecting,
-                                                               bool i_rightReflecting ) {
+// WavePropagation1d.cpp – just add the two ignored parameters
+void tsunami_lab::patches::WavePropagation1d::setGhostCells( bool i_leftReflecting,
+                                                             bool i_rightReflecting,
+                                                             bool ,     // unused bottomReflecting
+                                                             bool  ) {  // unused topReflecting
   t_real * l_h  = m_h[m_step];
   t_real * l_hu = m_hu[m_step];
 

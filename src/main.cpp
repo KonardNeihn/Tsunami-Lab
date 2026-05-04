@@ -5,6 +5,7 @@
  * Entry-point for simulations.
  **/
 #include "patches/WavePropagation1d.h"
+#include "patches/WavePropagation2d.h"
 #include "setups/DamBreak1d.h"
 #include "setups/ShockShock1d.h"
 #include "setups/RareRare1d.h"
@@ -12,6 +13,7 @@
 #include "setups/SubcriticalFlow1d.h"
 #include "setups/HydraulicJump1d.h"
 #include "setups/TsunamiEvent1d.h"
+#include "setups/CircularDamBreak2d.h"
 #include "io/Csv.h"
 #include <cstdlib>
 #include <iostream>
@@ -71,7 +73,7 @@ int main( int   i_argc,
       std::cout << "  -n <number>, (--ncells=<number>) Set number of cells. Default is 100." << std::endl;
       std::cout << "  -w <number>, (--width=<number>)  Set width of the observed space in meters. default is 10" << std::endl;
       std::cout << "  -t <number>, (--time=<number>)   Set time until aborting in s. default is 1.25" << std::endl;
-      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d, TsunamiEvent1d}. Default is DamBreak1d" << std::endl;
+      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d}. Default is DamBreak1d" << std::endl;
       return EXIT_SUCCESS;
     }
     // check if N_CELLS_X is passed
@@ -134,6 +136,7 @@ int main( int   i_argc,
                                             && l_setup_selection != "SubcriticalFlow1d"
                                             && l_setup_selection != "HydraulicJump1d"
                                             && l_setup_selection != "TsunamiEvent1d"
+                                            && l_setup_selection != "CircularDamBreak2d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -183,7 +186,9 @@ int main( int   i_argc,
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
-  tsunami_lab::setups::TsunamiEvent1d *l_tsunami = nullptr;                                                         
+  tsunami_lab::setups::TsunamiEvent1d *l_tsunami = nullptr; 
+  // set if simulation is 2D as to keep 1D-simulations working
+  bool l_is2D = false;
 
   if (l_sanity == "true"){
     if (l_setup_selection == "DamBreak1d") { // könnte man auch gleich oben in der argumentübergabe machen?
@@ -211,7 +216,7 @@ int main( int   i_argc,
                                                             0.5,       // bump width: 0.5m
                                                             2.0,       // water surface at 2m, well above the 0.8m bump
                                                             1.5        // constant momentum (positive means left to right)
-                      );
+                                                          );
     } else if (l_setup_selection == "HydraulicJump1d") {
       l_setup = new tsunami_lab::setups::HydraulicJump1d( -0.13, // obstacle height
                                                           -0.33, // base height of the bathymetry
@@ -219,13 +224,18 @@ int main( int   i_argc,
                                                         );
     } else if (l_setup_selection == "TsunamiEvent1d") {
       l_tsunami = new tsunami_lab::setups::TsunamiEvent1d( "src/bathymetry/output/03_dem_03.csv"
-    );
-    l_setup = l_tsunami;
-    
-    // Use actual domain width from the CSV x-coordinates
-    l_w   = l_tsunami->getDomainWidth();
-    l_dxy = l_w / l_nx;
+                                                          );
+      l_setup = l_tsunami;
+      
+      // Use actual domain width from the CSV x-coordinates
+      l_w   = l_tsunami->getDomainWidth();
+      l_dxy = l_w / l_nx;
 
+    } else if (l_setup_selection == "CircularDamBreak2d") {
+      l_w   = 100.0;
+      l_ny  = l_nx;
+      l_dxy = l_w / l_nx;
+      l_setup = new tsunami_lab::setups::CircularDamBreak2d();
     }else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
@@ -240,21 +250,36 @@ int main( int   i_argc,
         std::cerr << "Still sane?" << std::endl;
         return EXIT_FAILURE;
       }
+
+  // overwrite 2D-state if the setup calls for it
+  l_is2D = (l_setup_selection == "CircularDamBreak2d");
+
   // construct solver
-  tsunami_lab::patches::WavePropagation *l_waveProp;
-  l_waveProp = new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver );
+ tsunami_lab::patches::WavePropagation *l_waveProp;
+  if( l_is2D ) {
+    l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_nx, l_ny );
+  } else {
+    l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx, l_solver );
+  }
 
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
 
   // set up solver
   for( tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++ ) {
-    tsunami_lab::t_real l_y = l_cy * l_dxy; 
 
-    tsunami_lab::t_real l_domainStart = (l_tsunami != nullptr) ? l_tsunami->getDomainStart() : 0.0;
+    // old implementation just in case
+    //tsunami_lab::t_real l_y = l_cy * l_dxy; 
+    //tsunami_lab::t_real l_domainStart = (l_tsunami != nullptr) ? l_tsunami->getDomainStart() : 0.0;
+    
+    // in case of 2d, we need to shift the domain by 50
+    tsunami_lab::t_real l_domainStartX = l_is2D ? -50.0 : 0.0;
+    tsunami_lab::t_real l_domainStartY = l_is2D ? -50.0 : 0.0;
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
-        tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStart;  
+        tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
+        tsunami_lab::t_real l_y = l_is2D ? (l_cy + 0.5) * l_dxy + l_domainStartY : l_cy * l_dxy;
+          
 
       // get initial values of the setup
       tsunami_lab::t_real l_h = l_setup->getHeight( l_x,
@@ -320,40 +345,50 @@ int main( int   i_argc,
       std::ofstream l_file;
       l_file.open( l_path  );
 
-      tsunami_lab::io::Csv::write( l_dxy,
-                                   l_nx,
-                                   1,
-                                   1,
-                                   l_waveProp->getBathymetry(),
-                                   l_waveProp->getHeight(),
-                                   l_waveProp->getMomentumX(),
-                                   nullptr,
-                                   l_file );
+      if( l_is2D ) {
+        tsunami_lab::io::Csv::write( l_dxy,
+                                    l_nx,
+                                    l_ny,
+                                    l_waveProp->getStride(),
+                                    l_waveProp->getBathymetry(),
+                                    l_waveProp->getHeight(),
+                                    l_waveProp->getMomentumX(),
+                                    l_waveProp->getMomentumY(),
+                                    l_file );
+      } else {
+        tsunami_lab::io::Csv::write( l_dxy,
+                                    l_nx,
+                                    1,
+                                    1,
+                                    l_waveProp->getBathymetry(),
+                                    l_waveProp->getHeight(),
+                                    l_waveProp->getMomentumX(),
+                                    nullptr,
+                                    l_file );
+      }
       l_file.close();
       l_nOut++;
     }
 
     /**  instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
     *    
-    *   CURRENTLY: it only checks if the actual depth of the water is lower than 20m.
-    */
+    *   OLD: it only checked if the actual depth of the water is lower than 200m.
+    
     // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the left-outermost cell
     bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 200;
     // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the right-outermost cell
     bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 200;
 
-
-    /* 
-    //previous setup checks if the floor is higher than the water level
-    bool l_leftReflecting  = l_setup->getBathymetry( 0.5 * l_dxy, 0 )    
-                          >= l_setup->getHeight( 0.5 * l_dxy, 0 )
-                          + l_setup->getBathymetry( 0.5 * l_dxy, 0 );
-    // checks if bathymetry of the right boundary is higher than waterlevel, by checking the middle of the right-outermost cell
-    bool l_rightReflecting = l_setup->getBathymetry( (l_nx - 0.5) * l_dxy, 0 )  
-                          >= l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 )
-                          + l_setup->getBathymetry( (l_nx - 0.5) * l_dxy, 0 );
-    */
     l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
+    */
+
+    // New setup for ghost-cells with false defaults in the setup.h
+    l_waveProp->setGhostCells(
+      l_setup->isLeftBoundaryReflecting(),
+      l_setup->isRightBoundaryReflecting(),
+      l_setup->isBottomBoundaryReflecting(),
+      l_setup->isTopBoundaryReflecting()
+    );
 
     l_waveProp->timeStep( l_scaling );
 
