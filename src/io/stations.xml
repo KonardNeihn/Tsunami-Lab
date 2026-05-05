@@ -1,7 +1,10 @@
 <tsunamilab>
     <stations>
-        <station name="StationA" x="5" y="0"/>
-        <station name="StationB" x="2" y="0"/>
+        <station name="StationA" x="10" y="50"/>
+        <station name="StationB" x="30" y="50"/>
+        <station name="StationC" x="50" y="50"/>
+        <station name="StationD" x="70" y="50"/>
+        <station name="StationE" x="90" y="50"/>
     </stations>
 
     <output>

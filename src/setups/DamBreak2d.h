@@ -30,7 +30,7 @@ class tsunami_lab::setups::DamBreak2d: public Setup {
     t_real m_locationDamX = 0;
     t_real m_locationDamY = 0;
 
-    t_real m_radiusDam
+    t_real m_radiusDam;
 
   public:
     /**

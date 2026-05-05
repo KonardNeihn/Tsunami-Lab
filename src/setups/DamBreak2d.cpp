@@ -6,7 +6,7 @@
  **/
 #include "DamBreak2d.h"
 
-tsunami_lab::setups::DamBreak1d::DamBreak2d( t_real i_heightLeft,
+tsunami_lab::setups::DamBreak2d::DamBreak2d( t_real i_heightLeft,
                 t_real i_heightRight,
                 t_real i_locationDamX,
                 t_real i_locationDamY,
@@ -34,12 +34,12 @@ tsunami_lab::t_real tsunami_lab::setups::DamBreak2d::getHeight( t_real i_x,
   }
 }
 
-tsunami_lab::t_real tsunami_lab::setups::DamBreak1d::getMomentumX( t_real,
+tsunami_lab::t_real tsunami_lab::setups::DamBreak2d::getMomentumX( t_real,
                                                                    t_real ) const {
   return 0;
 }
 
-tsunami_lab::t_real tsunami_lab::setups::DamBreak1d::getMomentumY( t_real,
+tsunami_lab::t_real tsunami_lab::setups::DamBreak2d::getMomentumY( t_real,
                                                                    t_real ) const {
   return 0;
 }
