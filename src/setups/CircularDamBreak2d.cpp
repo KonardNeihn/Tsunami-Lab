@@ -5,8 +5,22 @@
 #include "CircularDamBreak2d.h"
 
 tsunami_lab::t_real tsunami_lab::setups::CircularDamBreak2d::getHeight( t_real i_x,
-                                                                         t_real i_y ) const {
+                                                                        t_real i_y ) const {
   if( std::sqrt( i_x * i_x + i_y * i_y ) < 10 )
     return 10;
   return 5;
+}
+
+// only for second setup (bathymetry)
+
+tsunami_lab::t_real tsunami_lab::setups::CircularDamBreak2d::getBathymetry( t_real i_x,
+                                                                            t_real i_y ) const {
+  if( (i_x < 7) && (i_y > 12))
+    return -5;
+  else if( (i_x > 17) && (i_y > 12)) 
+    return 2;
+  else if( i_x > 20 ) 
+    return 3;
+  return 0;
+
 }

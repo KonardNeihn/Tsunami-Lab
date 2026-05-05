@@ -298,11 +298,12 @@ int main( int   i_argc,
       tsunami_lab::t_real l_b = l_setup->getBathymetry( l_x,
                                                         l_y );
 
+      tsunami_lab::t_real l_depth = std::max( tsunami_lab::t_real(0), l_h - l_b );
 
       // set initial values in wave propagation solver
       l_waveProp->setHeight( l_cx,
                              l_cy,
-                             l_h );
+                             l_depth );
 
       l_waveProp->setMomentumX( l_cx,
                                 l_cy,
@@ -409,9 +410,9 @@ int main( int   i_argc,
       l_setup->isTopBoundaryReflecting()
     );
 
-    std::cout << "before timestep" << std::endl;
+    //std::cout << "before timestep" << std::endl;
     l_waveProp->timeStep(l_scaling);
-    std::cout << "after timestep" << std::endl;
+    //std::cout << "after timestep" << std::endl;
 
     // Station Updates
     for (auto& station : stations) {
