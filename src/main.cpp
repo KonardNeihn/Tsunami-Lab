@@ -286,11 +286,11 @@ int main( int   i_argc,
     //tsunami_lab::t_real l_domainStart = (l_tsunami != nullptr) ? l_tsunami->getDomainStart() : 0.0;
     
     // in case of 2d, we need to shift the domain by 50
-    //tsunami_lab::t_real l_domainStartX = l_is2D ? -50.0 : 0.0;
-    //tsunami_lab::t_real l_domainStartY = l_is2D ? -50.0 : 0.0;
+    tsunami_lab::t_real l_domainStartX = l_is2D ? -50.0 : 0.0;
+    tsunami_lab::t_real l_domainStartY = l_is2D ? -50.0 : 0.0;
 
-    tsunami_lab::t_real l_domainStartX = 0.0;
-    tsunami_lab::t_real l_domainStartY = 0.0;
+    //tsunami_lab::t_real l_domainStartX = 0.0;
+    //tsunami_lab::t_real l_domainStartY = 0.0;
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
         tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
