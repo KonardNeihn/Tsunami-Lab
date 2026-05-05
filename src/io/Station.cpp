@@ -19,7 +19,7 @@ tsunami_lab::io::Station::Station(t_idx i_xPosition, t_idx i_yPosition, float i_
 
     m_timeSinceLastRecording = 0.0;   
 
-    m_linearPosition = /*(i_nx + 0) * (m_yPosition + 0) + */(m_xPosition + 1) + (0 * i_nx);
+    m_linearPosition = m_xPosition + m_yPosition * i_nx;
 }
 
 void tsunami_lab::io::Station::timeStep(t_real i_deltaTimeStep,const t_real *i_height, const t_real *i_momentumX, const t_real *i_momentumY) {

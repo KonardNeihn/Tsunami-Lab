@@ -14,6 +14,7 @@
 #include "setups/HydraulicJump1d.h"
 #include "setups/TsunamiEvent1d.h"
 #include "setups/CircularDamBreak2d.h"
+#include "setups/DamBreak2d.h"
 #include "io/Csv.h"
 #include "io/Station.h"
 #include "io/XmlReader.h"
@@ -140,6 +141,7 @@ int main( int   i_argc,
                                             && l_setup_selection != "HydraulicJump1d"
                                             && l_setup_selection != "TsunamiEvent1d"
                                             && l_setup_selection != "CircularDamBreak2d"
+                                            && l_setup_selection != "DamBreak2d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -239,7 +241,15 @@ int main( int   i_argc,
       l_ny  = l_nx;
       l_dxy = l_w / l_nx;
       l_setup = new tsunami_lab::setups::CircularDamBreak2d();
-    }else {
+
+    } else if (l_setup_selection == "DamBreak2d") {
+      l_ny  = l_nx;
+      l_setup = new tsunami_lab::setups::DamBreak2d(15, // height water dam
+                                                    10, // height water
+                                                    2.5, // position of dam X
+                                                    5,  // position of dam Y
+                                                    2.5); // radius of dam
+    } else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
     }
@@ -255,7 +265,7 @@ int main( int   i_argc,
       }
 
   // overwrite 2D-state if the setup calls for it
-  l_is2D = (l_setup_selection == "CircularDamBreak2d");
+  l_is2D = (l_setup_selection == "CircularDamBreak2d" || true);
 
   // construct solver
  tsunami_lab::patches::WavePropagation *l_waveProp;
@@ -278,6 +288,9 @@ int main( int   i_argc,
     // in case of 2d, we need to shift the domain by 50
     tsunami_lab::t_real l_domainStartX = l_is2D ? -50.0 : 0.0;
     tsunami_lab::t_real l_domainStartY = l_is2D ? -50.0 : 0.0;
+
+    //tsunami_lab::t_real l_domainStartX = 0.0;
+    //tsunami_lab::t_real l_domainStartY = 0.0;
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
         tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
@@ -410,9 +423,7 @@ int main( int   i_argc,
       l_setup->isTopBoundaryReflecting()
     );
 
-    //std::cout << "before timestep" << std::endl;
     l_waveProp->timeStep(l_scaling);
-    //std::cout << "after timestep" << std::endl;
 
     // Station Updates
     for (auto& station : stations) {
