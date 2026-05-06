@@ -106,6 +106,12 @@ loaded into Paraview and got converted into an gif:
    Old DamBreak1d Simulation.
 
 
+Some clear differences can be observed between the 1d and 2d dam break setup. The 2d setup feels a lot more like water because the water of the dam drops a lot and pushing the water towards the edges
+generating mutiple waves that go outwards. One major following by a smaller wave can be observed while the 1d setup only equals out the water. For the 2d setup the water hight at the end is a bit lower,
+probably beacuase the dam doesnt fill out the full left side but only a circle stamped out of the half.
+
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
