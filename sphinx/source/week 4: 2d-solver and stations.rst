@@ -44,21 +44,21 @@ the underwater cliffs in addition to the directional ones forming from the dambr
      <source src="_static/2dbathymetry.mp4" type="video/mp4">
    </video>
 
+
 Stations
 ~~~~~~~~~~~~~~~~~~~~~
 
-Each station has a position represented by x and y coordinates as well as a name to separate them easily. Every station has a recording interval which is the same for all stations.
-The output files will be saved inside the folder ``solutions/station_data``. The file is named after its station. The station class contains a public method ``timeStep`` handling the recording of the data.
-``timeStep`` gets called in main inside the main simulation loop and checks with the help of ``l_dt`` if it should record or keep waiting until the time since the last record is high enough.
-The csv files can be converted into plots the visulize the recorded data by running ``python3 station_vis.py`` in the command line. The outputed image will be safed inside ``solutions/stations_data/plots``.
+Each station has a position defined by x and y coordinates, as well as a unique name for identification. All stations share the same recording interval.
+The output files are stored in the folder ``solutions/station_data``. Each file is named after its corresponding station. The station class provides a public method ``timeStep`` which handles the recording of data.
+The ``timeStep`` method is called within the main simulation loop. It uses ``l_dt`` to determine whether enough time has passed since the last recording. If so, a new data point is written; otherwise, it waits until the required interval is reached.
+The generated CSV files can be converted into plots to visualize the recorded data by running ``python3 station_vis.py`` in the command line. The resulting images are saved in ``solutions/station_data/plots``.
 
 .. figure:: t
    :width: 600px
 
-Example of recorded station data. The station was placed in the center of an old RareRare1d setup.
+   Example of recorded station data. The station was placed in the center of a RareRare1d setup.
 
-The number of stations, their positions, the recording interval, and the location of the recorded data output folder can all be set inside ``src/io/stations.xml``.
-Based on the content, instances of the station class will be created.
+The number of stations, their positions, the recording interval, and the output directory can all be configured in ``src/io/stations.xml``. Based on this configuration, instances of the station class are created.
 
 ::
    <tsunamilab>
@@ -68,48 +68,43 @@ Based on the content, instances of the station class will be created.
       </stations>
 
       <output>
-         <record_intervall>0.1</record_intervall>
+         <record_interval>0.1</record_interval>
          <path>solutions/station_data/</path>
       </output>
    </tsunamilab>
 
 ``stations.xml`` file
 
+
 2D Circular Dambreak
 ~~~~~~~~~~~~~~~~~~~~~
 
-The 2D dam break was run with a circular dam with the height of 15 at the position x = 2.5 and y = 5 and a radius of 2.5, leading to the most right point of the dam being at x = 5.
-This makes the 2d version is now compareable to the 1d version. Five Station were placed on the x-Axis to record the data of the 2d simulation. The solution files of DamBreak2d were
-loaded into Paraview and got converted into an gif:
+The 2D dam break simulation was performed using a circular dam with a height of 15, centered at x = 2.5 and y = 5, and a radius of 2.5. This results in the rightmost point of the dam being located at x = 5.
+This setup makes the 2D configuration comparable to the 1D version. Five stations were placed along the x-axis to record data from the 2D simulation. The resulting solution files were loaded into ParaView and converted into a GIF:
 
 .. figure:: DamBreak2d.gif
    :width: 600px
 
-   New DamBreak2d Simulation.
-
+   New DamBreak2d simulation.
 
 .. figure:: LeftDamBreak2dStation.png
    :width: 600px
 
-   Recorded Data by a Station located on the left side of DamBreak2d.
-
+   Recorded data from a station located on the left side of the 2D dam break.
 
 .. figure:: RightDamBreak2dStation.png
    :width: 600px
 
-   Recorded Data by a Station located on the right side of DamBreak2d.
-
+   Recorded data from a station located on the right side of the 2D dam break.
 
 .. figure:: dambreak_15_10_5_100.gif
    :width: 600px
 
-   Old DamBreak1d Simulation.
+   Old DamBreak1d simulation.
 
-
-Some clear differences can be observed between the 1d and 2d dam break setup. The 2d setup feels a lot more like water because the water of the dam drops a lot and pushing the water towards the edges
-generating mutiple waves that go outwards. One major following by a smaller wave can be observed while the 1d setup only equals out the water. For the 2d setup the water hight at the end is a bit lower,
-probably beacuase the dam doesnt fill out the full left side but only a circle stamped out of the half.
-
+Several clear differences can be observed between the 1D and 2D dam break setups. The 2D simulation behaves more like real water: the water from the dam collapses and spreads outward, pushing fluid toward the edges and generating multiple outward-propagating waves.
+Typically, one dominant wave followed by smaller waves can be observed. In contrast, the 1D setup mainly results in a simple equalization of the water levels.
+In the 2D setup, the final water height is slightly lower. This is likely because the dam does not occupy the entire left region, but instead only forms a circular section.
 
 
 .. toctree::
