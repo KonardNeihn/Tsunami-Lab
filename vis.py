@@ -49,8 +49,13 @@ for file in files:
     ymin = min(ymin, b.min(), surface.min())
     ymax = max(ymax, b.max(), surface.max())
 
+<<<<<<< Updated upstream
 ymin = -1
 ymax = ymax + 10
+=======
+ymin = -2500
+ymax = ymax + 1
+>>>>>>> Stashed changes
 
 # Plotten
 for file in files:
