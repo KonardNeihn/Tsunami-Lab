@@ -15,8 +15,9 @@ How to build the current code
 
 Run the following commands:
 
-- nix-shell -p python3Packages.sphinx python3Packages.sphinx_rtd_theme doxygen pkgs.scons
-   - **nothing works without it**
+- Old setup: nix-shell -p python3Packages.sphinx python3Packages.sphinx_rtd_theme doxygen pkgs.scons
+- **New setup**: nix-shell 
+   - now uses seperate file (shell.nix) to load packages, still:  **nothing works without it**
 - scons
    - builds the project
 - ./build/tests
