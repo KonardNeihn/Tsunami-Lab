@@ -264,10 +264,18 @@ int main( int   i_argc,
         return EXIT_FAILURE;
       }
 
-  // overwrite 2D-state if the setup calls for it
-  l_is2D = (l_setup_selection == "CircularDamBreak2d" || true);
 
-  // construct solver
+  // check if setup is 2d ("2d" HAS TO BE INCLUDED IN SETUP NAME)
+  l_is2D = false;
+  int l_stringLength = l_setup_selection.length();
+  for (int i = 1; i < l_stringLength; i++) {
+    if (l_setup_selection[i-1] == '2' && l_setup_selection[i] == 'd') {
+      l_is2D = true;
+      break;
+    }
+  }
+
+ // construct solver
  tsunami_lab::patches::WavePropagation *l_waveProp;
   if( l_is2D ) {
     l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_nx, l_ny );
