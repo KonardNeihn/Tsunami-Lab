@@ -15,6 +15,7 @@ pkgs.mkShell {
         pkgs.paraview
         pkgs.pugixml
         pkgs.pkg-config
+        pkgs.netcdf
     ];
 
     shellHook = ''

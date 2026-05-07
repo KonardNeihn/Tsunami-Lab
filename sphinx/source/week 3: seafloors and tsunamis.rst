@@ -82,7 +82,7 @@ The Froude number is computed as:
 
 .. math::
 
-   F = \frac{4.42 / -b(10)}{\sqrt{0.5844578200955863 \cdot -b(10)}}
+   F = \frac{4.42 / -b(10)}{\sqrt{g \cdot -b(10)}}
 
 with:
 

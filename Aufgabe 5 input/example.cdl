@@ -1,0 +1,30 @@
+netcdf example {
+dimensions:
+    x = 2;
+    y = 3;
+    // für Zeitschritte
+    time = unlimited;
+variables:
+    float x(x);
+        x:units = "m";
+    float y(y);
+        y:units = "m";
+    float time(time);
+        time:units = "s";
+    float z(time,y,x);
+        z:units = "m";
+    // globale Attribute
+    :title = ".cdl Test";
+    :summary = "nein";
+data:
+    x = 1,2;
+    y = 3,4,5;
+    time = 0,1;
+    z = 1,2,
+        3,4,
+        5,6,
+
+        3,4,
+        5,6,
+        7,8;
+}
