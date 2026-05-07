@@ -75,6 +75,7 @@ int main( int   i_argc,
       std::cout << "  -s <name>,   (--solver=<name>)   Select a solver. Possible is {fwave, roe}. Default is fwave." << std::endl;
       std::cout << "  -i,          --insanity          Set flag for insanity. Default is sanity" << std::endl; // oder --sanity=true  ?
       std::cout << "  -n <number>, (--ncells=<number>) Set number of cells. Default is 100." << std::endl;
+      std::cout << "  -n <number> <number>             Set number of cells in x and y direction. Defaults: x = 100, y = 1" << std::endl;
       std::cout << "  -w <number>, (--width=<number>)  Set width of the observed space in meters. default is 10" << std::endl;
       std::cout << "  -t <number>, (--time=<number>)   Set time until aborting in s. default is 1.25" << std::endl;
       std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d}. Default is DamBreak1d" << std::endl;
@@ -99,11 +100,23 @@ int main( int   i_argc,
         return EXIT_FAILURE;
       }
     }
-    // ckeck if number of cells is specified
+    // ckeck if number of cells is specified only in x direction
     else if (arg == "-n" && i + 1 < i_argc) {  // || arg == "--ncells=<>"
       if (is_number(i_argv[++i])) {
         l_nx = atoi( i_argv[i] );
         if( l_nx < 1 ) {
+          std::cerr << "invalid number of cells, must be > 0" << std::endl;
+          return EXIT_FAILURE;
+        }
+        l_dxy = l_w / l_nx;
+      }
+    }
+    // check if number of cells is specified for x and y direction
+    else if (arg == "-n" && i + 2 < i_argc) {  // || arg == "--ncells=<>"
+      if (is_number(i_argv[++i]) && is_number(i_argv[++i])) {
+        l_nx = atoi(i_argv[i - 1]);
+        l_ny = atoi(i_argv[i]);
+        if(l_nx < 1 || l_ny < 1) {
           std::cerr << "invalid number of cells, must be > 0" << std::endl;
           return EXIT_FAILURE;
         }
