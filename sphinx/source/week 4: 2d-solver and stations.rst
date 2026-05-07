@@ -53,14 +53,14 @@ The output files are stored in the folder ``solutions/station_data``. Each file 
 The ``timeStep`` method is called within the main simulation loop. It uses ``l_dt`` to determine whether enough time has passed since the last recording. If so, a new data point is written; otherwise, it waits until the required interval is reached.
 The generated CSV files can be converted into plots to visualize the recorded data by running ``python3 station_vis.py`` in the command line. The resulting images are saved in ``solutions/station_data/plots``.
 
-.. figure:: t
+.. figure:: RightDamBreak2dStation.png
    :width: 600px
 
-   Example of recorded station data. The station was placed in the center of a RareRare1d setup.
+   Example of recorded station data.
 
 The number of stations, their positions, the recording interval, and the output directory can all be configured in ``src/io/stations.xml``. Based on this configuration, instances of the station class are created.
 
-::
+.. code-block::
    <tsunamilab>
       <stations>
          <station name="StationA" x="5" y="0"/>
