@@ -21,5 +21,7 @@ pkgs.mkShell {
     shellHook = ''
     export PUGIXML_INCLUDE=${pkgs.pugixml}/include
     export PUGIXML_LIB=${pkgs.pugixml}/lib
+    export NETCDF_INCLUDE=${pkgs.netcdf}/include
+    export NETCDF_LIB=${pkgs.netcdf}/lib
     '';
 }

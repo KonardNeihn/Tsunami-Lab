@@ -16,6 +16,7 @@
 #include "setups/CircularDamBreak2d.h"
 #include "setups/DamBreak2d.h"
 #include "io/Csv.h"
+#include "io/NetCdf.h" 
 #include "io/Station.h"
 #include "io/XmlReader.h"
 #include <vector>
@@ -185,6 +186,7 @@ int main( int   i_argc,
   // set output directory
   std::filesystem::path outDir = "solutions";
 
+
   // ensure output directory exists
   if (!std::filesystem::exists(outDir)) {
     std::filesystem::create_directory(outDir);
@@ -201,6 +203,9 @@ int main( int   i_argc,
       }
     }
   }
+
+  // set output path for NetCdf
+  std::string l_ncPath = "solutions/netcdf_output.nc";   
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
@@ -387,42 +392,55 @@ int main( int   i_argc,
                           outputConfig.path);
   }
 
+  // construct writer for NetCdf
+  tsunami_lab::io::NetCdf l_ncWriter( l_ncPath,                                         
+                                      l_nx,                                             
+                                      l_is2D ? l_ny : 1,          // pass 1 for 1D runs
+                                      l_dxy,                                            
+                                      l_waveProp->getStride(),                          
+                                      l_waveProp->getBathymetry()                                     
+);     
+
   // iterate over time
-  while( l_simTime < l_endTime ){
-    if( l_timeStep % 25 == 0 ) {
-      std::cout << "  simulation time / #time steps: "
-                << l_simTime << " / " << l_timeStep << std::endl;
+  while( l_simTime < l_endTime ) {
+      if( l_timeStep % 25 == 0 ) {
+          std::cout << "  simulation time / #time steps: "
+                    << l_simTime << " / " << l_timeStep << std::endl;
 
-      std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
-      std::cout << "  writing wave field to " << l_path << std::endl;
+          std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
+          std::cout << "  writing wave field to " << l_path << std::endl;
 
-      std::ofstream l_file;
-      l_file.open( l_path  );
+          std::ofstream l_file;
+          l_file.open( l_path );
 
-      if( l_is2D ) {
-        tsunami_lab::io::Csv::write( l_dxy,
-                                    l_nx,
-                                    l_ny,
-                                    l_waveProp->getStride(),
-                                    l_waveProp->getBathymetry(),
-                                    l_waveProp->getHeight(),
-                                    l_waveProp->getMomentumX(),
-                                    l_waveProp->getMomentumY(),
-                                    l_file );
-      } else {
-        tsunami_lab::io::Csv::write( l_dxy,
-                                    l_nx,
-                                    1,
-                                    1,
-                                    l_waveProp->getBathymetry(),
-                                    l_waveProp->getHeight(),
-                                    l_waveProp->getMomentumX(),
-                                    nullptr,
-                                    l_file );
-      }
-      l_file.close();
-      l_nOut++;
-    }
+          if( l_is2D ) {
+              tsunami_lab::io::Csv::write( l_dxy, l_nx, l_ny,
+                                          l_waveProp->getStride(),
+                                          l_waveProp->getBathymetry(),
+                                          l_waveProp->getHeight(),
+                                          l_waveProp->getMomentumX(),
+                                          l_waveProp->getMomentumY(),
+                                          l_file );
+          } else {
+              tsunami_lab::io::Csv::write( l_dxy, l_nx, 1, 1,
+                                          l_waveProp->getBathymetry(),
+                                          l_waveProp->getHeight(),
+                                          l_waveProp->getMomentumX(),
+                                          nullptr,
+                                          l_file );
+          }
+          l_file.close();
+
+          // netCDF write
+          l_ncWriter.write( l_simTime,
+                            l_waveProp->getHeight(),
+                            l_waveProp->getMomentumX(),
+                            l_is2D ? l_waveProp->getMomentumY() : nullptr );
+
+          l_nOut++;
+      }                                                                   
+
+
 
     /**  instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
     *    

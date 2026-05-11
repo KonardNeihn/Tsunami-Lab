@@ -22,6 +22,7 @@ l_sources = [ 'solvers/Roe.cpp',
               'setups/TsunamiEvent1d.cpp',
               'setups/CircularDamBreak2d.cpp',
               'setups/DamBreak2d.cpp',
+              'io/NetCdf.cpp',
               'io/Csv.cpp', 
               'io/Station.cpp',
               'io/XmlReader.cpp']
@@ -35,6 +36,10 @@ env.standalone = env.Object( "main.cpp" )
 env.Append(CPPPATH=[os.environ["PUGIXML_INCLUDE"]])
 env.Append(LIBPATH=[os.environ["PUGIXML_LIB"]])
 env.Append(LIBS=["pugixml"])
+
+env.Append(CPPPATH=[os.environ["NETCDF_INCLUDE"]])
+env.Append(LIBPATH=[os.environ["NETCDF_LIB"]])
+env.Append(LIBS=["netcdf"])
 
 # gather unit tests
 l_tests = [ 'tests.cpp',
