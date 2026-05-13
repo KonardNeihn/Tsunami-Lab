@@ -21,7 +21,7 @@ void tsunami_lab::io::NetCdf::checkNcErr( int         i_status,
   }
 }
 
-// Constructor – opens the file, defines the schema, writes the static data
+// Constructor – opens the file and writes the static data
 tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
                                   tsunami_lab::t_idx          i_nx,
                                   tsunami_lab::t_idx          i_ny,
@@ -39,7 +39,7 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
   l_status = nc_create( i_path.c_str(), NC_CLOBBER | NC_NETCDF4, &m_ncId );
   checkNcErr( l_status, "nc_create" );
 
-  // 2. Global attributes (COARDS requires "Conventions")
+  // 2. Global attributes (COARDS requires conventions)
   const char *l_conventions = "COARDS";
   l_status = nc_put_att_text( m_ncId, NC_GLOBAL, "Conventions",
                                std::strlen( l_conventions ), l_conventions );

@@ -36,4 +36,5 @@ To generate the Documentation in Sphinx:
    week 2: wave types and dambreak
    week 3: seafloors and tsunamis
    week 4: 2d-solver and stations
+   week 5: NetCdf
 
