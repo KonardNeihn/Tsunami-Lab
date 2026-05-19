@@ -5,6 +5,7 @@
 # Entry-point for builds.
 ##
 import SCons
+import os
 
 print( '####################################' )
 print( '### Tsunami Lab                  ###' )
@@ -32,6 +33,17 @@ if vars.UnknownVariables():
 
 # create environment
 env = Environment( variables = vars )
+
+env.Append(CPPPATH=[f"{os.environ['PUGIXML_INCLUDE']}"])
+env.Append(LIBPATH=[f"{os.environ['PUGIXML_LIB']}"])
+env.Append(LIBS=["pugixml"])
+
+env.Append(CPPPATH=[os.environ["NETCDF_INCLUDE"]])
+env.Append(LIBPATH=[os.environ["NETCDF_LIB"]])
+env.Append(LIBS=["netcdf"])
+
+#env.ParseConfig("pkg-config --cflags --libs pugixml")
+#env.ParseConfig("pkg-config --cflags --libs netcdf")
 
 # generate help message
 Help( vars.GenerateHelpText( env ) )
@@ -70,15 +82,13 @@ env.Append( CXXFLAGS = [ '-isystem', 'submodules/Catch2/single_include' ] )
 VariantDir( variant_dir = 'build/src',
             src_dir     = 'src' )
 
-env.sources = []
-env.tests = []
-
-Export('env')
-SConscript( 'build/src/SConscript' )
-Import('env')
+sources, tests, standalone = SConscript(
+    'build/src/SConscript',
+    exports='env'
+)
 
 env.Program( target = 'build/tsunami_lab',
-             source = env.sources + env.standalone )
+             source = sources + standalone )
 
 env.Program( target = 'build/tests',
-             source = env.sources + env.tests )
+             source = sources + tests )
