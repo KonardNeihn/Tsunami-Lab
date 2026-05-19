@@ -28,7 +28,7 @@ jobs:
       - name: Static Code Analysis
         run:
           nix-shell --run "
-            cppcheck src/ --template=gcc --force --error-exitcode=1
+            cppcheck src/ --template=gcc --force --inconclusive --error-exitcode=1
           "
 
       - name: Sanitize
