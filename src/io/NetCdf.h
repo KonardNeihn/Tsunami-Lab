@@ -11,6 +11,7 @@
 #include <string>
 #include <netcdf.h>
 #include "../constants.h"
+#include <vector>
 
 namespace tsunami_lab {
   namespace io {
@@ -122,10 +123,21 @@ class tsunami_lab::io::NetCdf {
      * @param i_hv       Pointer to the first interior y-momentum value
      *                  
      **/
+
     void write( tsunami_lab::t_real        i_simTime,
                 const tsunami_lab::t_real *i_h,
                 const tsunami_lab::t_real *i_hu,
                 const tsunami_lab::t_real *i_hv );
+
+    /**
+     * Reads a variable from a netCDF file and returns it as a vector.
+     *
+     * @param i_path      Path to the .nc file to read.
+     * @param i_variable  Name of the variable to read.
+     * @return            1D Vector containing the variables values. 
+     **/
+    std::vector<tsunami_lab::t_real> read(const std::string &i_path,
+                                          const std::string &i_variable);
 };
 
 #endif 

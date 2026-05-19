@@ -1,0 +1,50 @@
+/**
+ * @author 
+ *
+ * @section DESCRIPTION
+ * One-dimensional dam break problem.
+ **/
+#include "ArtificialTsunami2d.h"
+#include <algorithm>
+#include <math.h>
+
+
+tsunami_lab::setups::ArtificialTsunami2d::ArtificialTsunami2d(t_real i_bIn,
+                    t_real i_roh) {
+
+    m_bIn = i_bIn;
+    m_roh = i_roh;
+}
+
+tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getHeight( t_real i_x,
+                                                                t_real i_y ) const {
+    if (m_bIn < 0) {
+        max(-m_bIn, m_roh);
+    } else {
+        return 0;
+    }
+}
+
+tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getMomentumX( t_real,
+                                                                   t_real ) const {
+  return 0;
+}
+
+tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getMomentumY( t_real,
+                                                                   t_real ) const {
+  return 0;
+}
+
+tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getBathymetry( t_real i_x,
+                                                                            t_real i_y ) const {
+    t_real l_f = sin((i_x / 500) + 1) * M_PI;
+    t_real l_g = -((i_y / 500)*(i_y / 500)) + 1;
+    
+    t_real l_d = 5 * l_f * l_g;
+
+    if (m_bIn < 0) {
+        min(m_bIn, -m_roh) + l_d;
+    } else {
+        max(m_bIn, m_roh) + l_d;
+    }
+}

@@ -156,6 +156,7 @@ int main( int   i_argc,
                                             && l_setup_selection != "TsunamiEvent1d"
                                             && l_setup_selection != "CircularDamBreak2d"
                                             && l_setup_selection != "DamBreak2d"
+                                            && l_setup_selection != "ArtificialTsunami2d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -267,6 +268,11 @@ int main( int   i_argc,
                                                     2.5, // position of dam X
                                                     5,  // position of dam Y
                                                     2.5); // radius of dam
+    } else if (l_setup_selection == "ArtificialTsunami2d") {
+      l_ny = l_nx;
+      l_setup = new tsunami_lab::setups::ArtificialTsunami2d(10.0, 
+                                                            15.0);
+
     } else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;

@@ -357,3 +357,51 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
   // 4. Advance the record index
   ++m_timeStep;
 }
+
+std::vector<tsunami_lab::t_real> tsunami_lab::io::NetCdf::read(const std::string &i_path,
+                                                                    const std::string &i_variable) {
+    int l_status;
+    int l_ncId = -1;
+    int l_varId = -1;
+
+    l_status = nc_open( i_path.c_str(), NC_NOWRITE, &l_ncId );
+    checkNcErr( l_status, "nc_open" );
+
+    l_status = nc_inq_varid( l_ncId, i_variable.c_str(), &l_varId );
+    checkNcErr( l_status, "nc_inq_varid" );
+
+    nc_type l_type;
+    int l_ndims;
+    int l_dimIds[NC_MAX_DIMS];
+    l_status = nc_inq_var( l_ncId, l_varId, nullptr, &l_type, &l_ndims, l_dimIds, nullptr );
+    checkNcErr( l_status, "nc_inq_var" );
+
+    size_t l_total = 1;
+    for( int l_dim = 0; l_dim < l_ndims; ++l_dim ) {
+      size_t l_len = 0;
+      l_status = nc_inq_dimlen( l_ncId, l_dimIds[l_dim], &l_len );
+      checkNcErr( l_status, "nc_inq_dimlen" );
+      l_total *= l_len;
+    }
+
+    std::vector<tsunami_lab::t_real> l_data( l_total );
+    if( l_type == NC_FLOAT ) {
+      l_status = nc_get_var_float( l_ncId, l_varId, l_data.data() );
+      checkNcErr( l_status, "nc_get_var_float" );
+    } else if( l_type == NC_DOUBLE ) {
+      std::vector<double> l_tmp( l_total );
+      l_status = nc_get_var_double( l_ncId, l_varId, l_tmp.data() );
+      checkNcErr( l_status, "nc_get_var_double" );
+      for( size_t l_i = 0; l_i < l_total; ++l_i )
+        l_data[l_i] = static_cast<tsunami_lab::t_real>( l_tmp[l_i] );
+    } else {
+      std::cerr << "Unsupported netCDF variable type for '" << i_variable << "'" << std::endl;
+      nc_close( l_ncId );
+      return std::vector<tsunami_lab::t_real>();
+    }
+
+    l_status = nc_close( l_ncId );
+    checkNcErr( l_status, "nc_close" );
+
+    return l_data;
+}
