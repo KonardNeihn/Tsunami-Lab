@@ -31,19 +31,7 @@ l_sources = [ 'solvers/Roe.cpp',
               'io/Station.cpp',
               'io/XmlReader.cpp']
 
-for l_so in l_sources:
-  env.sources.append( env.Object( l_so ) )
-
-
-env.standalone = env.Object( "main.cpp" )
-
-env.Append(CPPPATH=[os.environ["PUGIXML_INCLUDE"]])
-env.Append(LIBPATH=[os.environ["PUGIXML_LIB"]])
-env.Append(LIBS=["pugixml"])
-
-env.Append(CPPPATH=[os.environ["NETCDF_INCLUDE"]])
-env.Append(LIBPATH=[os.environ["NETCDF_LIB"]])
-env.Append(LIBS=["netcdf"])
+sources = [env.Object(s) for s in l_sources]
 
 # gather unit tests
 l_tests = [ 'tests.cpp',
@@ -60,7 +48,8 @@ l_tests = [ 'tests.cpp',
             'setups/HydraulicJump1d.test.cpp',
             'setups/TsunamiEvent1d.test.cpp',]
 
-for l_te in l_tests:
-  env.tests.append( env.Object( l_te ) )
+tests = [env.Object(s) for s in l_tests]
 
-Export('env')
+standalone = env.Object( "main.cpp" )
+
+Return('sources tests standalone')

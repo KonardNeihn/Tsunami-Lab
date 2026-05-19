@@ -50,10 +50,10 @@ The example essentially shows 12m deep water filling a pocket of 2m deep water o
 
 
 Subcritical and Supercritical Flow
-------------------------------------------
+-------------------------------------
 
 Calculating the Location and Value of the Maximum Froude Number
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Froude number is defined as:
 
@@ -70,7 +70,7 @@ The lowest water height can be found at the top of the obstacle, which is at:
    x = 10
 
 Subcritical Flow
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Height of the water at :math:`x = 10` is:
 
@@ -98,7 +98,7 @@ Result:
 
 
 Supercritical Flow
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Height of the water at :math:`x = 10` is:
 
@@ -127,7 +127,7 @@ Result:
 
 
 Simulation Results
-----------------------
+---------------------
 
 We implemented a new hydraulic jump setup. The values that do not change between the subcritical (3.3.1) and supercritical flow (3.3.2) 
 are hardcoded into the setup file, while the values that change can be specified as agrguments inside main.cpp.

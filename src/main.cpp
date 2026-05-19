@@ -394,7 +394,7 @@ int main( int   i_argc,
                           stationConfig.y,
                           outputConfig.interval,
                           stationConfig.name,
-                          l_nx,
+                          l_waveProp->getStride(),
                           outputConfig.path);
   }
 

@@ -36,25 +36,25 @@ class tsunami_lab::setups::CircularDamBreak2d: public Setup {
      * @return water height.
      **/
     t_real getHeight( t_real i_x,
-                      t_real i_y ) const;
+                      t_real i_y ) const override;
 
     /**
      * Gets the momentum in x-direction (always 0).
      **/
     t_real getMomentumX( t_real,
-                         t_real ) const { return 0; }
+                         t_real ) const override { return 0; }
 
     /**
      * Gets the momentum in y-direction (always 0).
      **/
     t_real getMomentumY( t_real,
-                         t_real ) const { return 0; }
+                         t_real ) const override { return 0; }
 
     /**
      * Gets the bathymetry (always 0 — flat domain).
      **/
     t_real getBathymetry( t_real i_x,
-                          t_real i_y ) const; 
+                          t_real i_y ) const override; 
 
     // All four boundaries are outflow — no overrides needed, since the base class defaults to false for all of them.
 };

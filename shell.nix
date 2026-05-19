@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-24.05.tar.gz") {} }:
 
 pkgs.mkShell {
     packages = [
@@ -16,6 +16,8 @@ pkgs.mkShell {
         pkgs.pugixml
         pkgs.pkg-config
         pkgs.netcdf
+        pkgs.cppcheck
+        pkgs.valgrind
     ];
 
     shellHook = ''

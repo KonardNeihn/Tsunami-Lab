@@ -20,36 +20,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install scons
-          sudo apt-get install valgrind
-          sudo apt-get install cppcheck
-          git submodule init
-          git submodule update
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-24.05
 
-      - name: Static Code Analysis
+      - name: Static Code Analysis (show Errors)
         run:
-          cppcheck src/ --template=gcc --force --error-exitcode=1
+          nix-shell --run "
+            cppcheck src/ --template=gcc --force
+          "
+
+      - name: Static Code Analysis (show Hints)
+        run:
+          nix-shell --run "
+            cppcheck src/ --template=gcc --force --enable=all --error-exitcode=0
+          "
 
       - name: Sanitize
         run: |
-          scons mode=debug+san
-          ./build/tests
-          ./build/tsunami_lab 25
-          scons mode=release+san
-          ./build/tests
-          ./build/tsunami_lab 500
+          nix-shell --run "
+            scons mode=debug+san &&
+            ./build/tests &&
+            ./build/tsunami_lab 25 &&
+            scons mode=release+san &&
+            ./build/tests &&
+            ./build/tsunami_lab 500
+          "
 
       - name: Valgrind
         run: |
-          scons mode=debug
-          valgrind ./build/tests
-          valgrind ./build/tsunami_lab 25
-
+          nix-shell --run "
+            scons mode=debug &&
+            valgrind ./build/tests &&
+            valgrind ./build/tsunami_lab 25
+          "
+          
       - name: Release
         run: |
-          scons
-          ./build/tests
-          ./build/tsunami_lab 500
+          nix-shell --run "
+            scons &&
+            ./build/tests &&
+            ./build/tsunami_lab 500
+          "

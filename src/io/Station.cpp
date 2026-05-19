@@ -4,6 +4,7 @@
 #include <filesystem>
 
 tsunami_lab::io::Station::Station(t_idx i_xPosition, t_idx i_yPosition, float i_recordingInterval, std::string i_stationName, t_idx i_nx, std::string i_path) {
+
     m_xPosition = i_xPosition;
     m_yPosition = i_yPosition;
     m_recordingInterval = i_recordingInterval;
