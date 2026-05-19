@@ -22,6 +22,8 @@ jobs:
 
       - name: Install Nix
         uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-24.05
 
       - name: Static Code Analysis
         run:
@@ -43,15 +45,15 @@ jobs:
       - name: Valgrind
         run: |
           nix-shell --pure --run "
-            scons mode=debug
-            valgrind ./build/tests
+            scons mode=debug &&
+            valgrind ./build/tests &&
             valgrind ./build/tsunami_lab 25
           "
           
       - name: Release
         run: |
           nix-shell --pure --run "
-            scons
-            ./build/tests
+            scons &&
+            ./build/tests &&
             ./build/tsunami_lab 500
           "
