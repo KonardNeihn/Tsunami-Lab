@@ -33,13 +33,8 @@ for l_so in l_sources:
 
 env.standalone = env.Object( "main.cpp" )
 
-env.Append(CPPPATH=[os.environ["PUGIXML_INCLUDE"]])
-env.Append(LIBPATH=[os.environ["PUGIXML_LIB"]])
-env.Append(LIBS=["pugixml"])
-
-env.Append(CPPPATH=[os.environ["NETCDF_INCLUDE"]])
-env.Append(LIBPATH=[os.environ["NETCDF_LIB"]])
-env.Append(LIBS=["netcdf"])
+env.ParseConfig("pkg-config --cflags --libs pugixml")
+env.ParseConfig("pkg-config --cflags --libs netcdf")
 
 # gather unit tests
 l_tests = [ 'tests.cpp',

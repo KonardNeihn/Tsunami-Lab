@@ -27,6 +27,8 @@ jobs:
           sudo apt-get install valgrind
           sudo apt-get install cppcheck
           sudo apt-get install libpugixml-dev
+          sudo apt-get install libnetcdf-dev
+          sudo apt-get install pkg-config
           git submodule init
           git submodule update
 
