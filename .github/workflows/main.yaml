@@ -28,7 +28,6 @@ jobs:
       - name: Static Code Analysis
         run:
           nix-shell --run "
-            bear -- scons &&
             cppcheck src/ --template=gcc --force --enable=warning,performance,style --error-exitcode=0
           "
 

@@ -18,7 +18,6 @@ pkgs.mkShell {
         pkgs.netcdf
         pkgs.cppcheck
         pkgs.valgrind
-        pkgs.bear
     ];
 
     shellHook = ''
