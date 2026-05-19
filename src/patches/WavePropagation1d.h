@@ -50,14 +50,14 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     /**
      * Destructor which frees all allocated memory.
      **/
-    ~WavePropagation1d();
+    ~WavePropagation1d() override;
 
     /**
      * Performs a time step.
      *
      * @param i_scaling scaling of the time step (dt / dx).
      **/
-    void timeStep( t_real i_scaling );
+    void timeStep( t_real i_scaling ) override;
 
     /**
      * Sets the values of the ghost cells according to RESPECTIVE boundary conditions.
@@ -65,14 +65,14 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     void setGhostCells( bool i_leftReflecting,
                         bool i_rightReflecting,
                         bool i_bottomReflecting = false,  
-                        bool i_topReflecting    = false );
+                        bool i_topReflecting    = false ) override;
 
     /**
      * Gets the stride in y-direction. x-direction is stride-1.
      *
      * @return stride in y-direction.
      **/
-    t_idx getStride(){
+    t_idx getStride() override {
       return m_nCells+2;
     }
 
@@ -81,7 +81,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      *
      * @return water heights.
      */
-    t_real const * getHeight(){
+    t_real const * getHeight() override {
       return m_h[m_step]+1;
     }
 
@@ -90,7 +90,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      *
      * @return floor heights.
      */
-    t_real const * getBathymetry(){
+    t_real const * getBathymetry() override {
       return m_b+1;
     }
 
@@ -99,14 +99,14 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      *
      * @return momenta in x-direction.
      **/
-    t_real const * getMomentumX(){
+    t_real const * getMomentumX() override {
       return m_hu[m_step]+1;
     }
 
     /**
      * Dummy function which returns a nullptr.
      **/
-    t_real const * getMomentumY(){
+    t_real const * getMomentumY() override {
       return nullptr;
     }
 
@@ -118,7 +118,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      **/
     void setHeight( t_idx  i_ix,
                     t_idx,
-                    t_real i_h ) {
+                    t_real i_h ) override {
       m_h[m_step][i_ix+1] = i_h;
     }
 
@@ -130,7 +130,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      **/
     void setMomentumX( t_idx  i_ix,
                        t_idx,
-                       t_real i_hu ) {
+                       t_real i_hu ) override {
       m_hu[m_step][i_ix+1] = i_hu;
     }
 
@@ -139,7 +139,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      **/
     void setMomentumY( t_idx,
                        t_idx,
-                       t_real ) {};
+                       t_real ) override {};
 
     /**
      * Sets the bathyetry in x-direction to the given value.
@@ -149,7 +149,7 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      **/
     void setBathymetry( t_idx  i_ix,
                         t_idx,
-                        t_real i_b ) {
+                        t_real i_b ) override {
       m_b[i_ix+1] = i_b;
     }
 
