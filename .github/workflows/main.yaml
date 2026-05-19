@@ -28,7 +28,7 @@ jobs:
       - name: Static Code Analysis (show Errors)
         run:
           nix-shell --run "
-            cppcheck src/ --template=gcc --force --enable=error --error-exitcode=1
+            cppcheck src/ --template=gcc --force --enable=warning --error-exitcode=1
           "
 
       - name: Static Code Analysis (show Hints)
