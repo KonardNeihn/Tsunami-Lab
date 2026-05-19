@@ -16,6 +16,8 @@ pkgs.mkShell {
         pkgs.pugixml
         pkgs.pkg-config
         pkgs.netcdf
+        pkgs.cppcheck
+        pkgs.valgrind
     ];
 
     shellHook = ''
