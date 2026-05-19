@@ -25,7 +25,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-24.05
 
-      - name: Static Code Analysis (show Errors)
+      - name: Static Code Analysis (show Warnings)
         run:
           nix-shell --run "
             cppcheck src/ --template=gcc --force --enable=warning --error-exitcode=1

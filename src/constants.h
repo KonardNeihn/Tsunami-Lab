@@ -11,7 +11,7 @@
 
 namespace tsunami_lab {
   //! integral type for cell-ids, pointer arithmetic, etc.
-  typedef std::size_t t_idx;
+  typedef std::ptrdiff_t t_idx;
 
   //! floating point type
   typedef float t_real;
