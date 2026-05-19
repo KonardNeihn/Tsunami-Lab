@@ -25,13 +25,13 @@ jobs:
 
       - name: Static Code Analysis
         run:
-          nix-shell --run "
+          nix-shell --pure --run "
             cppcheck src/ --template=gcc --force --error-exitcode=1
           "
 
       - name: Sanitize
         run: |
-          nix-shell --run "
+          nix-shell --pure --run "
             scons mode=debug+san &&
             ./build/tests &&
             ./build/tsunami_lab 25 &&
@@ -42,7 +42,7 @@ jobs:
 
       - name: Valgrind
         run: |
-          nix-shell --run "
+          nix-shell --pure --run "
             scons mode=debug
             valgrind ./build/tests
             valgrind ./build/tsunami_lab 25
@@ -50,7 +50,7 @@ jobs:
           
       - name: Release
         run: |
-          nix-shell --run "
+          nix-shell --pure --run "
             scons
             ./build/tests
             ./build/tsunami_lab 500
