@@ -15,6 +15,8 @@
 #include "setups/TsunamiEvent1d.h"
 #include "setups/CircularDamBreak2d.h"
 #include "setups/DamBreak2d.h"
+#include "setups/ArtificialTsunami2d.h"
+#include "setups/TsunamiEvent2d.h"
 #include "io/Csv.h"
 #include "io/NetCdf.h" 
 #include "io/Station.h"
@@ -157,6 +159,7 @@ int main( int   i_argc,
                                             && l_setup_selection != "CircularDamBreak2d"
                                             && l_setup_selection != "DamBreak2d"
                                             && l_setup_selection != "ArtificialTsunami2d"
+                                            && l_setup_selection != "TsunamiEvent2d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -272,8 +275,13 @@ int main( int   i_argc,
       l_ny = l_nx;
       l_setup = new tsunami_lab::setups::ArtificialTsunami2d(10.0, 
                                                             15.0);
-
-    } else {
+    } else if (l_setup_selection == "TsunamiEvent2d") {
+      l_setup = new tsunami_lab::setups::TsunamiEvent2d("NetCdf/artificialtsunami_bathymetry_1000.nc",
+                                                        "NetCdf/artificialtsunami_displ_1000.nc");
+      l_ny = l_nx;
+    }
+    
+    else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
       return EXIT_FAILURE;
     }

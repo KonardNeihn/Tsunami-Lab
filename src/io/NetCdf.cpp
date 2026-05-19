@@ -359,7 +359,7 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
 }
 
 std::vector<tsunami_lab::t_real> tsunami_lab::io::NetCdf::read(const std::string &i_path,
-                                                                    const std::string &i_variable) {
+                                                                           const std::string &i_variable) {
     int l_status;
     int l_ncId = -1;
     int l_varId = -1;

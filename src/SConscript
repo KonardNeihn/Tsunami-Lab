@@ -22,11 +22,9 @@ l_sources = [ 'solvers/Roe.cpp',
               'setups/TsunamiEvent1d.cpp',
               'setups/CircularDamBreak2d.cpp',
               'setups/DamBreak2d.cpp',
-<<<<<<< Updated upstream
               'io/NetCdf.cpp',
-=======
               'setups/ArtificialTsunami2d.cpp',
->>>>>>> Stashed changes
+              'setups/TsunamiEvent2d.cpp',
               'io/Csv.cpp', 
               'io/Station.cpp',
               'io/XmlReader.cpp']

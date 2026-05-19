@@ -137,7 +137,7 @@ class tsunami_lab::io::NetCdf {
      * @return            1D Vector containing the variables values. 
      **/
     std::vector<tsunami_lab::t_real> read(const std::string &i_path,
-                                          const std::string &i_variable);
+                                                    const std::string &i_variable);
 };
 
 #endif 
