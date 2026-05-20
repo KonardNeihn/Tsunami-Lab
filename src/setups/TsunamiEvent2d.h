@@ -9,7 +9,7 @@
 #include "Setup.h"
 #include <string>
 #include <vector>
-#include "../io/NetCdf.h"
+#include "../io/NetCdfReader.h"
 
 namespace tsunami_lab {
   namespace setups {
@@ -24,6 +24,8 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
   private:
     std::vector<t_real> m_x;
     std::vector<t_real> m_y;
+    std::vector<t_real> m_xd;
+    std::vector<t_real> m_yd;
 
     std::vector<t_real> m_1dBathymetry;
     std::vector<std::vector<t_real>> m_2dBathymetry;
@@ -54,7 +56,7 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
      * @return height at the given point. 
      **/
     t_real getHeight( t_real i_x,
-                      t_real      ) const;
+                      t_real i_y     ) const;
 
     /**
      * Gets the momentum in x-direction.

@@ -35,7 +35,7 @@ int main( int   i_argc,
           char *i_argv[] ) {
   // number of cells in x- and y-direction
   tsunami_lab::t_idx l_nx = 100;
-  tsunami_lab::t_idx l_ny = 1;
+  tsunami_lab::t_idx l_ny = 100;
 
   // width of the observed space
   tsunami_lab::t_real l_w = 10.0;
@@ -273,12 +273,14 @@ int main( int   i_argc,
                                                     2.5); // radius of dam
     } else if (l_setup_selection == "ArtificialTsunami2d") {
       l_ny = l_nx;
-      l_setup = new tsunami_lab::setups::ArtificialTsunami2d(-10.0, 
-                                                            20.0);
+      l_setup = new tsunami_lab::setups::ArtificialTsunami2d(-50.0, 
+                                                            50.0);
     } else if (l_setup_selection == "TsunamiEvent2d") {
-      l_setup = new tsunami_lab::setups::TsunamiEvent2d("NetCdf/artificialtsunami_bathymetry_1000.nc",
-                                                        "NetCdf/artificialtsunami_displ_1000.nc");
       l_ny = l_nx;
+      l_w   = 10.0;
+      l_dxy = l_w / l_nx;
+      l_setup = new tsunami_lab::setups::TsunamiEvent2d("src/NetCdf/artificialtsunami_bathymetry_1000.nc",
+                                                        "src/NetCdf/artificialtsunami_displ_1000.nc");
     }
     
     else {
@@ -326,11 +328,16 @@ int main( int   i_argc,
     //tsunami_lab::t_real l_domainStart = (l_tsunami != nullptr) ? l_tsunami->getDomainStart() : 0.0;
     
     // in case of 2d, we need to shift the domain by 50
-    tsunami_lab::t_real l_domainStartX = l_is2D ? -50.0 : 0.0;
-    tsunami_lab::t_real l_domainStartY = l_is2D ? -50.0 : 0.0;
+    //tsunami_lab::t_real l_domainStartX = l_is2D ? -50.0 : 0.0;
+    //tsunami_lab::t_real l_domainStartY = l_is2D ? -50.0 : 0.0;
 
-    //tsunami_lab::t_real l_domainStartX = 0.0;
-    //tsunami_lab::t_real l_domainStartY = 0.0;
+    /*if (l_setup_selection == "TsunamiEvent2d") {
+      l_domainStartX = -0.5 * l_w;
+      l_domainStartY = -0.5 * l_w;
+    }*/
+
+    tsunami_lab::t_real l_domainStartX = 0.0;
+    tsunami_lab::t_real l_domainStartY = 0.0;
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
         tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;

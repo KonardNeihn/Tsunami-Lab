@@ -8,62 +8,83 @@
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
-std::size_t tsunami_lab::setups::TsunamiEvent2d::findClosestIndex(const std::vector<t_real> &i_coords,
-                                                                   t_real i_value) const {
+std::size_t tsunami_lab::setups::TsunamiEvent2d::findClosestIndex(
+    const std::vector<t_real> &i_coords,
+    t_real i_value) const {
   if (i_coords.empty()) return 0;
-  if (i_value <= i_coords.front()) return 0;
-  if (i_value >= i_coords.back()) return i_coords.size() - 1;
 
-  auto it = std::lower_bound(i_coords.begin(), i_coords.end(), i_value);
-  if (it == i_coords.begin()) return 0;
+  std::size_t best = 0;
+  t_real bestDiff = std::abs(i_coords[0] - i_value);
 
-  auto prev = it - 1;
-  auto idx = static_cast<std::size_t>(std::distance(i_coords.begin(), it));
-  auto prevIdx = idx - 1;
+  for (std::size_t i = 1; i < i_coords.size(); ++i) {
+    t_real diff = std::abs(i_coords[i] - i_value);
+    if (diff < bestDiff) {
+      best = i;
+      bestDiff = diff;
+    }
+  }
 
-  t_real diffNext = std::abs(*it - i_value);
-  t_real diffPrev = std::abs(*prev - i_value);
-  return (diffPrev <= diffNext) ? prevIdx : idx;
+  return best;
 }
 
 tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(std::string pathBathymetry, std::string pathDisplacement) {
-    tsunami_lab::io::NetCdf l_ncBath(pathBathymetry, 0, 0, 0, 0, nullptr);
-    tsunami_lab::io::NetCdf l_ncDisp(pathDisplacement, 0, 0, 0, 0, nullptr);
+    tsunami_lab::io::NetCdfReader l_ncBath;
+    tsunami_lab::io::NetCdfReader l_ncDisp;
 
     m_x = l_ncBath.read(pathBathymetry, "x");
     m_y = l_ncBath.read(pathBathymetry, "y");
 
-    m_1dBathymetry = l_ncBath.read(pathBathymetry, "z");
-    m_1dDisplacement = l_ncDisp.read(pathDisplacement, "z");
-    
-    std::size_t l_nx = m_x.size();
-    std::size_t l_ny = m_y.size();
+    auto l_bathy = l_ncBath.read(pathBathymetry, "z");
+    std::vector<t_real> dx = l_ncDisp.read(pathDisplacement, "x");
+    std::vector<t_real> dy = l_ncDisp.read(pathDisplacement, "y");
+    auto l_disp = l_ncDisp.read(pathDisplacement, "z");
 
-    if (l_nx == 0 || l_ny == 0) {
-      throw std::runtime_error("TsunamiEvent2d: empty x or y coordinate vector");
+    m_xd = dx;
+    m_yd = dy;
+
+    const std::size_t nx = m_x.size();
+    const std::size_t ny = m_y.size();
+    const std::size_t nx_d = dx.size();
+    const std::size_t ny_d = dy.size();
+
+    if (nx == 0 || ny == 0 || nx_d == 0 || ny_d == 0) {
+        throw std::runtime_error("TsunamiEvent2d: empty grid");
     }
-    if (m_1dBathymetry.size() != l_nx * l_ny || m_1dDisplacement.size() != l_nx * l_ny) {
-      throw std::runtime_error("TsunamiEvent2d: unexpected z variable shape");
+
+    if (l_bathy.size() != nx * ny) {
+        throw std::runtime_error("TsunamiEvent2d: bathymetry variable has unexpected shape");
+    }
+    if (l_disp.size() != nx_d * ny_d) {
+        throw std::runtime_error("TsunamiEvent2d: displacement variable has unexpected shape");
     }
 
-    m_2dBathymetry.assign(l_ny, std::vector<t_real>(l_nx));
-    m_2dDisplacement.assign(l_ny, std::vector<t_real>(l_nx));
+    // Build a bathymetry grid on the displacement coordinate system.
+    // The displacement file is 100x100 while the bathymetry file is 1000x1000.
+    m_2dBathymetry.resize(ny, std::vector<t_real>(nx));
+    m_2dDisplacement.resize(ny_d, std::vector<t_real>(nx_d));
 
-    for (std::size_t j = 0; j < l_ny; ++j) {
-        for (std::size_t i = 0; i < l_nx; ++i) {
-            std::size_t idx = j * l_nx + i;
-            m_2dBathymetry[j][i] = m_1dBathymetry[idx];
-            m_2dDisplacement[j][i] = m_1dDisplacement[idx];
+    std::cout << "Bathymetry size: " << nx << " times " << ny << std::endl;
+    std::cout << "Displacement size: " << nx_d << " times " << ny_d << std::endl;
+    std::cout << l_bathy.size() << std::endl;
+
+    for (std::size_t j = 0; j < ny; ++j) {
+        for (std::size_t i = 0; i < nx; ++i) {
+            m_2dBathymetry[j][i] = l_bathy[j * nx + i];
+        }
+    }
+
+    for (std::size_t j = 0; j < ny_d; ++j) {
+        for (std::size_t i = 0; i < nx_d; ++i) {
+            m_2dDisplacement[j][i] = l_disp[j * nx_d + i];
         }
     }
 }
 
-tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getHeight( t_real i_x,
-                                                                    t_real i_y ) const {
-    std::size_t l_ix = findClosestIndex(m_x, i_x);
-    std::size_t l_iy = findClosestIndex(m_y, i_y);
-    return m_2dDisplacement[l_iy][l_ix];
+tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getHeight(t_real i_x, t_real i_y) const {
+    // hardcoded 100x100, so no next index has to be found
+    return m_2dDisplacement[i_y][i_x];
 }
 
 tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getMomentumX( t_real,
@@ -78,7 +99,10 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getMomentumY( t_real,
 
 tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getBathymetry( t_real i_x,
                                                                             t_real i_y ) const {
-    std::size_t l_ix = findClosestIndex(m_x, i_x);
-    std::size_t l_iy = findClosestIndex(m_y, i_y);
+    std::size_t l_ix = 10 * i_x;
+    std::size_t l_iy = 10 * i_y;
+    if (l_iy >= m_2dBathymetry.size() || l_ix >= m_2dBathymetry[0].size()) {
+        throw std::runtime_error("getBathymetry: index out of bounds");
+    }
     return m_2dBathymetry[l_iy][l_ix];
 }

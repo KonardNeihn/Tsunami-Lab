@@ -111,6 +111,13 @@ class tsunami_lab::io::NetCdf {
     // Flushes pending writes and closes the netCDF file.
     ~NetCdf();
 
+    // struct to hold a 2D grid read from netCDF, along with its dimensions
+    struct NetCdfGrid {
+      std::vector<tsunami_lab::t_real> data;
+      std::size_t nx;
+      std::size_t ny;
+    };
+
     /**
      * Appends one time record to the netCDF file.
      *
@@ -128,16 +135,6 @@ class tsunami_lab::io::NetCdf {
                 const tsunami_lab::t_real *i_h,
                 const tsunami_lab::t_real *i_hu,
                 const tsunami_lab::t_real *i_hv );
-
-    /**
-     * Reads a variable from a netCDF file and returns it as a vector.
-     *
-     * @param i_path      Path to the .nc file to read.
-     * @param i_variable  Name of the variable to read.
-     * @return            1D Vector containing the variables values. 
-     **/
-    std::vector<tsunami_lab::t_real> read(const std::string &i_path,
-                                                    const std::string &i_variable);
 };
 
 #endif 
