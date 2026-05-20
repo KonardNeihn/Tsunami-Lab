@@ -402,7 +402,7 @@ int main( int   i_argc,
                           stationConfig.y,
                           outputConfig.interval,
                           stationConfig.name,
-                          l_waveProp->getStride(),
+                          l_nx,
                           outputConfig.path);
   }
 
