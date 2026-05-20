@@ -273,8 +273,8 @@ int main( int   i_argc,
                                                     2.5); // radius of dam
     } else if (l_setup_selection == "ArtificialTsunami2d") {
       l_ny = l_nx;
-      l_setup = new tsunami_lab::setups::ArtificialTsunami2d(10.0, 
-                                                            15.0);
+      l_setup = new tsunami_lab::setups::ArtificialTsunami2d(-10.0, 
+                                                            20.0);
     } else if (l_setup_selection == "TsunamiEvent2d") {
       l_setup = new tsunami_lab::setups::TsunamiEvent2d("NetCdf/artificialtsunami_bathymetry_1000.nc",
                                                         "NetCdf/artificialtsunami_displ_1000.nc");
