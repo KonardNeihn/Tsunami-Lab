@@ -27,8 +27,6 @@ void tsunami_lab::io::Station::timeStep(t_real i_deltaTimeStep,const t_real *i_h
     
     if (m_timeSinceLastRecording >= m_recordingInterval) {
         // new recording should be made
-        
-        std::cout << m_linearPosition << std::endl;
 
         m_recordedHeight = i_height[m_linearPosition];
         m_recordedMomentumX = i_momentumX[m_linearPosition];
