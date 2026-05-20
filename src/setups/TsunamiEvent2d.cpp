@@ -10,25 +10,6 @@
 #include <stdexcept>
 #include <iostream>
 
-std::size_t tsunami_lab::setups::TsunamiEvent2d::findClosestIndex(
-    const std::vector<t_real> &i_coords,
-    t_real i_value) const {
-  if (i_coords.empty()) return 0;
-
-  std::size_t best = 0;
-  t_real bestDiff = std::abs(i_coords[0] - i_value);
-
-  for (std::size_t i = 1; i < i_coords.size(); ++i) {
-    t_real diff = std::abs(i_coords[i] - i_value);
-    if (diff < bestDiff) {
-      best = i;
-      bestDiff = diff;
-    }
-  }
-
-  return best;
-}
-
 tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(std::string pathBathymetry, std::string pathDisplacement) {
     tsunami_lab::io::NetCdfReader l_ncBath;
     tsunami_lab::io::NetCdfReader l_ncDisp;

@@ -26,6 +26,16 @@ Currently both recording variations are in use for testing purposes, but the rec
 Input for NetCdf
 ~~~~~~~~~~~~~~~~~
 
+To get the input from the NetCdf files, we implemented a `NetCdfReader` class, which can read a single variable from a NetCdf file. This data is then returned as a vector.
+The complete data from a NetCdf file can be used by first reading x and y values to know the dimensions if the data, so that it can be correctly converted into the dimensions if the simulation grid.
+Then the z variable (bathymetry or water displacement) can be read. Since the data is stored in a 1d vector it has to be converted into a 2d vector. Now it can be easily used inside `getHeight` and `getBathymetry`.
+
+Checking the correctness of the file based input system two new setups were implemented. The ArtificialSetup2d is a simple setup with a flat bathymetry and a basic wave like water displacement. 
+The TsunamiEvent2d setup reads a bathymetry and a water displacement from NetCdf files. The pathes to these files can be set in the `TsunamiEvent2d` constructor.  
+
+For both setups the bathymetry is constantly at -100. For the artificial setup the water displacement varies from 160 to 161 and for the tsunami event setup it varies from 100 to 101.
+The differens can probably be changed by adjusting the paramteres of the artifical setup.
+
 
 .. toctree::
    :maxdepth: 2

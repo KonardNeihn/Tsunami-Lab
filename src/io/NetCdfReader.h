@@ -51,7 +51,6 @@ class tsunami_lab::io::NetCdfReader {
     std::vector<tsunami_lab::t_real> read(const std::string &i_path,
                                                     const std::string &i_variable);
 
-    std::vector<tsunami_lab::t_real> read1D(const std::string &i_path, const std::string &i_variable);
 };
 
 #endif 

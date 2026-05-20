@@ -33,16 +33,6 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
     std::vector<t_real> m_1dDisplacement;
     std::vector<std::vector<t_real>> m_2dDisplacement;
 
-    /**
-     * Finds the index in a coordinate vector closest to the given value.
-     *
-     * @param i_coords coordinate vector
-     * @param i_value query value
-     * @return closest index
-     **/
-    std::size_t findClosestIndex(const std::vector<t_real> &i_coords,
-                                 t_real i_value) const;
-
   public:
     /**
      * Constructor.
