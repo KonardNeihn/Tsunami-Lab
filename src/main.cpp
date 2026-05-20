@@ -403,15 +403,18 @@ int main( int   i_argc,
   std::string stationsXmlPath = "src/io/stations.xml";
   tsunami_lab::io::loadXmlConfig(stationsXmlPath, stationConfigs, outputConfig);
   std::vector<tsunami_lab::io::Station> stations;
-  for (const auto& stationConfig : stationConfigs) {
-    // construct Object directly into vector
-    stations.emplace_back(stationConfig.x,
-                          stationConfig.y,
-                          outputConfig.interval,
-                          stationConfig.name,
-                          l_waveProp->getStride(),
-                          outputConfig.path);
+  if(l_is2D) {
+    for (const auto& stationConfig : stationConfigs) {
+      // construct Object directly into vector
+      stations.emplace_back(stationConfig.x,
+                            stationConfig.y,
+                            outputConfig.interval,
+                            stationConfig.name,
+                            l_nx,
+                            outputConfig.path);
+    }
   }
+  
 
   // construct writer for NetCdf
   tsunami_lab::io::NetCdf l_ncWriter( l_ncPath,                                         
