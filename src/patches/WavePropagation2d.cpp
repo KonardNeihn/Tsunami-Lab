@@ -83,6 +83,10 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
       // initialize new netUpdate array for both collumn-values
       t_real l_netUpdates[2][2];
 
+      if (l_hOld[l_ceL] <= m_b[l_ceL]) {
+        std::cout << "Water Height lower then Bathymetry at (" << l_ix << ", " << l_iy << ") with h = " << l_hOld[l_ceL] << " and b = " << m_b[l_ceL] << std::endl;
+      }
+
       // netUpdate mit 
       solvers::f_wave::netUpdates(
                                     l_hOld[l_ceL],
