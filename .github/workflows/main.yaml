@@ -25,6 +25,13 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-24.05
 
+      - name: Generate builds
+        run:
+          nix-shell --run "
+            scons -c &&
+            bear --output build/compile_commands.json -- scons
+          "
+
       - name: Static Code Analysis (show Errors)
         run:
           nix-shell --run "
@@ -34,7 +41,7 @@ jobs:
       - name: Static Code Analysis (show Hints)
         run:
           nix-shell --run "
-            cppcheck src/ --template=gcc --force --enable=all --error-exitcode=0
+            cppcheck src/ --force --enable=warning,style,performance --error-exitcode=0
           "
 
       - name: Sanitize
