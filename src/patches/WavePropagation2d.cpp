@@ -99,13 +99,23 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
                                     l_netUpdates[1]
       );
 
-      // A+ ΔQ_{i-1/2,j} for updates to left cell with right-going wave
-      l_hNew[l_ceL]  -= i_scaling * l_netUpdates[0][0];
-      l_huNew[l_ceL] -= i_scaling * l_netUpdates[0][1];
+      if( l_ix > 0 ) {
+        l_hNew[l_ceL]  -= i_scaling * l_netUpdates[0][0];
+        l_huNew[l_ceL] -= i_scaling * l_netUpdates[0][1];
+      }
 
-      // A- ΔQ_{i+1/2,j} for updates to right cell with left-going wave
-      l_hNew[l_ceR]  -= i_scaling * l_netUpdates[1][0];
-      l_huNew[l_ceR] -= i_scaling * l_netUpdates[1][1];
+      if( l_ix < m_nCellsX ) {
+        l_hNew[l_ceR]  -= i_scaling * l_netUpdates[1][0];
+        l_huNew[l_ceR] -= i_scaling * l_netUpdates[1][1];
+      }
+
+            if( l_hNew[l_ceL] <= m_b[l_ceL] ) {
+        std::cout << "BAD UPDATE LEFT at "
+                  << l_ix << " " << l_iy
+                  << " hNew=" << l_hNew[l_ceL]
+                  << " b=" << m_b[l_ceL]
+                  << std::endl;
+      }
     }
   }
 
@@ -136,13 +146,20 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
                                     l_netUpdates[1]
       );
 
+      if( l_iy > 0 ) {
+        l_hNew[l_ceB]  -= i_scaling * l_netUpdates[0][0];
+        l_hvNew[l_ceB] -= i_scaling * l_netUpdates[0][1];
+      }
+
+      if( l_iy < m_nCellsY ) {
+        l_hNew[l_ceT]  -= i_scaling * l_netUpdates[1][0];
+        l_hvNew[l_ceT] -= i_scaling * l_netUpdates[1][1];
+      }
+
       // B+ ΔQ_{i,j-1/2} for updates to the bottom cell
-      l_hNew[l_ceB]  -= i_scaling * l_netUpdates[0][0];
-      l_hvNew[l_ceB] -= i_scaling * l_netUpdates[0][1];
 
       // B- ΔQ_{i,j+1/2} for updates to the top cell
-      l_hNew[l_ceT]  -= i_scaling * l_netUpdates[1][0];
-      l_hvNew[l_ceT] -= i_scaling * l_netUpdates[1][1];
+      
     }
   }
 }
