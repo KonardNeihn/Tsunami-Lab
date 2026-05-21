@@ -79,8 +79,8 @@ TEST_CASE( "Test the 2d wave propagation: ghost cell setup (reflecting)", "[Wave
 
   // bottom ghost row: hv negated, hu unchanged
   for( tsunami_lab::t_idx l_cx = 0; l_cx < 3; l_cx++ ) {
-    REQUIRE( l_hu[ -1 * (tsunami_lab::t_idx)l_s + l_cx ] == Approx(  3.0 ) );
-    REQUIRE( l_hv[ -1 * (tsunami_lab::t_idx)l_s + l_cx ] == Approx( -7.0 ) );
+    REQUIRE( l_hu[ l_cx - l_s ] == Approx(  3.0 ) );
+    REQUIRE( l_hv[ l_cx - l_s ] == Approx( -7.0 ) );
   }
 
   // top ghost row: hv negated, hu unchanged
