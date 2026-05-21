@@ -7,6 +7,7 @@
 #include "ArtificialTsunami2d.h"
 #include <algorithm>
 #include <math.h>
+#include <iostream>
 
 
 tsunami_lab::setups::ArtificialTsunami2d::ArtificialTsunami2d(t_real i_bIn,
@@ -24,9 +25,10 @@ tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getHeight( t_real 
     t_real l_d = 5 * l_f * l_g;
 
     if (m_bIn < 0) {
-        return -std::min(m_bIn, -m_roh) + l_d;
+        std::cout << "Height: " << -std::min(m_bIn, -m_roh) + l_d << std::endl;
+        return std::max(-m_bIn, m_roh) + l_d;
     } else {
-        return -std::max(m_bIn, m_roh) + l_d;
+        return 0 + l_d;
     }
 }
 

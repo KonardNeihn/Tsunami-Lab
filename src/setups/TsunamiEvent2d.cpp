@@ -65,6 +65,7 @@ tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(std::string pathBathymetry, 
 
 tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getHeight(t_real i_x, t_real i_y) const {
     // hardcoded 100x100, so no next index has to be found
+    std::cout << "Height: " << m_2dDisplacement[i_y][i_x] << std::endl;
     return m_2dDisplacement[i_y][i_x];
 }
 
@@ -85,5 +86,6 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getBathymetry( t_real i
     if (l_iy >= m_2dBathymetry.size() || l_ix >= m_2dBathymetry[0].size()) {
         throw std::runtime_error("getBathymetry: index out of bounds");
     }
+    std::cout << "Bathymetry: " << m_2dBathymetry[l_iy][l_ix] << std::endl;
     return m_2dBathymetry[l_iy][l_ix];
 }
