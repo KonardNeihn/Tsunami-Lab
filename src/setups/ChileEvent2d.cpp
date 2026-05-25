@@ -74,7 +74,7 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getHeight(t_real i_x, t_r
         throw std::runtime_error("getBathymetry: index out of bounds");
     }
     std::cout << "Height: " << m_2dDisplacement[i_y][i_x] << std::endl;
-    return m_2dDisplacement[i_y][i_x];
+    return m_2dDisplacement[l_iy][l_ix];
 }
 
 tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getMomentumX( t_real,

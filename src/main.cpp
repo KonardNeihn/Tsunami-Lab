@@ -17,6 +17,8 @@
 #include "setups/DamBreak2d.h"
 #include "setups/ArtificialTsunami2d.h"
 #include "setups/TsunamiEvent2d.h"
+#include "setups/ChileEvent2d.h"
+#include "setups/TohokuEvent2d.h"
 #include "io/Csv.h"
 #include "io/NetCdf.h" 
 #include "io/Station.h"
@@ -160,6 +162,8 @@ int main( int   i_argc,
                                             && l_setup_selection != "DamBreak2d"
                                             && l_setup_selection != "ArtificialTsunami2d"
                                             && l_setup_selection != "TsunamiEvent2d"
+                                            && l_setup_selection != "ChileEvent2d"
+                                            && l_setup_selection != "TohokuEvent2d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -283,7 +287,22 @@ int main( int   i_argc,
       l_dxy = l_w / l_nx;
       l_setup = new tsunami_lab::setups::TsunamiEvent2d("src/NetCdf/artificialtsunami_bathymetry_1000.nc",
                                                         "src/NetCdf/artificialtsunami_displ_1000.nc");
-    }
+    } else if (l_setup_selection == "ChileEvent2d") {
+      l_ny = l_nx;
+      l_w   = 10.0;
+      l_dxy = l_w / l_nx;
+      l_setup = new tsunami_lab::setups::ChileEvent2d("src/NetCdf/chile_gebco20_usgs_250m_bath_fixed.nc",
+                                                        "src/NetCdf/chile_gebco20_usgs_250m_displ_fixed.nc",
+                                                      l_nx, l_ny);
+    } else if (l_setup_selection == "TohokuEvent2d") {
+      l_nx = 100;
+      l_ny = l_nx;
+      l_w   = 10.0;
+      l_dxy = l_w / l_nx;
+      l_setup = new tsunami_lab::setups::TohokuEvent2d("src/NetCdf/tohoku_gebco20_usgs_250m_bath.nc",
+                                                        "src/NetCdf/tohoku_gebco20_usgs_250m_displ.nc",
+                                                      l_nx, l_ny);
+     }
     
     else {
       std::cerr << "Somethings wrong. Did you add the setup_selection?" << std::endl;
