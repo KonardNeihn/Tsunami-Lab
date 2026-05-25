@@ -72,6 +72,14 @@ void tsunami_lab::solvers::f_wave::netUpdates( t_real i_hL,
                                             t_real i_bR,
                                             t_real o_netUpdateL[2],
                                             t_real o_netUpdateR[2] ) {
+
+  // DRY-STATE CHECK: if either side is dry, no flux exchange
+  if( i_hL <= m_dryThreshold || i_hR <= m_dryThreshold ) {
+    o_netUpdateL[0] = 0; o_netUpdateL[1] = 0;
+    o_netUpdateR[0] = 0; o_netUpdateR[1] = 0;
+    return;
+  }
+
   // compute particle velocities 
   t_real l_uL = i_huL / i_hL;
   t_real l_uR = i_huR / i_hR;
@@ -99,6 +107,13 @@ void tsunami_lab::solvers::f_wave::netUpdates( t_real i_hL,
             i_bR,
             l_fdH,
             l_fdHu );
+
+  // DRY-STATE CHECK
+  if( i_hL <= m_dryThreshold || i_hR <= m_dryThreshold ) {
+    o_fluxdiffH  = 0;
+    o_fluxdiffHu = 0;
+    return;
+  }
 
   // calculate eigenvector α[2] in as in αL = (matrix inversion prefix) * (sR * Δf(h) - 1 * Δf(hu)) and αR =  (matrix inversion prefix) * (-sL * Δf(h) + 1 * Δf(hu))
   // first calculate inverted R (only prefix)

@@ -162,6 +162,17 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
       
     }
   }
+  // CLAMP: after both sweeps, zero out any cells that went dry
+  for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
+    for( t_idx l_ix = 1; l_ix <= m_nCellsX; l_ix++ ) {
+      t_idx l_ce = idx(l_ix, l_iy);
+      if( l_hNew[l_ce] <= m_dryThreshold ) {
+        l_hNew[l_ce]  = 0;
+        l_huNew[l_ce] = 0;
+        l_hvNew[l_ce] = 0;
+      }
+    }
+  }
 }
 
 // the ghost-cells are more complicated now, since it iessentially an entire outer layer around the simulated space.

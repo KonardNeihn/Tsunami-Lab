@@ -21,6 +21,8 @@ class tsunami_lab::solvers::f_wave {
     static t_real constexpr m_gSqrt = 3.131557121;
     //! gravity as is written in 1.Riemann Solver
     static t_real constexpr m_g = 9.80665;
+    //! temporary static threshold for dry-state purposes
+    static constexpr t_real m_dryThreshold = 1e-4;
 
     /**
      * Computes the wave speeds.
