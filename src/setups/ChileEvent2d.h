@@ -70,6 +70,8 @@ class tsunami_lab::setups::ChileEvent2d: public Setup {
     
     t_real getBathymetry( t_real i_x,
                           t_real i_y ) const; 
+
+    t_real getDomainWidth() const;
 };
 
 #endif

@@ -83,7 +83,7 @@ int main( int   i_argc,
       std::cout << "  -n <number> <number>             Set number of cells in x and y direction. Defaults: x = 100, y = 1" << std::endl;
       std::cout << "  -w <number>, (--width=<number>)  Set width of the observed space in meters. default is 10" << std::endl;
       std::cout << "  -t <number>, (--time=<number>)   Set time until aborting in s. default is 1.25" << std::endl;
-      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d}. Default is DamBreak1d" << std::endl;
+      std::cout << "  -S <name>,   (--setup=<name>)    Select setup to simulate. Possible is {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d, DamBreak2d, ArtificialTsunami2d, TsunamiEvent2d, ChileEvent2d, TohokuEvent2d}. Default is DamBreak1d" << std::endl;
       return EXIT_SUCCESS;
     }
     // check if N_CELLS_X is passed
@@ -289,11 +289,21 @@ int main( int   i_argc,
                                                         "src/NetCdf/artificialtsunami_displ_1000.nc");
     } else if (l_setup_selection == "ChileEvent2d") {
       l_ny = l_nx;
-      l_w   = 10.0;
+
+      auto* l_chile =
+          new tsunami_lab::setups::ChileEvent2d(
+              "src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
+              "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc",
+              l_nx,
+              l_ny
+          );
+
+      l_setup = l_chile;
+
+      // use size given by .nc file
+      l_w = l_chile->getDomainWidth();
       l_dxy = l_w / l_nx;
-      l_setup = new tsunami_lab::setups::ChileEvent2d("src/NetCdf/chile_gebco20_usgs_250m_bath_fixed.nc",
-                                                        "src/NetCdf/chile_gebco20_usgs_250m_displ_fixed.nc",
-                                                      l_nx, l_ny);
+
     } else if (l_setup_selection == "TohokuEvent2d") {
       l_nx = 100;
       l_ny = l_nx;

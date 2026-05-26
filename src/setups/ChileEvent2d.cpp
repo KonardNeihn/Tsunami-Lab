@@ -25,6 +25,14 @@ tsunami_lab::setups::ChileEvent2d::ChileEvent2d(
     m_x = l_ncBath.read(pathBathymetry, "x");
     m_y = l_ncBath.read(pathBathymetry, "y");
 
+    std::cout << "Bathymetry X range: "
+          << m_x.front() << " -> "
+          << m_x.back() << std::endl;
+
+    std::cout << "Bathymetry Y range: "
+          << m_y.front() << " -> "
+          << m_y.back() << std::endl;
+
     auto l_bathy = l_ncBath.read(pathBathymetry, "z");
 
     std::vector<t_real> dx = l_ncDisp.read(pathDisplacement, "x");
@@ -67,7 +75,7 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getHeight(
     t_real i_x,
     t_real i_y) const
 {
-    const float scaleX =
+    /*const float scaleX =
         static_cast<float>(m_2dDisplacement[0].size()) / m_nx;
 
     const float scaleY =
@@ -84,6 +92,38 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getHeight(
     std::cout << "Height: "
               << m_2dDisplacement[l_iy][l_ix]
               << std::endl;
+    */
+
+    // Simulation domain [0,m_nx] -> NetCDF coordinates
+    t_real xCoord =
+        m_xd.front() +
+        (i_x / static_cast<t_real>(m_nx)) *
+        (m_xd.back() - m_xd.front());
+
+    t_real yCoord =
+        m_yd.front() +
+        (i_y / static_cast<t_real>(m_ny)) *
+        (m_yd.back() - m_yd.front());
+
+    // find matching indices
+    auto xIt = std::lower_bound(m_xd.begin(), m_xd.end(), xCoord);
+    auto yIt = std::lower_bound(m_yd.begin(), m_yd.end(), yCoord);
+
+    std::size_t l_ix =
+        std::min(
+            static_cast<std::size_t>(
+                std::distance(m_xd.begin(), xIt)
+            ),
+            m_xd.size() - 1
+        );
+
+    std::size_t l_iy =
+        std::min(
+            static_cast<std::size_t>(
+                std::distance(m_yd.begin(), yIt)
+            ),
+            m_yd.size() - 1
+        );
 
     return std::max(-getBathymetry(i_x, i_y), 0.0f) + m_2dDisplacement[l_iy][l_ix];
 }
@@ -102,7 +142,7 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getBathymetry(
     t_real i_x,
     t_real i_y) const
 {
-    const float scaleX =
+    /*const float scaleX =
         static_cast<float>(m_2dBathymetry[0].size()) / m_nx;
 
     const float scaleY =
@@ -115,10 +155,47 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getBathymetry(
     std::size_t l_iy = std::min(
         static_cast<std::size_t>(scaleY * i_y),
         m_2dBathymetry.size() - 1);
+    */
 
-    std::cout << "Bathymetry: "
+    // Simulation domain [0,m_nx] -> NetCDF coordinates
+    t_real xCoord =
+        m_x.front() +
+        (i_x / static_cast<t_real>(m_nx)) *
+        (m_x.back() - m_x.front());
+
+    t_real yCoord =
+        m_y.front() +
+        (i_y / static_cast<t_real>(m_ny)) *
+        (m_y.back() - m_y.front());
+
+    // find matching indices
+    auto xIt = std::lower_bound(m_x.begin(), m_x.end(), xCoord);
+    auto yIt = std::lower_bound(m_y.begin(), m_y.end(), yCoord);
+
+    std::size_t l_ix =
+        std::min(
+            static_cast<std::size_t>(
+                std::distance(m_x.begin(), xIt)
+            ),
+            m_x.size() - 1
+        );
+
+    std::size_t l_iy =
+        std::min(
+            static_cast<std::size_t>(
+                std::distance(m_y.begin(), yIt)
+            ),
+            m_y.size() - 1
+        );
+
+    /*std::cout << "Bathymetry: "
               << m_2dBathymetry[l_iy][l_ix]
               << std::endl;
+    */
 
     return m_2dBathymetry[l_iy][l_ix];
+}
+
+tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getDomainWidth() const {
+    return m_x.back() - m_x.front();
 }
