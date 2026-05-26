@@ -81,10 +81,10 @@ tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getHeight(
         m_2dDisplacement.size() - 1);
 
     std::cout << "Height: "
-              << m_2dDisplacement[l_iy][l_ix]
+              << 500 + m_2dDisplacement[l_iy][l_ix]
               << std::endl;
 
-    return m_2dDisplacement[l_iy][l_ix];
+    return std::max(-getBathymetry(i_x, i_y), 0.0f) + m_2dDisplacement[l_iy][l_ix];
 }
 
 tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getMomentumX( t_real,

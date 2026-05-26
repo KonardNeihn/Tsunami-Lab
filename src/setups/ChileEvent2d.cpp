@@ -85,7 +85,7 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getHeight(
               << m_2dDisplacement[l_iy][l_ix]
               << std::endl;
 
-    return m_2dDisplacement[l_iy][l_ix];
+    return std::max(-getBathymetry(i_x, i_y), 0.0f) + m_2dDisplacement[l_iy][l_ix];
 }
 
 tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getMomentumX( t_real,
