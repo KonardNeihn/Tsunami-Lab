@@ -110,8 +110,8 @@ void tsunami_lab::solvers::f_wave::netUpdates( t_real i_hL,
 
   // DRY-STATE CHECK
   if( i_hL <= m_dryThreshold || i_hR <= m_dryThreshold ) {
-    o_fluxdiffH  = 0;
-    o_fluxdiffHu = 0;
+    l_fdH  = 0;
+    l_fdHu = 0;
     return;
   }
 
