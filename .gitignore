@@ -27,4 +27,8 @@ src/data_in
 src/data_tmp
 src/bathymetry/gmt.history
 src/bathymetry/data_tmp
-
+src/bathymetry/
+# aber diese Dateien NICHT ignorieren
+!src/bathymetry/output/03_dem_01.ps
+!src/bathymetry/output/03_dem_02.csv
+!src/bathymetry/output/03_dem_03.csv
