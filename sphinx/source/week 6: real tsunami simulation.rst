@@ -14,12 +14,17 @@ A visualisation of the input data:
 
     Chile event visualisation of the input data with 250m resolution.
 
-The simulation had to run for: 
+.. figure:: 250x250_chile.gif
+   :width: 600px
+
+    Chile event visualisation with 250m resolution on a 250x250 grid.
+
+The simulation had to run for: 0.580082 (time in ParaView)
 before the first waves left the computational domain.
 
 The computational demands are: 
-    - number of required cells:
-    - number of cell updates: 
+    - number of required cells: 250 x 250 = 62500
+    - number of cell updates: 25 x 62500 = 1562500 cell updates
 
 Implementing the 2011 magnitude 8.8 Tohoku event
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
