@@ -468,7 +468,7 @@ int main( int   i_argc,
           std::ofstream l_file;
           l_file.open( l_path );
 
-        //*
+        
           if( l_is2D ) {
               tsunami_lab::io::Csv::write( l_dxy, l_nx, l_ny,
                                           l_waveProp->getStride(),
