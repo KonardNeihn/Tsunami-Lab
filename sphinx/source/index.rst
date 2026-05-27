@@ -37,4 +37,5 @@ To generate the Documentation in Sphinx:
    week 3: seafloors and tsunamis
    week 4: 2d-solver and stations
    week 5: NetCdf
+   week 6: real tsunami simulation
 

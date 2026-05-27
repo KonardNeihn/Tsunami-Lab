@@ -35,7 +35,14 @@ published their observations, including: *15:50 JST Sōma 7.3 meters or higher* 
 Tohoku University, in their paper "Tsunami arrival time characteristics of the 2011 East Japan Tsunami obtained from eyewitness accounts, evidence and numerical simulation"
 mentions arrival time, in central Sõma, of 69 minutes after the Event. This matches the data of the JMA with only a few minutes difference.
 
-To calculate the arrival time
+To calculate the arrival time we have to consider the following facts: the distance from the epicentre to the coast
+is **198 km** and the wave speed there is: **λ = √(9.81 × 1990) ≈ 140 m/s**, since the epicentre is at a depth of 1990 m.
+The rule of thumb calculation leads to 198000/140 s which is about 23.5 minutes (1414 seconds). 
+This is significantly faster than the real recorded arrival time, mostly because it does not take the slowing effect of
+the coastal bathymetry into consideration and assumes a constant depth of 1990 meters. 
+If we instead calculate a mean value for depth and speed we get λ = √(9.81 × 620) ≈ 78 m/s and therefore 42,3 minutes
+which is much better, but still decently far off of the recorded 69 minutes.
+
 
 
 
