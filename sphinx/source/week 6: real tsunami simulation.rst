@@ -20,10 +20,18 @@ The computational demands are:
 Implementing the 2011 magnitude 8.8 Tohoku event
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. figure:: 100x100_250_tohoku.gif
+   :width: 600px
+
+    Tohoku event visualisation of the input data with 250m resolution on a 100x100 grid.
+
+
 .. figure:: 250_tohoku.gif
    :width: 600px
 
     Tohoku event visualisation of the input data with 250m resolution on a 500x500 grid.
+
+The 50m resolution version didnt work. After a short time of running the simulation, the consol outputed 'Killed'. Probably the simulation ran out of memory, since the 50m version has 100 times more cells than the 250m version.
 
 The simulation had to run for: 0.406338
 before the first waves left the computational domain. (Top Edge)
