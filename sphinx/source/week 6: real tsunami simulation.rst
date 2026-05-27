@@ -20,12 +20,17 @@ The computational demands are:
 Implementing the 2011 magnitude 8.8 Tohoku event
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The simulation had to run for: 
-before the first waves left the computational domain.
+.. figure:: 250_tohoku.gif
+   :width: 600px
+
+    Tohoku event visualisation of the input data with 250m resolution on a 500x500 grid.
+
+The simulation had to run for: 0.406338
+before the first waves left the computational domain. (Top Edge)
 
 The computational demands are: 
-    - number of required cells:
-    - number of cell updates: 
+    - number of required cells: 500 x 500 = 250000
+    - number of cell updates: 25 time_steps x 250000 cells = 6250000 cell updates
 
 The earthquake took place at 14:46 JST (UTC 05:46) around 67 kilometers from the nearest point on Japan's coastline, 
 and initial estimates indicated the tsunami would have taken about 30 minutes to reach the areas first affected, 
