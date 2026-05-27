@@ -309,8 +309,8 @@ int main( int   i_argc,
       l_ny = l_nx;
       l_w   = 10.0;
       l_dxy = l_w / l_nx;
-      l_setup = new tsunami_lab::setups::TohokuEvent2d("src/NetCdf/tohoku_gebco20_usgs_250m_bath.nc",
-                                                        "src/NetCdf/tohoku_gebco20_usgs_250m_displ.nc",
+      l_setup = new tsunami_lab::setups::TohokuEvent2d("src/bathymetry/output/tohoku_gebco20_usgs_250m_bath.nc",
+                                                        "src/bathymetry/output/tohoku_gebco20_usgs_250m_displ.nc",
                                                       l_nx, l_ny);
      }
     
@@ -464,7 +464,7 @@ int main( int   i_argc,
 
           std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
           std::cout << "  writing wave field to " << l_path << std::endl;
-
+        /*
           std::ofstream l_file;
           l_file.open( l_path );
 
@@ -486,7 +486,7 @@ int main( int   i_argc,
                                           l_file );
           }
           l_file.close();
-      //
+      */
 
           // netCDF write
           l_ncWriter.write( l_simTime,
