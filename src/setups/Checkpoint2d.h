@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "../io/NetCdfReader.h"
+//#include "../io/NetCdfCheckpoint.h"
 
 namespace tsunami_lab {
   namespace setups {
