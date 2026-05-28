@@ -288,26 +288,18 @@ int main( int   i_argc,
       l_setup = new tsunami_lab::setups::TsunamiEvent2d("src/NetCdf/artificialtsunami_bathymetry_1000.nc",
                                                         "src/NetCdf/artificialtsunami_displ_1000.nc");
     } else if (l_setup_selection == "ChileEvent2d") {
-      l_ny = l_nx;
-
-      auto* l_chile =
-          new tsunami_lab::setups::ChileEvent2d(
-              "src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
-              "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc",
-              l_nx,
-              l_ny
-          );
-
-      l_setup = l_chile;
-
-      // use size given by .nc file
-      l_w = l_chile->getDomainWidth();
-      l_dxy = l_w / l_nx;
-
-    } else if (l_setup_selection == "TohokuEvent2d") {
       l_nx = 100;
       l_ny = l_nx;
-      l_w   = 10.0;
+      l_w   = l_nx;
+      l_dxy = l_w / l_nx;
+      l_setup = new tsunami_lab::setups::ChileEvent2d("src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
+                                                        "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc",
+                                                      l_nx, l_ny);
+
+    } else if (l_setup_selection == "TohokuEvent2d") {
+      l_nx = 1000;
+      l_ny = l_nx;
+      l_w   = l_nx;
       l_dxy = l_w / l_nx;
       l_setup = new tsunami_lab::setups::TohokuEvent2d("src/bathymetry/output/tohoku_gebco20_usgs_250m_bath.nc",
                                                         "src/bathymetry/output/tohoku_gebco20_usgs_250m_displ.nc",
@@ -459,8 +451,7 @@ int main( int   i_argc,
   // iterate over time
   while( l_simTime < l_endTime ) {
       if( l_timeStep % 25 == 0 ) {
-          std::cout << "  simulation time / #time steps: "
-                    << l_simTime << " / " << l_timeStep << std::endl;
+          std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
 
           std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
           std::cout << "  writing wave field to " << l_path << std::endl;

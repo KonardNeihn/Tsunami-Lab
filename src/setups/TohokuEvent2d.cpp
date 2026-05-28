@@ -80,9 +80,11 @@ tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getHeight(
         static_cast<std::size_t>(scaleY * i_y),
         m_2dDisplacement.size() - 1);
 
+    /*
     std::cout << "Height: "
               << 500 + m_2dDisplacement[l_iy][l_ix]
               << std::endl;
+    */
 
     return std::max(-getBathymetry(i_x, i_y), 0.0f) + m_2dDisplacement[l_iy][l_ix];
 }
@@ -114,10 +116,12 @@ tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getBathymetry(
     std::size_t l_iy = std::min(
         static_cast<std::size_t>(scaleY * i_y),
         m_2dBathymetry.size() - 1);
-
+    
+    /*
     std::cout << "Bathymetry: "
               << m_2dBathymetry[l_iy][l_ix]
               << std::endl;
+    */
 
     return m_2dBathymetry[l_iy][l_ix];
 }
