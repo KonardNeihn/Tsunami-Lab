@@ -1,4 +1,4 @@
-Tsunami Lab Week 4
+Tsunami Lab Week 6
 =======================
 
 Project Report
@@ -7,15 +7,16 @@ Project Report
 Implementing the 2008 magnitude 8.8 Chile event
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A visualisation of the input data:
 
-..figure:: chile2010.png
-   :width: 600px
+.. figure:: chile2010.png
+    :width: 600px
+    :align: center
 
-    Chile event visualisation of the input data with 250m resolution.
+    A visualisation of the input data
 
 .. figure:: 250x250_chile.gif
-   :width: 600px
+    :width: 600px
+    :align: center
 
     Chile event visualisation with 250m resolution on a 250x250 grid.
 
@@ -23,20 +24,23 @@ The simulation had to run for: 0.580082 (time in ParaView)
 before the first waves left the computational domain.
 
 The computational demands are: 
-    - number of required cells: 250 x 250 = 62500
-    - number of cell updates: 25 x 62500 = 1562500 cell updates
+
+- number of required cells: 250 x 250 = 62500
+- number of cell updates: 25 x 62500 = 1562500 cell updates
 
 Implementing the 2011 magnitude 8.8 Tohoku event
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: 100x100_250_tohoku.gif
-   :width: 600px
+    :width: 600px
+    :align: center
 
     Tohoku event visualisation with 250m resolution on a 100x100 grid.
 
 
 .. figure:: 250_tohoku.gif
-   :width: 600px
+    :width: 600px
+    :align: center
 
     Tohoku event visualisation with 250m resolution on a 500x500 grid.
 
