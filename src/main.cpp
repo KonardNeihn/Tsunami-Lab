@@ -288,16 +288,19 @@ int main( int   i_argc,
       l_setup = new tsunami_lab::setups::TsunamiEvent2d("src/NetCdf/artificialtsunami_bathymetry_1000.nc",
                                                         "src/NetCdf/artificialtsunami_displ_1000.nc");
     } else if (l_setup_selection == "ChileEvent2d") {
-      l_nx = 100;
-      l_ny = l_nx;
-      l_w   = l_nx;
-      l_dxy = l_w / l_nx;
+      l_nx = 2000;
       l_setup = new tsunami_lab::setups::ChileEvent2d("src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
                                                         "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc",
                                                       l_nx, l_ny);
-
+      //l_w   = l_setup->getDomainWidth();
+      std::cout << "  domain width: " << l_setup->getDomainWidth() << std::endl;
+      std::cout << "  domain length: " << l_setup->getDomainLength() << std::endl;
+      l_ny = l_nx * (l_setup->getDomainLength() / l_setup->getDomainWidth());
+      l_w = l_setup->getDomainWidth();
+      l_dxy = l_w / l_nx;
+  
     } else if (l_setup_selection == "TohokuEvent2d") {
-      l_nx = 1000;
+      l_nx = 500;
       l_ny = l_nx;
       l_w   = l_nx;
       l_dxy = l_w / l_nx;
@@ -363,8 +366,10 @@ int main( int   i_argc,
     tsunami_lab::t_real l_domainStartY = 0.0;
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
-        tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
-        tsunami_lab::t_real l_y = l_is2D ? (l_cy + 0.5) * l_dxy + l_domainStartY : l_cy * l_dxy;
+
+      // l_x and l_y is in meters
+      tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
+      tsunami_lab::t_real l_y = l_is2D ? (l_cy + 0.5) * l_dxy + l_domainStartY : l_cy * l_dxy;
           
 
       // get initial values of the setup

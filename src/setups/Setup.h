@@ -68,6 +68,22 @@ class tsunami_lab::setups::Setup {
       return 0;
     };
 
+    /**
+    * Gets the width of the data set in meters
+    **/
+    virtual t_real getDomainWidth() const {
+      // returns 0 by default
+      return 0;
+    };
+
+    /**
+    * Gets the length of the dataset in meters
+    **/
+    virtual t_real getDomainLength() const {
+      // returns 0 by default
+      return 0;
+    };
+
     // four virtual methods with false as defaults
     virtual bool isLeftBoundaryReflecting()   const { return false; }
     virtual bool isRightBoundaryReflecting()  const { return false; }
