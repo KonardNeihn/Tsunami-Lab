@@ -30,7 +30,9 @@ l_sources = [ 'solvers/Roe.cpp',
               'setups/TsunamiEvent2d.cpp',
               'io/Csv.cpp', 
               'io/Station.cpp',
-              'io/XmlReader.cpp']
+              'io/XmlReader.cpp',
+              'config/Config.cpp',
+              'factory/SetupFactory.cpp']
 
 sources = [env.Object(s) for s in l_sources]
 
