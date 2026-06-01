@@ -6,7 +6,6 @@
  **/
 #include "patches/WavePropagation1d.h"
 #include "patches/WavePropagation2d.h"
-<<<<<<< HEAD
 #include "setups/DamBreak1d.h"
 #include "setups/ShockShock1d.h"
 #include "setups/RareRare1d.h"
@@ -21,8 +20,6 @@
 #include "setups/ChileEvent2d.h"
 #include "setups/TohokuEvent2d.h"
 #include "setups/Checkpoint2d.h"
-=======
->>>>>>> 6d14a054b16f82be185f631a312d7e05f874f2ee
 #include "io/Csv.h"
 #include "io/NetCdf.h" 
 #include "io/NetCdfCheckpoint.h"
@@ -381,8 +378,8 @@ int main( int   i_argc,
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
         tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
         tsunami_lab::t_real l_y = l_is2D ? (l_cy + 0.5) * l_dxy + l_domainStartY : l_cy * l_dxy;
-    tsunami_lab::t_real l_domainStartX = 0.0;
-    tsunami_lab::t_real l_domainStartY = 0.0;
+    //tsunami_lab::t_real l_domainStartX = 0.0;
+    //tsunami_lab::t_real l_domainStartY = 0.0;
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_config.nx; l_cx++ ) {
 
@@ -479,7 +476,6 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
       if( l_timeStep % 25 == 0 ) {
           std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
 
-<<<<<<< HEAD
           //std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
           //std::cout << "  writing wave field to " << l_path << std::endl;
         /*
@@ -505,10 +501,8 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
           }
           l_file.close();
       */
-=======
           std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
           std::cout << "  writing wave field to " << l_path << std::endl;
->>>>>>> 6d14a054b16f82be185f631a312d7e05f874f2ee
 
           // netCDF write
           l_ncWriter.write( l_simTime,
