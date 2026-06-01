@@ -6,6 +6,7 @@
  **/
 #include "patches/WavePropagation1d.h"
 #include "patches/WavePropagation2d.h"
+<<<<<<< HEAD
 #include "setups/DamBreak1d.h"
 #include "setups/ShockShock1d.h"
 #include "setups/RareRare1d.h"
@@ -20,6 +21,8 @@
 #include "setups/ChileEvent2d.h"
 #include "setups/TohokuEvent2d.h"
 #include "setups/Checkpoint2d.h"
+=======
+>>>>>>> 6d14a054b16f82be185f631a312d7e05f874f2ee
 #include "io/Csv.h"
 #include "io/NetCdf.h" 
 #include "io/NetCdfCheckpoint.h"
@@ -32,6 +35,8 @@
 #include <fstream>
 #include <limits>
 #include <filesystem>
+#include "config/Config.h"
+#include "factory/SetupFactory.h"
 
 int is_number(char* input);
 
@@ -76,6 +81,7 @@ int main( int   i_argc,
   std::cout << "####################################" << std::endl;
 
   // Handling input options
+  Config l_config = parseArgs(i_argc, i_argv);
 
   for (int i = 1; i < i_argc; i++) {
     std::string arg = i_argv[i];
@@ -194,19 +200,21 @@ int main( int   i_argc,
       return EXIT_FAILURE;
     }
   }
+  // construct setup
+  auto l_setup = createSetup(l_config);
 
   // notify user about selectet configuration
   std::cout << "runtime configuration" << std::endl;
-  std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
-  std::cout << "  number of cells in y-direction: " << l_ny << std::endl;
-  std::cout << "  cell size:                      " << l_dxy << std::endl;
-  std::cout << "  sanity:                         " << l_sanity << std::endl;
-  std::cout << "  selected solver:                " << l_solver << std::endl;
-  std::cout << "  selected time:                  " << l_endTime << std::endl;
+  std::cout << "  number of cells in x-direction: " << l_config.nx << std::endl;
+  std::cout << "  number of cells in y-direction: " << l_config.ny << std::endl;
+  std::cout << "  cell size:                      " << l_config.dxy << std::endl;
+  std::cout << "  sanity:                         " << l_config.insanity << std::endl;
+  std::cout << "  selected solver:                " << l_config.solver << std::endl;
+  std::cout << "  selected time:                  " << l_config.endTime << std::endl;
+
 
   // set output directory
   std::filesystem::path outDir = "solutions";
-
 
   // ensure output directory exists
   if (!std::filesystem::exists(outDir)) {
@@ -358,34 +366,29 @@ int main( int   i_argc,
 
  // construct solver
  tsunami_lab::patches::WavePropagation *l_waveProp;
-  if( l_is2D ) {
-    l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_nx, l_ny );
+  if( l_config.is_2d ) {
+    l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_config.nx, l_config.ny );
   } else {
-    l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx, l_solver );
+    l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_config.nx, l_config.solver );
   }
 
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
 
   // set up solver
-  for( tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++ ) {
-
-    // old implementation just in case
-    //tsunami_lab::t_real l_y = l_cy * l_dxy; 
-    //tsunami_lab::t_real l_domainStart = (l_tsunami != nullptr) ? l_tsunami->getDomainStart() : 0.0;
-    
-    // in case of 2d, we need to shift the domain by 50
-    //tsunami_lab::t_real l_domainStartX = l_is2D ? -500.0 : 0.0;
-    //tsunami_lab::t_real l_domainStartY = l_is2D ? -500.0 : 0.0;
-
-    /*if (l_setup_selection == "TsunamiEvent2d") {
-      l_domainStartX = -0.5 * l_w;
-      l_domainStartY = -0.5 * l_w;
-    }*/
+  for( tsunami_lab::t_idx l_cy = 0; l_cy < l_config.ny; l_cy++ ) {
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
         tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
         tsunami_lab::t_real l_y = l_is2D ? (l_cy + 0.5) * l_dxy + l_domainStartY : l_cy * l_dxy;
+    tsunami_lab::t_real l_domainStartX = 0.0;
+    tsunami_lab::t_real l_domainStartY = 0.0;
+
+    for( tsunami_lab::t_idx l_cx = 0; l_cx < l_config.nx; l_cx++ ) {
+
+      // l_x and l_y is in meters
+      tsunami_lab::t_real l_x = (l_cx + 0.5) * l_config.dxy + l_domainStartX;
+      tsunami_lab::t_real l_y = l_config.is_2d ? (l_cy + 0.5) * l_config.dxy + l_domainStartY : l_cy * l_config.dxy;
           
 
       // get initial values of the setup
@@ -428,10 +431,10 @@ int main( int   i_argc,
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
 
   // derive constant time step; changes at simulation time are ignored
-  tsunami_lab::t_real l_dt = 0.5 * l_dxy / l_speedMax;
+  tsunami_lab::t_real l_dt = 0.5 * l_config.dxy / l_speedMax;
 
   // derive scaling for a time step
-  tsunami_lab::t_real l_scaling = l_dt / l_dxy;
+  tsunami_lab::t_real l_scaling = l_dt / l_config.dxy;
 
   // set up time and print control
   tsunami_lab::t_idx  l_timeStep = 0;
@@ -446,14 +449,14 @@ int main( int   i_argc,
   std::string stationsXmlPath = "src/io/stations.xml";
   tsunami_lab::io::loadXmlConfig(stationsXmlPath, stationConfigs, outputConfig);
   std::vector<tsunami_lab::io::Station> stations;
-  if(l_is2D) {
+  if(l_config.is_2d) {
     for (const auto& stationConfig : stationConfigs) {
       // construct Object directly into vector
       stations.emplace_back(stationConfig.x,
                             stationConfig.y,
                             outputConfig.interval,
                             stationConfig.name,
-                            l_nx,
+                            l_config.nx,
                             outputConfig.path);
     }
   }
@@ -461,9 +464,9 @@ int main( int   i_argc,
 
   // construct writer for NetCdf
   tsunami_lab::io::NetCdf l_ncWriter( l_ncPath,                                         
-                                      l_nx,                                             
-                                      l_is2D ? l_ny : 1,          // pass 1 for 1D runs
-                                      l_dxy,                                            
+                                      l_config.nx,                                             
+                                      l_config.is_2d ? l_config.ny : 1,          // pass 1 for 1D runs
+                                      l_config.dxy,                                            
                                       l_waveProp->getStride(),                          
                                       l_waveProp->getBathymetry()                                     
 );     
@@ -472,10 +475,11 @@ tsunami_lab::io::NetCdfCheckpoint l_checkpoint;
 tsunami_lab::t_real l_checkpointTimer = 0.0;
 
   // iterate over time
-  while( l_simTime < l_endTime ) {
+  while( l_simTime < l_config.endTime ) {
       if( l_timeStep % 25 == 0 ) {
           std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
 
+<<<<<<< HEAD
           //std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
           //std::cout << "  writing wave field to " << l_path << std::endl;
         /*
@@ -501,12 +505,16 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
           }
           l_file.close();
       */
+=======
+          std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
+          std::cout << "  writing wave field to " << l_path << std::endl;
+>>>>>>> 6d14a054b16f82be185f631a312d7e05f874f2ee
 
           // netCDF write
           l_ncWriter.write( l_simTime,
                             l_waveProp->getHeight(),
                             l_waveProp->getMomentumX(),
-                            l_is2D ? l_waveProp->getMomentumY() : nullptr );
+                            l_config.is_2d ? l_waveProp->getMomentumY() : nullptr );
 
           l_nOut++;
       }                                                                   
@@ -518,9 +526,9 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
     *   OLD: it only checked if the actual depth of the water is lower than 200m.
     
     // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the left-outermost cell
-    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_dxy, 0 ) < 200;
+    bool l_leftReflecting = l_setup->getHeight( 0.5 * l_config.dxy, 0 ) < 200;
     // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the right-outermost cell
-    bool l_rightReflecting = l_setup->getHeight( (l_nx - 0.5) * l_dxy, 0 ) < 200;
+    bool l_rightReflecting = l_setup->getHeight( (l_config.nx - 0.5) * l_config.dxy, 0 ) < 200;
 
     l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
     */

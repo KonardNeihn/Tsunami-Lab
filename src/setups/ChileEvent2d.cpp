@@ -2,7 +2,7 @@
  * @author 
  *
  * @section DESCRIPTION
- * One-dimensional dam break problem.
+ * Chile 2010 Tsunami.
  **/
 #include "ChileEvent2d.h"
 #include <algorithm>
@@ -37,7 +37,32 @@ tsunami_lab::setups::ChileEvent2d::ChileEvent2d(
 
     std::vector<t_real> dx = l_ncDisp.read(pathDisplacement, "x");
     std::vector<t_real> dy = l_ncDisp.read(pathDisplacement, "y");
+
+    std::cout << "Displacement X range: "
+          << dx.front() << " -> "
+          << dx.back() << std::endl;
+
+    std::cout << "Displacement Y range: "
+          << dy.front() << " -> "
+          << dy.back() << std::endl;
+
     auto l_disp = l_ncDisp.read(pathDisplacement, "z");
+
+
+    std::cout << "Bathymetry X width: "
+          << m_x.back() - m_x.front() << std::endl;
+
+    std::cout << "Bathymetry Y width: "
+          << m_y.back() - m_y.front() << std::endl;
+
+    std::cout << "Displacement X width: "
+          << dx.back() - dx.front() << std::endl;
+
+    std::cout << "Displacement Y width: "
+          << dy.back() - dy.front() << std::endl;
+
+
+
 
     m_xd = dx;
     m_yd = dy;
@@ -75,57 +100,37 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getHeight(
     t_real i_x,
     t_real i_y) const
 {
-    /*const float scaleX =
-        static_cast<float>(m_2dDisplacement[0].size()) / m_nx;
+    // i_x and i_y are in meters
+    // conversion: meters -> dataset indices
+    const float scaleX =
+        static_cast<float>(m_2dDisplacement[0].size()) /
+        getDomainWidth();
 
     const float scaleY =
-        static_cast<float>(m_2dDisplacement.size()) / m_ny;
+        static_cast<float>(m_2dDisplacement.size()) /
+        getDomainLength();
 
     std::size_t l_ix = std::min(
         static_cast<std::size_t>(scaleX * i_x),
-        m_2dDisplacement[0].size() - 1);
+        m_2dDisplacement[0].size() - 1
+    );
 
     std::size_t l_iy = std::min(
         static_cast<std::size_t>(scaleY * i_y),
-        m_2dDisplacement.size() - 1);
+        m_2dDisplacement.size() - 1
+    );
 
-    std::cout << "Height: "
-              << m_2dDisplacement[l_iy][l_ix]
-              << std::endl;
-    */
+    t_real b =
+        m_2dBathymetry[l_iy][l_ix];
 
-    // Simulation domain [0,m_nx] -> NetCDF coordinates
-    t_real xCoord =
-        m_xd.front() +
-        (i_x / static_cast<t_real>(m_nx)) *
-        (m_xd.back() - m_xd.front());
+    t_real disp =
+        m_2dDisplacement[l_iy][l_ix];
 
-    t_real yCoord =
-        m_yd.front() +
-        (i_y / static_cast<t_real>(m_ny)) *
-        (m_yd.back() - m_yd.front());
+    // water depth over bathymetry
+    t_real h =
+        std::max(-b + disp, (t_real)0);
 
-    // find matching indices
-    auto xIt = std::lower_bound(m_xd.begin(), m_xd.end(), xCoord);
-    auto yIt = std::lower_bound(m_yd.begin(), m_yd.end(), yCoord);
-
-    std::size_t l_ix =
-        std::min(
-            static_cast<std::size_t>(
-                std::distance(m_xd.begin(), xIt)
-            ),
-            m_xd.size() - 1
-        );
-
-    std::size_t l_iy =
-        std::min(
-            static_cast<std::size_t>(
-                std::distance(m_yd.begin(), yIt)
-            ),
-            m_yd.size() - 1
-        );
-
-    return std::max(-getBathymetry(i_x, i_y), 0.0f) + m_2dDisplacement[l_iy][l_ix];
+    return h;
 }
 
 tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getMomentumX( t_real,
@@ -142,60 +147,34 @@ tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getBathymetry(
     t_real i_x,
     t_real i_y) const
 {
-    /*const float scaleX =
-        static_cast<float>(m_2dBathymetry[0].size()) / m_nx;
+    
+    // i_x and i_y are in meters
+    // conversion: meters -> dataset indices
+    const float scaleX =
+        static_cast<float>(m_2dBathymetry[0].size()) /
+        getDomainWidth();
 
     const float scaleY =
-        static_cast<float>(m_2dBathymetry.size()) / m_ny;
+        static_cast<float>(m_2dBathymetry.size()) /
+        getDomainLength();
 
     std::size_t l_ix = std::min(
         static_cast<std::size_t>(scaleX * i_x),
-        m_2dBathymetry[0].size() - 1);
+        m_2dBathymetry[0].size() - 1
+    );
 
     std::size_t l_iy = std::min(
         static_cast<std::size_t>(scaleY * i_y),
-        m_2dBathymetry.size() - 1);
-    */
-
-    // Simulation domain [0,m_nx] -> NetCDF coordinates
-    t_real xCoord =
-        m_x.front() +
-        (i_x / static_cast<t_real>(m_nx)) *
-        (m_x.back() - m_x.front());
-
-    t_real yCoord =
-        m_y.front() +
-        (i_y / static_cast<t_real>(m_ny)) *
-        (m_y.back() - m_y.front());
-
-    // find matching indices
-    auto xIt = std::lower_bound(m_x.begin(), m_x.end(), xCoord);
-    auto yIt = std::lower_bound(m_y.begin(), m_y.end(), yCoord);
-
-    std::size_t l_ix =
-        std::min(
-            static_cast<std::size_t>(
-                std::distance(m_x.begin(), xIt)
-            ),
-            m_x.size() - 1
-        );
-
-    std::size_t l_iy =
-        std::min(
-            static_cast<std::size_t>(
-                std::distance(m_y.begin(), yIt)
-            ),
-            m_y.size() - 1
-        );
-
-    /*std::cout << "Bathymetry: "
-              << m_2dBathymetry[l_iy][l_ix]
-              << std::endl;
-    */
+        m_2dBathymetry.size() - 1
+    );
 
     return m_2dBathymetry[l_iy][l_ix];
 }
 
 tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getDomainWidth() const {
     return m_x.back() - m_x.front();
+}
+
+tsunami_lab::t_real tsunami_lab::setups::ChileEvent2d::getDomainLength() const {
+    return m_y.back() - m_y.front();
 }
