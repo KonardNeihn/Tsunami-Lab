@@ -106,18 +106,9 @@ Setup* createSetup(Config& c) {
         }
 
         else if (c.setup == "ChileEvent2d") {
-            c.is_2d = true;
-            Setup* setup = new ChileEvent2d("src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
-                                            "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc",
-                                            c.nx, 
-                                            c.ny );
-
-            std::cout << "  domain width: " << setup->getDomainWidth() << std::endl;
-            std::cout << "  domain length: " << setup->getDomainLength() << std::endl;
-            c.ny = c.nx * (setup->getDomainLength() / setup->getDomainWidth());
-            c.width = setup->getDomainWidth();
-            c.dxy = c.width / c.nx;
-            return setup;
+            return new ChileEvent2d(c,
+                                    "src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
+                                    "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc" );
         }
 
         else if (c.setup == "TohokuEvent2d") {

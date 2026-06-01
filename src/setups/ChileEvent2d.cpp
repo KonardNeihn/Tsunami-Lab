@@ -11,13 +11,10 @@
 #include <iostream>
 
 tsunami_lab::setups::ChileEvent2d::ChileEvent2d(
+    Config& config,
     std::string pathBathymetry,
-    std::string pathDisplacement,
-    t_idx i_nx,
-    t_idx i_ny)
+    std::string pathDisplacement)
 {
-    m_nx = i_nx;
-    m_ny = i_ny;
 
     tsunami_lab::io::NetCdfReader l_ncBath;
     tsunami_lab::io::NetCdfReader l_ncDisp;
@@ -61,8 +58,10 @@ tsunami_lab::setups::ChileEvent2d::ChileEvent2d(
     std::cout << "Displacement Y width: "
           << dy.back() - dy.front() << std::endl;
 
-
-
+    config.is_2d = true;
+    config.ny = config.nx * (getDomainLength() / getDomainWidth());
+    config.width = getDomainWidth();
+    config.dxy = config.width / config.nx;
 
     m_xd = dx;
     m_yd = dy;
