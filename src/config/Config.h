@@ -6,7 +6,7 @@
 struct Config {
   // number of cells in x- and y-direction
   tsunami_lab::t_idx nx = 100;
-  tsunami_lab::t_idx ny = 100;
+  tsunami_lab::t_idx ny = 1;
 
   // width of the observed space in meters
   tsunami_lab::t_real width = 10.0;
