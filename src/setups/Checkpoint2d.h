@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include "../io/NetCdfReader.h"
-//#include "../io/NetCdfCheckpoint.h"
+#include "../io/NetCdfCheckpoint.h"
 
 namespace tsunami_lab {
   namespace setups {
@@ -22,7 +22,7 @@ namespace tsunami_lab {
  *  2d checkpoint setup.
  * Loads a checkpoint file to get latest calculated timestep and continue
  **/
-class tsunami_lab::setups::Checkpointt2d: public Setup {
+class tsunami_lab::setups::Checkpoint2d: public Setup {
   private:
     t_idx m_nx;
     t_idx m_ny;
@@ -57,16 +57,16 @@ class tsunami_lab::setups::Checkpointt2d: public Setup {
      *
      * @return momentum in x-direction.
      **/
-    t_real getMomentumX( t_real,
-                         t_real ) const;
+    t_real getMomentumX( t_real i_x,
+                         t_real i_y) const;
 
     /**
      * Gets the momentum in y-direction.
      *
      * @return momentum in y-direction.
      **/
-    t_real getMomentumY( t_real,
-                         t_real ) const;
+    t_real getMomentumY( t_real i_x,
+                         t_real i_y) const;
 
     
     /**

@@ -60,11 +60,11 @@ class tsunami_lab::io::NetCdfCheckpoint {
                          t_real i_domainStartX,
                          t_real i_domainStartY);
 
-    void writeCheckpoint(std::string checkpointPath,
-                         std::string variableName,
-                        t_real x,
-                        t_real y,
-                        t_real value);
+    void write2DVariable(std::string checkpointPath,
+                                std::string variableName,
+                                const t_real* data,
+                                t_idx nx,
+                                t_idx ny);
 };
 
 #endif 
