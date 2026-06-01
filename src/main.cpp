@@ -34,7 +34,7 @@
 #include <filesystem>
 #include "config/Config.h"
 #include "factory/SetupFactory.h"
-//#include "core/Initializer.h"
+#include "core/Initializer.h"
 
 int is_number(char* input);
 
