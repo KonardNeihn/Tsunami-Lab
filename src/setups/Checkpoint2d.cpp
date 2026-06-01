@@ -16,59 +16,74 @@ tsunami_lab::setups::Checkpoint2d::Checkpoint2d(
     std::string l_checkpointFolder = "";
     m_checkpointPath = l_checkpointFolder + checkpoint;
 
-    // todo: implement NetCdfCheckpoint class to read (and write) checkpoint files
-    tsunami_lab::io::NetCdfCheckpoint l_checkpointReader();
+    tsunami_lab::io::NetCdfCheckpoint l_checkpointReader;
     
+    l_checkpointReader.readCheckpointAndSetParameters(
+        m_checkpointPath,
+        m_nx,
+        m_ny,
+        m_lastTimeStep,
+        m_endTime,
+        m_w,
+        m_domainStartX,
+        m_domainStartY
+    );
+
+    m_2dBathymetry = l_checkpointReader.read2DVariable(m_checkpointPath, "bathymetry");
+    m_2dDisplacement = l_checkpointReader.read2DVariable(m_checkpointPath, "height");
+    m_2dMomentumX = l_checkpointReader.read2DVariable(m_checkpointPath, "momentumX");
+    m_2dMomentumY = l_checkpointReader.read2DVariable(m_checkpointPath, "momentumY");
 }
 
-tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getHeight(
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getHeight(
     t_real i_x,
     t_real i_y) const
 {
-    const float scaleX =
-        static_cast<float>(m_2dDisplacement[0].size()) / m_nx;
-
-    const float scaleY =
-        static_cast<float>(m_2dDisplacement.size()) / m_ny;
-
-    std::size_t l_ix = std::min(
-        static_cast<std::size_t>(scaleX * i_x),
-        m_2dDisplacement[0].size() - 1);
-
-    std::size_t l_iy = std::min(
-        static_cast<std::size_t>(scaleY * i_y),
-        m_2dDisplacement.size() - 1);
-
-    return std::max(-getBathymetry(i_x, i_y), 0.0f) + m_2dDisplacement[l_iy][l_ix];
+    // displacement is the actual water height
+    return m_2dDisplacement[i_y][i_x];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getMomentumX( t_real,
-                                                                   t_real ) const {
-  return 0;
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getMomentumX( t_real i_x,
+                                                                   t_real i_y) const {
+  return m_2dMomentumX[i_y][i_x];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getMomentumY( t_real,
-                                                                   t_real ) const {
-  return 0;
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getMomentumY( t_real i_x,
+                                                                   t_real i_y) const {
+  return m_2dMomentumY[i_y][i_x];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::TohokuEvent2d::getBathymetry(
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getBathymetry(
     t_real i_x,
     t_real i_y) const
 {
-    const float scaleX =
-        static_cast<float>(m_2dBathymetry[0].size()) / m_nx;
+    return m_2dBathymetry[i_y][i_x];
+}
 
-    const float scaleY =
-        static_cast<float>(m_2dBathymetry.size()) / m_ny;
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getDomainStartX() const {
+    return m_domainStartX;
+}
 
-    std::size_t l_ix = std::min(
-        static_cast<std::size_t>(scaleX * i_x),
-        m_2dBathymetry[0].size() - 1);
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getDomainStartY() const {
+    return m_domainStartY;
+}
 
-    std::size_t l_iy = std::min(
-        static_cast<std::size_t>(scaleY * i_y),
-        m_2dBathymetry.size() - 1);
+tsunami_lab::t_idx tsunami_lab::setups::Checkpoint2d::getNX() const {
+    return m_nx;
+}
 
-    return m_2dBathymetry[l_iy][l_ix];
+tsunami_lab::t_idx tsunami_lab::setups::Checkpoint2d::getNY() const {
+    return m_ny;
+}
+
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getLastTimeStep() const {
+    return m_lastTimeStep;
+}
+
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getEndTime() const {
+    return m_endTime; 
+}
+
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getWidth() const {
+    return m_w;
 }

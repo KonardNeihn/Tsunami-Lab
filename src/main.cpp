@@ -19,8 +19,10 @@
 #include "setups/TsunamiEvent2d.h"
 #include "setups/ChileEvent2d.h"
 #include "setups/TohokuEvent2d.h"
+#include "setups/Checkpoint2d.h"
 #include "io/Csv.h"
 #include "io/NetCdf.h" 
+#include "io/NetCdfCheckpoint.h"
 #include "io/Station.h"
 #include "io/XmlReader.h"
 #include <vector>
@@ -45,8 +47,18 @@ int main( int   i_argc,
   // time until abortion
   tsunami_lab::t_real l_endTime = 1.25;
 
+  // current simulation time
+  tsunami_lab::t_real l_simTime = 0;
+
   // set cell size
   tsunami_lab::t_real l_dxy = l_w / l_nx;
+
+  // Domainstart
+  tsunami_lab::t_real l_domainStartX = 0.0;
+  tsunami_lab::t_real l_domainStartY = 0.0;
+
+  // rate at which checkpoints are written (relative to end time)
+  tsunami_lab::t_real l_checkpointRate = 0.5; 
 
   // string of selected solver
   std::string l_solver = "fwave";
@@ -164,6 +176,7 @@ int main( int   i_argc,
                                             && l_setup_selection != "TsunamiEvent2d"
                                             && l_setup_selection != "ChileEvent2d"
                                             && l_setup_selection != "TohokuEvent2d"
+                                            && l_setup_selection != "Checkpoint2d"
                                           ) {
         std::cout << "tsunami_lab: invalid setup '" << i_argv[i] << "'" << std::endl;
         std::cout << "Try 'tsunami_lab --help' for more information." << std::endl;
@@ -304,6 +317,17 @@ int main( int   i_argc,
       l_setup = new tsunami_lab::setups::TohokuEvent2d("src/bathymetry/output/tohoku_gebco20_usgs_250m_bath.nc",
                                                         "src/bathymetry/output/tohoku_gebco20_usgs_250m_displ.nc",
                                                       l_nx, l_ny);
+     } else if (l_setup_selection == "Checkpoint2d") {
+        auto l_checkpointSetup = new tsunami_lab::setups::Checkpoint2d("solutions/checkpoint.nc");
+        l_nx = l_checkpointSetup->getNX();
+        l_ny = l_checkpointSetup->getNY();
+        l_w = l_checkpointSetup->getWidth();
+        l_dxy = l_w / l_nx;
+        l_domainStartX = l_checkpointSetup->getDomainStartX();
+        l_domainStartY = l_checkpointSetup->getDomainStartY();
+        l_simTime = l_checkpointSetup->getLastTimeStep();
+        l_endTime = l_checkpointSetup->getEndTime();
+        l_setup = l_checkpointSetup;
      }
     
     else {
@@ -359,9 +383,6 @@ int main( int   i_argc,
       l_domainStartY = -0.5 * l_w;
     }*/
 
-    tsunami_lab::t_real l_domainStartX = 0.0;
-    tsunami_lab::t_real l_domainStartY = 0.0;
-
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
         tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy + l_domainStartX;
         tsunami_lab::t_real l_y = l_is2D ? (l_cy + 0.5) * l_dxy + l_domainStartY : l_cy * l_dxy;
@@ -416,7 +437,6 @@ int main( int   i_argc,
   tsunami_lab::t_idx  l_timeStep = 0;
   tsunami_lab::t_idx  l_nOut = 0;
   //tsunami_lab::t_real l_endTime = 1.25; is set above
-  tsunami_lab::t_real l_simTime = 0;
 
   std::cout << "entering time loop" << std::endl;
 
@@ -448,13 +468,16 @@ int main( int   i_argc,
                                       l_waveProp->getBathymetry()                                     
 );     
 
+tsunami_lab::io::NetCdfCheckpoint l_checkpoint;
+tsunami_lab::t_real l_checkpointTimer = 0.0;
+
   // iterate over time
   while( l_simTime < l_endTime ) {
       if( l_timeStep % 25 == 0 ) {
           std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
 
-          std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
-          std::cout << "  writing wave field to " << l_path << std::endl;
+          //std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
+          //std::cout << "  writing wave field to " << l_path << std::endl;
         /*
           std::ofstream l_file;
           l_file.open( l_path );
@@ -518,7 +541,51 @@ int main( int   i_argc,
       station.timeStep(l_dt, l_waveProp->getHeight(), l_waveProp->getMomentumX(), l_waveProp->getMomentumY());
     }
 
+    // Handle Checkpoint
+    if (l_checkpointTimer >= l_checkpointRate) {
+
+      std::string checkpointPath = "solutions/checkpoint.nc";
+      std::cout << "Creating checkpoint to " << checkpointPath << std::endl;
+      l_checkpoint.createCheckpoint(checkpointPath, l_nx, l_ny, l_simTime, l_endTime, l_w, l_domainStartX, l_domainStartY);
+      
+      l_checkpoint.write2DVariable(
+        checkpointPath,
+        "height",
+        l_waveProp->getHeight(),
+        l_nx,
+        l_ny
+      );
+
+      l_checkpoint.write2DVariable(
+          checkpointPath,
+          "bathymetry",
+          l_waveProp->getBathymetry(),
+          l_nx,
+          l_ny
+      );
+
+      l_checkpoint.write2DVariable(
+          checkpointPath,
+          "momentumX",
+          l_waveProp->getMomentumX(),
+          l_nx,
+          l_ny
+      );
+
+      l_checkpoint.write2DVariable(
+          checkpointPath,
+          "momentumY",
+          l_waveProp->getMomentumY(),
+          l_nx,
+          l_ny
+      );
+
+      std::cout << "Finished creating Checkpoint" << std::endl;
+      l_checkpointTimer = 0.0;
+    }
+
     l_timeStep++;
+    l_checkpointTimer += l_dt;
     l_simTime += l_dt;
   }
 
