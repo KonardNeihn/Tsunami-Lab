@@ -50,7 +50,7 @@ class tsunami_lab::setups::TohokuEvent2d: public Setup {
      * @return height at the given point. 
      **/
     t_real getHeight( t_real i_x,
-                      t_real i_y     ) const;
+                      t_real i_y     ) const override;
 
     /**
      * Gets the momentum in x-direction.
@@ -58,7 +58,7 @@ class tsunami_lab::setups::TohokuEvent2d: public Setup {
      * @return momentum in x-direction.
      **/
     t_real getMomentumX( t_real,
-                         t_real ) const;
+                         t_real ) const override;
 
     /**
      * Gets the momentum in y-direction.
@@ -66,11 +66,11 @@ class tsunami_lab::setups::TohokuEvent2d: public Setup {
      * @return momentum in y-direction.
      **/
     t_real getMomentumY( t_real,
-                         t_real ) const;
+                         t_real ) const override;
 
     
     t_real getBathymetry( t_real i_x,
-                          t_real i_y ) const; 
+                          t_real i_y ) const override; 
 };
 
 #endif

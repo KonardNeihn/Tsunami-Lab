@@ -24,13 +24,18 @@ l_sources = [ 'solvers/Roe.cpp',
               'setups/DamBreak2d.cpp',
               'setups/ChileEvent2d.cpp',
               'setups/TohokuEvent2d.cpp',
+              'setups/Checkpoint2d.cpp',
               'io/NetCdf.cpp',
               'io/NetCdfReader.cpp',
+              'io/NetCdfCheckpoint.cpp',
               'setups/ArtificialTsunami2d.cpp',
               'setups/TsunamiEvent2d.cpp',
               'io/Csv.cpp', 
               'io/Station.cpp',
-              'io/XmlReader.cpp']
+              'io/XmlReader.cpp',
+              'config/Config.cpp',
+              'factory/SetupFactory.cpp',
+              'core/Initializer.cpp']
 
 sources = [env.Object(s) for s in l_sources]
 

@@ -49,10 +49,10 @@ jobs:
           nix-shell --run "
             scons mode=debug+san &&
             ./build/tests &&
-            ./build/tsunami_lab 25 &&
+            ./build/tsunami_lab -n 25 &&
             scons mode=release+san &&
             ./build/tests &&
-            ./build/tsunami_lab 500
+            ./build/tsunami_lab -n 500
           "
 
       - name: Valgrind
@@ -60,7 +60,7 @@ jobs:
           nix-shell --run "
             scons mode=debug &&
             valgrind ./build/tests &&
-            valgrind ./build/tsunami_lab 25
+            valgrind ./build/tsunami_lab -n 25
           "
           
       - name: Release
@@ -68,5 +68,5 @@ jobs:
           nix-shell --run "
             scons &&
             ./build/tests &&
-            ./build/tsunami_lab 500
+            ./build/tsunami_lab -n 500
           "

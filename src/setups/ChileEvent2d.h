@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "../io/NetCdfReader.h"
+#include "../config/Config.h"
 
 namespace tsunami_lab {
   namespace setups {
@@ -22,9 +23,8 @@ namespace tsunami_lab {
  **/
 class tsunami_lab::setups::ChileEvent2d: public Setup {
   private:
-    t_idx m_nx;
-    t_idx m_ny;
-
+    Config* config;
+    
     std::vector<t_real> m_x;
     std::vector<t_real> m_y;
     std::vector<t_real> m_xd;
@@ -40,7 +40,7 @@ class tsunami_lab::setups::ChileEvent2d: public Setup {
     /**
      * Constructor.
      **/
-    ChileEvent2d(std::string pathBathymetry, std::string pathDisplacement, t_idx i_nx, t_idx i_ny);
+    ChileEvent2d(Config& config, std::string pathBathymetry, std::string pathDisplacement);
 
     /**
      * Gets the water height at a given point.
@@ -49,7 +49,7 @@ class tsunami_lab::setups::ChileEvent2d: public Setup {
      * @return height at the given point. 
      **/
     t_real getHeight( t_real i_x,
-                      t_real i_y     ) const;
+                      t_real i_y     ) const override;
 
     /**
      * Gets the momentum in x-direction.
@@ -57,7 +57,7 @@ class tsunami_lab::setups::ChileEvent2d: public Setup {
      * @return momentum in x-direction.
      **/
     t_real getMomentumX( t_real,
-                         t_real ) const;
+                         t_real ) const override;
 
     /**
      * Gets the momentum in y-direction.
@@ -65,13 +65,15 @@ class tsunami_lab::setups::ChileEvent2d: public Setup {
      * @return momentum in y-direction.
      **/
     t_real getMomentumY( t_real,
-                         t_real ) const;
+                         t_real ) const override;
 
     
     t_real getBathymetry( t_real i_x,
-                          t_real i_y ) const; 
+                          t_real i_y ) const override; 
 
     t_real getDomainWidth() const;
+
+    t_real getDomainLength() const;
 };
 
 #endif

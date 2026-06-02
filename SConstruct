@@ -92,3 +92,5 @@ env.Program( target = 'build/tsunami_lab',
 
 env.Program( target = 'build/tests',
              source = sources + tests )
+
+print("SOURCES:", sources)
