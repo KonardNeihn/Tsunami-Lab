@@ -36,6 +36,7 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
   int l_status;
 
   // 1. Create the file (overwrite if it already exists (NC_CLOBBER), use classic format)
+  // now with NC_SHuffle for Compression
   l_status = nc_create( i_path.c_str(), NC_CLOBBER | NC_NETCDF4, &m_ncId );
   checkNcErr( l_status, "nc_create" );
 
@@ -178,6 +179,25 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
     l_status = nc_def_var( m_ncId, "h", NC_FLOAT, l_nDims, l_dataDimIds, &m_varHId );
     checkNcErr( l_status, "def_var h" );
 
+    // CHUNKING AND COMPRESSION
+    // Example chunk size: 1 step of time, and the full space layout (or a subset like 128x128)
+    int l_storage = NC_CHUNKED;
+    size_t l_chunks[3];
+    if (m_is2D) {
+      l_chunks[0] = 1; 
+      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_ny));   
+      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nx));
+    } else {
+      l_chunks[0] = 1;
+      l_chunks[1] = m_nx;
+    }
+    l_status = nc_def_var_chunking(m_ncId, m_varHId, l_storage, l_chunks);
+    checkNcErr(l_status, "def_var_chunking h");
+
+    // Enable Shuffle (1) and Deflate compression level 6 (standard)
+    l_status = nc_def_var_deflate(m_ncId, m_varHId, 1, 1, 6);
+    checkNcErr(l_status, "def_var_deflate h");
+
     const char *l_hLongName = "water height above bathymetry";
     l_status = nc_put_att_text( m_ncId, m_varHId, "long_name",
                                  std::strlen( l_hLongName ), l_hLongName );
@@ -194,6 +214,25 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
     l_status = nc_def_var( m_ncId, "hu", NC_FLOAT, l_nDims, l_dataDimIds, &m_varHuId );
     checkNcErr( l_status, "def_var hu" );
 
+    // CHUNKING AND COMPRESSION
+    // Example chunk size: 1 step of time, and the full space layout (or a subset like 128x128)
+    int l_storage = NC_CHUNKED;
+    size_t l_chunks[3];
+    if (m_is2D) {
+      l_chunks[0] = 1; 
+      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_ny));   
+      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nx));
+    } else {
+      l_chunks[0] = 1;
+      l_chunks[1] = m_nx;
+    }
+    l_status = nc_def_var_chunking(m_ncId, m_varHuId, l_storage, l_chunks);
+    checkNcErr(l_status, "def_var_chunking hu");
+
+    // Enable Shuffle (1) and Deflate compression level 6 (standard)
+    l_status = nc_def_var_deflate(m_ncId, m_varHuId, 1, 1, 6);
+    checkNcErr(l_status, "def_var_deflate hu");
+
     const char *l_huLongName = "x-momentum (h * u)";
     l_status = nc_put_att_text( m_ncId, m_varHuId, "long_name",
                                  std::strlen( l_huLongName ), l_huLongName );
@@ -209,6 +248,25 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
   if( m_is2D ) {
     l_status = nc_def_var( m_ncId, "hv", NC_FLOAT, l_nDims, l_dataDimIds, &m_varHvId );
     checkNcErr( l_status, "def_var hv" );
+
+    // CHUNKING AND COMPRESSION
+    // Example chunk size: 1 step of time, and the full space layout (or a subset like 128x128)
+    int l_storage = NC_CHUNKED;
+    size_t l_chunks[3];
+    if (m_is2D) {
+      l_chunks[0] = 1; 
+      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_ny));   
+      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nx));
+    } else {
+      l_chunks[0] = 1;
+      l_chunks[1] = m_nx;
+    }
+    l_status = nc_def_var_chunking(m_ncId, m_varHvId, l_storage, l_chunks);
+    checkNcErr(l_status, "def_var_chunking hv");
+
+    // Enable Shuffle (1) and Deflate compression level 6 (standard)
+    l_status = nc_def_var_deflate(m_ncId, m_varHvId, 1, 1, 6);
+    checkNcErr(l_status, "def_var_deflate hv");
 
     const char *l_hvLongName = "y-momentum (h * v)";
     l_status = nc_put_att_text( m_ncId, m_varHvId, "long_name",
