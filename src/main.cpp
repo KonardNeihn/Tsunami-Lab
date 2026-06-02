@@ -41,13 +41,6 @@ int is_number(char* input);
 int main( int   i_argc,
           char *i_argv[] ) {
 
-  // current simulation time
-  tsunami_lab::t_real l_simTime = 0;
-
-  // Domainstart
-  tsunami_lab::t_real l_domainStartX = 0.0;
-  tsunami_lab::t_real l_domainStartY = 0.0;
-
   // rate at which checkpoints are written (relative to end time)
   tsunami_lab::t_real l_checkpointRate = 0.5; 
 
@@ -63,13 +56,18 @@ int main( int   i_argc,
   // construct setup
   auto setup = createSetup(g_config);
 
+
+  // current simulation time
+  tsunami_lab::t_real l_simTime = g_config.simTime;
+
   // notify user about selectet configuration
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  selected setup:                 " << g_config.setup << std::endl;
   std::cout << "  number of cells in x-direction: " << g_config.nx << std::endl;
   std::cout << "  number of cells in y-direction: " << g_config.ny << std::endl;
   std::cout << "  cell size:                      " << g_config.dxy << std::endl;
-  std::cout << "  selected time:                  " << g_config.endTime << std::endl;
+  std::cout << "  starts at time:                 " << l_simTime << std::endl;
+  std::cout << "  ends at time:                   " << g_config.endTime << std::endl;
   std::cout << "  selected solver:                " << g_config.solver << std::endl;
   std::cout << "  insanity:                       " << g_config.insanity << std::endl;
 
@@ -112,8 +110,6 @@ int main( int   i_argc,
     l_waveProp,
     setup,
     g_config,
-    l_domainStartX,
-    l_domainStartY,
     l_hMax
   );
 
@@ -160,7 +156,7 @@ int main( int   i_argc,
                                       l_waveProp->getBathymetry()                                     
 );     
 
-tsunami_lab::io::NetCdfCheckpoint l_checkpoint;
+tsunami_lab::io::NetCdfCheckpoint l_checkpoint(g_config);
 tsunami_lab::t_real l_checkpointTimer = 0.0;
 
   // iterate over time
@@ -168,7 +164,7 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
       if( l_timeStep % 25 == 0 ) {
           std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
 
-          std::string l_path = (outDir / ("solution_" + std::to_string(l_nOut) + ".csv")).string();
+          std::string l_path = (outDir / ("netcdf_output.nc")).string();
           std::cout << "  writing wave field to " << l_path << std::endl;
 
           // netCDF write
@@ -216,7 +212,7 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
       std::string checkpointPath = "solutions/checkpoint.nc";
       std::cout << "Creating checkpoint to " << checkpointPath << std::endl;
 
-      l_checkpoint.createCheckpoint(checkpointPath, g_config.nx, g_config.ny, l_simTime, g_config.endTime, g_config.width, l_domainStartX, l_domainStartY);
+      l_checkpoint.createCheckpoint(checkpointPath, l_simTime);
       
       l_checkpoint.write2DVariable(
         checkpointPath,

@@ -10,8 +10,6 @@ void initialize(
     patches::WavePropagation* solver,
     setups::Setup* setup,
     const Config& config,
-    t_real domainStartX,
-    t_real domainStartY,
     t_real& hMax
 );
 

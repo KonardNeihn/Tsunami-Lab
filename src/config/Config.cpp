@@ -19,7 +19,7 @@ Config parseArgs(int argc, char** argv) {
     app.add_option("-S,--setup", c.setup, "Select setup to simulate. Possible is \
         {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, \
         HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d, DamBreak2d, ArtificialTsunami2d, \
-        TsunamiEvent2d, ChileEvent2d, TohokuEvent2d}. Default is DamBreak1d");
+        TsunamiEvent2d, ChileEvent2d, TohokuEvent2d, Checkpoint2d}. Default is DamBreak1d");
 
     app.parse(argc, argv);
 

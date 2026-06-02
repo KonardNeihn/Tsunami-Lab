@@ -11,22 +11,17 @@
 #include <iostream>
 
 tsunami_lab::setups::Checkpoint2d::Checkpoint2d(
-    std::string checkpoint)
+    std::string checkpoint,
+   Config& config)
+: g_config(config)
 {
     std::string l_checkpointFolder = "";
     m_checkpointPath = l_checkpointFolder + checkpoint;
 
-    tsunami_lab::io::NetCdfCheckpoint l_checkpointReader;
+    tsunami_lab::io::NetCdfCheckpoint l_checkpointReader(g_config);
     
     l_checkpointReader.readCheckpointAndSetParameters(
-        m_checkpointPath,
-        m_nx,
-        m_ny,
-        m_lastTimeStep,
-        m_endTime,
-        m_w,
-        m_domainStartX,
-        m_domainStartY
+        m_checkpointPath
     );
 
     m_2dBathymetry = l_checkpointReader.read2DVariable(m_checkpointPath, "bathymetry");
@@ -60,30 +55,6 @@ tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getBathymetry(
     return m_2dBathymetry[i_y][i_x];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getDomainStartX() const {
-    return m_domainStartX;
-}
-
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getDomainStartY() const {
-    return m_domainStartY;
-}
-
-tsunami_lab::t_idx tsunami_lab::setups::Checkpoint2d::getNX() const {
-    return m_nx;
-}
-
-tsunami_lab::t_idx tsunami_lab::setups::Checkpoint2d::getNY() const {
-    return m_ny;
-}
-
 tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getLastTimeStep() const {
     return m_lastTimeStep;
-}
-
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getEndTime() const {
-    return m_endTime; 
-}
-
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getWidth() const {
-    return m_w;
 }

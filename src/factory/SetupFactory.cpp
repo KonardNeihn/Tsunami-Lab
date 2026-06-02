@@ -12,6 +12,7 @@
 #include "../setups/TsunamiEvent2d.h"
 #include "../setups/ChileEvent2d.h"
 #include "../setups/TohokuEvent2d.h"
+#include "../setups/Checkpoint2d.h"
 
 #include <iostream>
 
@@ -116,10 +117,18 @@ Setup* createSetup(Config& c) {
             c.ny = c.nx;
             c.width = c.nx;
             c.dxy = c.width / c.nx;
-            return new TohokuEvent2d(   "src/bathymetry/output/tohoku.nc",
-                                        "src/displ/tohoku.nc",
+            return new TohokuEvent2d(   "src/bathymetry/output/tohoku_gebco20_usgs_250m_bath.nc",
+                                        "src/bathymetry/output/tohoku_gebco20_usgs_250m_displ.nc",
                                         c.nx, 
                                         c.ny );
+        }
+
+        else if (c.setup == "Checkpoint2d") {
+            c.is_2d = true;
+            std::cout << "check1" << std::endl;
+            return new Checkpoint2d("solutions/checkpoint.nc",
+                                    c);
+            std::cout << "check2" << std::endl;
         }
 
         throw std::runtime_error("Unknown setup: " + c.setup);

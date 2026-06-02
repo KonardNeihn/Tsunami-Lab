@@ -12,6 +12,7 @@
 #include <netcdf.h>
 #include "../constants.h"
 #include <vector>
+#include "../config/Config.h"
 
 namespace tsunami_lab {
   namespace io {
@@ -29,22 +30,16 @@ class tsunami_lab::io::NetCdfCheckpoint {
      **/
     void checkNcErr( int         i_status,
                      const char *i_context ) const;
+    Config& g_config;
 
   public:
-    NetCdfCheckpoint();
+    NetCdfCheckpoint(Config& config);
     ~NetCdfCheckpoint();
 
     /*
     *
     */
-    void readCheckpointAndSetParameters(std::string checkpointPath,
-                                  t_idx &o_nx,
-                                  t_idx &o_ny,
-                                  t_real &o_lastTimeStep,
-                                  t_real &o_endTime,
-                                  t_real &o_w,
-                                  t_real &o_domainStartX,
-                                  t_real &o_domainStartY);
+    void readCheckpointAndSetParameters(std::string checkpointPath);
 
     /*
     *
@@ -52,13 +47,7 @@ class tsunami_lab::io::NetCdfCheckpoint {
     std::vector<std::vector<t_real>> read2DVariable(std::string checkpointPath, std::string varName);
 
     void createCheckpoint(std::string checkpointPath,
-                         t_idx i_nx,
-                         t_idx i_ny,
-                         t_real i_lastTimeStep,
-                         t_real i_endTime,
-                         t_real i_w,
-                         t_real i_domainStartX,
-                         t_real i_domainStartY);
+                         t_real i_simTime);
 
     void write2DVariable(std::string checkpointPath,
                                 std::string variableName,

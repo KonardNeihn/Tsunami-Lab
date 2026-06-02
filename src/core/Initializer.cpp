@@ -6,8 +6,6 @@ void initialize(
     patches::WavePropagation* solver,
     setups::Setup* setup,
     const Config& config,
-    t_real domainStartX,
-    t_real domainStartY,
     t_real& hMax
 ) {
     // iterating over ny cells
@@ -16,9 +14,9 @@ void initialize(
         for (t_idx l_cx = 0; l_cx < config.nx; l_cx++) {
 
             //calculating corresponding domain index l_x and l_y is in meters
-            t_real l_x = (l_cx + 0.5) * config.dxy + domainStartX;
+            t_real l_x = (l_cx + 0.5) * config.dxy + config.domainStartX;
             t_real l_y = config.is_2d
-                ? (l_cy + 0.5) * config.dxy + domainStartY
+                ? (l_cy + 0.5) * config.dxy + config.domainStartY
                 : l_cy * config.dxy;
 
             t_real l_h  = setup->getHeight(l_x, l_y);

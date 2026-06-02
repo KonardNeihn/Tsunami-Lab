@@ -24,14 +24,9 @@ namespace tsunami_lab {
  **/
 class tsunami_lab::setups::Checkpoint2d: public Setup {
   private:
-    t_idx m_nx;
-    t_idx m_ny;
+    Config& g_config;
     std::string m_checkpointPath;
     t_real m_lastTimeStep;
-    t_real m_endTime;
-    t_real m_w;
-    t_real m_domainStartX;
-    t_real m_domainStartY;
 
     std::vector<std::vector<t_real>> m_2dBathymetry;
     std::vector<std::vector<t_real>> m_2dDisplacement;
@@ -41,7 +36,7 @@ class tsunami_lab::setups::Checkpoint2d: public Setup {
     /**
      * Constructor.
      **/
-    Checkpoint2d(std::string checkpoint);
+    Checkpoint2d(std::string checkpoint, Config& config);
 
     /**
      * Gets the water height at a given point.
