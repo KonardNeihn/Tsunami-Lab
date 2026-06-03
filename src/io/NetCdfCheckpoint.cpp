@@ -39,7 +39,10 @@ void NetCdfCheckpoint::readCheckpointAndSetParameters(
     checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "lastTimeStep", &g_config.simTime), "lastTimeStep");
     checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "endTime", &g_config.endTime), "endTime");
 
-    checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "cellSize", &g_config.width), "cellSize");
+    checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "cellSize", &g_config.dxy), "cellSize");
+
+    checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "width", &g_config.width), "width");
+    
     checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "domainStartX", &g_config.domainStartX), "domainStartX");
     checkNcErr(nc_get_att_float(ncid, NC_GLOBAL, "domainStartY", &g_config.domainStartY), "domainStartY");
 
@@ -119,7 +122,9 @@ void NetCdfCheckpoint::createCheckpoint(
     checkNcErr(nc_put_att_float(ncid, NC_GLOBAL, "lastTimeStep", NC_FLOAT, 1, &i_simTime), "lastTime");
     checkNcErr(nc_put_att_float(ncid, NC_GLOBAL, "endTime", NC_FLOAT, 1, &g_config.endTime), "endTime");
 
-    checkNcErr(nc_put_att_float(ncid, NC_GLOBAL, "cellSize", NC_FLOAT, 1, &g_config.width), "cellSize");
+    checkNcErr(nc_put_att_float(ncid, NC_GLOBAL, "cellSize", NC_FLOAT, 1, &g_config.dxy), "cellSize");
+
+    nc_put_att_float(ncid, NC_GLOBAL, "width", NC_FLOAT, 1, &g_config.width);
 
     checkNcErr(nc_put_att_float(ncid, NC_GLOBAL, "domainStartX", NC_FLOAT, 1, &g_config.domainStartX), "dx");
     checkNcErr(nc_put_att_float(ncid, NC_GLOBAL, "domainStartY", NC_FLOAT, 1, &g_config.domainStartY), "dy");
@@ -130,8 +135,8 @@ void NetCdfCheckpoint::createCheckpoint(
     // --- 4. DATA MODE: Write actual variable arrays ---
     std::vector<t_real> x(g_config.nx), y(g_config.ny);
 
-    for (t_idx ix = 0; ix < g_config.nx; ix++) x[ix] = g_config.domainStartX + ix * g_config.width;
-    for (t_idx iy = 0; iy < g_config.ny; iy++) y[iy] = g_config.domainStartY + iy * g_config.width;
+    for (t_idx ix = 0; ix < g_config.nx; ix++) x[ix] = g_config.domainStartX + ix * g_config.dxy;
+    for (t_idx iy = 0; iy < g_config.ny; iy++) y[iy] = g_config.domainStartY + iy * g_config.dxy;
 
     checkNcErr(nc_put_var_float(ncid, dimX_var, x.data()), "coordX write");
     checkNcErr(nc_put_var_float(ncid, dimY_var, y.data()), "coordY write");

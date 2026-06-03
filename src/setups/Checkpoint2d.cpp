@@ -5,10 +5,6 @@
  * 2d Checkpoint setup.
  **/
 #include "Checkpoint2d.h"
-#include <algorithm>
-#include <cmath>
-#include <stdexcept>
-#include <iostream>
 
 tsunami_lab::setups::Checkpoint2d::Checkpoint2d(
     std::string checkpoint,
@@ -30,29 +26,22 @@ tsunami_lab::setups::Checkpoint2d::Checkpoint2d(
     m_2dMomentumY = l_checkpointReader.read2DVariable(m_checkpointPath, "momentumY");
 }
 
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getHeight(
-    t_real i_x,
-    t_real i_y) const
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getHeight(t_real solverX, t_real solverY) const
 {
-    // displacement is the actual water height
-    return m_2dDisplacement[i_y][i_x];
+    return m_2dDisplacement[solverY][solverX];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getMomentumX( t_real i_x,
-                                                                   t_real i_y) const {
-  return m_2dMomentumX[i_y][i_x];
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getMomentumX(t_real solverX, t_real solverY) const {
+  return m_2dMomentumX[solverY][solverX];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getMomentumY( t_real i_x,
-                                                                   t_real i_y) const {
-  return m_2dMomentumY[i_y][i_x];
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getMomentumY(t_real solverX, t_real solverY) const {
+  return m_2dMomentumY[solverY][solverX];
 }
 
-tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getBathymetry(
-    t_real i_x,
-    t_real i_y) const
+tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getBathymetry(t_real solverX, t_real solverY) const
 {
-    return m_2dBathymetry[i_y][i_x];
+    return m_2dBathymetry[solverY][solverX];
 }
 
 tsunami_lab::t_real tsunami_lab::setups::Checkpoint2d::getLastTimeStep() const {

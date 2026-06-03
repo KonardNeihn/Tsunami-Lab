@@ -125,10 +125,8 @@ Setup* createSetup(Config& c) {
 
         else if (c.setup == "Checkpoint2d") {
             c.is_2d = true;
-            std::cout << "check1" << std::endl;
             return new Checkpoint2d("solutions/checkpoint.nc",
                                     c);
-            std::cout << "check2" << std::endl;
         }
 
         throw std::runtime_error("Unknown setup: " + c.setup);
