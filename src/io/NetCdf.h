@@ -75,6 +75,15 @@ class tsunami_lab::io::NetCdf {
     //! true when the simulation is 2-D (m_ny > 1)
     bool m_is2D = true;
 
+    //! coarsening factor currently still disabled for testing
+    //tsunami_lab::t_idx m_k = 1;
+
+    //! number of output cells in x after coarsening: ceil(nx / k)
+    //tsunami_lab::t_idx m_nxOut = 0;
+
+    //! number of output cells in y after coarsening: ceil(ny / k)
+    //tsunami_lab::t_idx m_nyOut = 0;
+
     /**
      * Checks a netCDF return code and aborts with a descriptive message on error.
      *
@@ -106,7 +115,9 @@ class tsunami_lab::io::NetCdf {
             tsunami_lab::t_idx          i_ny,
             tsunami_lab::t_real         i_dxy,
             tsunami_lab::t_idx          i_stride,
-            const tsunami_lab::t_real  *i_b );
+            const tsunami_lab::t_real  *i_b //, currently disabled for testing purposes
+ //           tsunami_lab::t_idx          i_k = 1 // default 1 = no coarsening
+          );  
 
     // Flushes pending writes and closes the netCDF file.
     ~NetCdf();

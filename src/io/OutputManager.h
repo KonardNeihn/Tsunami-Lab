@@ -26,6 +26,7 @@ private:
     io::NetCdf m_ncWriter;
 
     t_idx m_lastCheckpointId = 2;
+    // t_idx k = 4  // currently disabled
 
 };
 

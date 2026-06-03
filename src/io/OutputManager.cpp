@@ -14,7 +14,8 @@ OutputManager::OutputManager(Config& config,
                 g_config.is_2d ? g_config.ny : 1,          // pass 1 for 1D runs
                 g_config.dxy,                                            
                 g_solver->getStride(),                          
-                g_solver->getBathymetry()                                     
+                g_solver->getBathymetry()//, 
+                //g_config.k                  // currently disabled               
   )   
 {}
 
