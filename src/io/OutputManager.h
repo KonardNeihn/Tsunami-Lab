@@ -10,11 +10,11 @@ namespace tsunami_lab {
 
 class OutputManager {
 public:
-    OutputManager(const Config& g_config,
+    OutputManager(Config& g_config,
                   patches::WavePropagation* g_solver);
 
-    void writeStep();
-    void writeCheckpointIfNeeded(t_real dt);
+    void writeStep(t_real simTime);
+    void writeCheckpoint(t_real simTime);
     void updateStations();
 
 private:
@@ -22,10 +22,11 @@ private:
     patches::WavePropagation* g_solver;
 
     std::string m_ncPath;
-    io::NetCdf m_ncWriter;
     io::NetCdfCheckpoint m_checkpoint;
+    io::NetCdf m_ncWriter;
 
-    t_real m_checkpointTimer;
+    t_idx m_lastCheckpointId = 2;
+
 };
 
 }

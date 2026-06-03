@@ -21,14 +21,12 @@
 #include "config/Config.h"
 #include "factory/SetupFactory.h"
 #include "core/Initializer.h"
+#include "io/OutputManager.h"
 
 int is_number(char* input);
 
 int main( int   i_argc,
           char *i_argv[] ) {
-
-  // rate at which checkpoints are written (relative to end time)
-  tsunami_lab::t_real l_checkpointRate = 0.5; 
 
   std::cout << "####################################" << std::endl;
   std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -129,32 +127,19 @@ int main( int   i_argc,
                             outputConfig.path);
     }
   }
-  
 
-  // construct writer for NetCdf
-  tsunami_lab::io::NetCdf l_ncWriter( l_ncPath,                                         
-                                      g_config.nx,                                             
-                                      g_config.is_2d ? g_config.ny : 1,          // pass 1 for 1D runs
-                                      g_config.dxy,                                            
-                                      l_waveProp->getStride(),                          
-                                      l_waveProp->getBathymetry()                                     
-);     
-
-tsunami_lab::io::NetCdfCheckpoint l_checkpoint(g_config);
-tsunami_lab::t_real l_checkpointTimer = 0.0;
+  tsunami_lab::OutputManager output(g_config, l_waveProp);
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {
-      if( l_timeStep % 25 == 0 ) {
-          std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
-          std::cout << "  writing wave field to " << l_ncPath << std::endl;
+    if( l_timeStep % 25 == 0 ) {
+      std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
+      std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
-          // netCDF write
-          l_ncWriter.write( l_simTime,
-                            l_waveProp->getHeight(),
-                            l_waveProp->getMomentumX(),
-                            g_config.is_2d ? l_waveProp->getMomentumY() : nullptr );
-      }                                                                   
+      // netCDF write
+      output.writeStep(l_simTime);
+      output.writeCheckpoint(l_simTime);
+    }                                                                   
 
     // New setup for ghost-cells with false defaults in the setup.h
     l_waveProp->setGhostCells(
@@ -172,69 +157,12 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
       station.timeStep(l_dt, l_waveProp->getHeight(), l_waveProp->getMomentumX(), l_waveProp->getMomentumY());
     }
 
-    // Handle Checkpoint
-    if (l_checkpointTimer >= l_checkpointRate) {
-
-      std::cout << "nx=" << g_config.nx
-          << " stride=" << l_waveProp->getStride()
-          << std::endl;
-
-      std::string checkpointPath = "solutions/checkpoint.nc";
-      std::cout << "Creating checkpoint to " << checkpointPath << std::endl;
-
-      l_checkpoint.createCheckpoint(checkpointPath, l_simTime);
-      
-      l_checkpoint.write2DVariable(
-        checkpointPath,
-        "height",
-        l_waveProp->getHeight(),
-        g_config.nx,
-        g_config.ny
-      );
-
-      l_checkpoint.write2DVariable(
-          checkpointPath,
-          "bathymetry",
-          l_waveProp->getBathymetry(),
-          g_config.nx,
-          g_config.ny
-      );
-
-      l_checkpoint.write2DVariable(
-          checkpointPath,
-          "momentumX",
-          l_waveProp->getMomentumX(),
-          g_config.nx,
-          g_config.ny
-      );
-
-      if(g_config.is_2d) {
-          l_checkpoint.write2DVariable(
-              checkpointPath,
-              "momentumY",
-              l_waveProp->getMomentumY(),
-              g_config.nx,
-              g_config.ny
-          );
-      }
-
-      std::cout << "Finished creating Checkpoint" << std::endl;
-      l_checkpointTimer = 0.0;
-    }
-
     l_timeStep++;
-    l_checkpointTimer += l_dt;
     l_simTime += l_dt;
   }
   //saving one last time
   std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
-  std::cout << "  writing wave field to " << l_ncPath << std::endl;
-
-  // netCDF write
-  l_ncWriter.write( l_simTime,
-                    l_waveProp->getHeight(),
-                    l_waveProp->getMomentumX(),
-                    g_config.is_2d ? l_waveProp->getMomentumY() : nullptr );
+  output.writeStep(l_simTime);
 
   std::cout << "finished time loop" << std::endl;
 

@@ -35,7 +35,8 @@ l_sources = [ 'solvers/Roe.cpp',
               'io/XmlReader.cpp',
               'config/Config.cpp',
               'factory/SetupFactory.cpp',
-              'core/Initializer.cpp']
+              'core/Initializer.cpp',
+              'io/OutputManager.cpp']
 
 sources = [env.Object(s) for s in l_sources]
 
