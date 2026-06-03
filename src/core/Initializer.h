@@ -9,8 +9,8 @@ namespace tsunami_lab {
 void initialize(
     patches::WavePropagation* solver,
     setups::Setup* setup,
-    const Config& config,
-    t_real& hMax
+    const Config& g_config,
+    t_real& o_hMax
 );
 
 }

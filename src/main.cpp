@@ -6,20 +6,6 @@
  **/
 #include "patches/WavePropagation1d.h"
 #include "patches/WavePropagation2d.h"
-#include "setups/DamBreak1d.h"
-#include "setups/ShockShock1d.h"
-#include "setups/RareRare1d.h"
-#include "setups/Bathymetry1d.h"
-#include "setups/SubcriticalFlow1d.h"
-#include "setups/HydraulicJump1d.h"
-#include "setups/TsunamiEvent1d.h"
-#include "setups/CircularDamBreak2d.h"
-#include "setups/DamBreak2d.h"
-#include "setups/ArtificialTsunami2d.h"
-#include "setups/TsunamiEvent2d.h"
-#include "setups/ChileEvent2d.h"
-#include "setups/TohokuEvent2d.h"
-#include "setups/Checkpoint2d.h"
 #include "io/Csv.h"
 #include "io/NetCdf.h" 
 #include "io/NetCdfCheckpoint.h"
@@ -62,15 +48,14 @@ int main( int   i_argc,
 
   // notify user about selectet configuration
   std::cout << "runtime configuration" << std::endl;
-  std::cout << "  selected setup:                 " << g_config.setup << std::endl;
-  std::cout << "  number of cells in x-direction: " << g_config.nx << std::endl;
-  std::cout << "  number of cells in y-direction: " << g_config.ny << std::endl;
-  std::cout << "  cell size:                      " << g_config.dxy << std::endl;
-  std::cout << "  starts at time:                 " << l_simTime << std::endl;
-  std::cout << "  ends at time:                   " << g_config.endTime << std::endl;
-  std::cout << "  selected solver:                " << g_config.solver << std::endl;
-  std::cout << "  insanity:                       " << g_config.insanity << std::endl;
-
+  std::cout << "  selected setup:                        " << g_config.setup << std::endl;
+  std::cout << "  number of solver cells in x-direction: " << g_config.nx << std::endl;
+  std::cout << "  number of solver cells in y-direction: " << g_config.ny << std::endl;
+  std::cout << "  cell size in meters:                   " << g_config.dxy << std::endl;
+  std::cout << "  starts at time (sec):                  " << l_simTime << std::endl;
+  std::cout << "  ends at time (sec):                    " << g_config.endTime << std::endl;
+  std::cout << "  selected solver:                       " << g_config.solver << std::endl;
+  std::cout << "  insanity:                              " << g_config.insanity << std::endl;
 
   // set output directory
   std::filesystem::path outDir = "solutions";
@@ -104,7 +89,7 @@ int main( int   i_argc,
   }
 
   // maximum observed height during setup
-  tsunami_lab::t_real l_hMax;
+  tsunami_lab::t_real l_hMax = 0;
 
   tsunami_lab::initialize(
     l_waveProp,
@@ -124,7 +109,6 @@ int main( int   i_argc,
 
   // set up time and print control
   tsunami_lab::t_idx  l_timeStep = 0;
-  tsunami_lab::t_idx  l_nOut = 0;
 
   std::cout << "entering time loop" << std::endl;
 
@@ -163,32 +147,14 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
   while( l_simTime < g_config.endTime ) {
       if( l_timeStep % 25 == 0 ) {
           std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
-
-          std::string l_path = (outDir / ("netcdf_output.nc")).string();
-          std::cout << "  writing wave field to " << l_path << std::endl;
+          std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
           // netCDF write
           l_ncWriter.write( l_simTime,
                             l_waveProp->getHeight(),
                             l_waveProp->getMomentumX(),
                             g_config.is_2d ? l_waveProp->getMomentumY() : nullptr );
-
-          l_nOut++;
       }                                                                   
-
-
-
-    /**  instead of: l_waveProp->setGhostOutflow(); we now check if boundaries are outflow or reflecting
-    *    
-    *   OLD: it only checked if the actual depth of the water is lower than 200m.
-    
-    // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the left-outermost cell
-    bool l_leftReflecting = setup->getHeight( 0.5 * g_config.dxy, 0 ) < 200;
-    // checks if the depth of the water on the left is smaller than 20 meters, by checking the middle of the right-outermost cell
-    bool l_rightReflecting = setup->getHeight( (g_config.nx - 0.5) * g_config.dxy, 0 ) < 200;
-
-    l_waveProp->setGhostCells( l_leftReflecting, l_rightReflecting );
-    */
 
     // New setup for ghost-cells with false defaults in the setup.h
     l_waveProp->setGhostCells(
@@ -208,6 +174,10 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
 
     // Handle Checkpoint
     if (l_checkpointTimer >= l_checkpointRate) {
+
+      std::cout << "nx=" << g_config.nx
+          << " stride=" << l_waveProp->getStride()
+          << std::endl;
 
       std::string checkpointPath = "solutions/checkpoint.nc";
       std::cout << "Creating checkpoint to " << checkpointPath << std::endl;
@@ -256,6 +226,15 @@ tsunami_lab::t_real l_checkpointTimer = 0.0;
     l_checkpointTimer += l_dt;
     l_simTime += l_dt;
   }
+  //saving one last time
+  std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
+  std::cout << "  writing wave field to " << l_ncPath << std::endl;
+
+  // netCDF write
+  l_ncWriter.write( l_simTime,
+                    l_waveProp->getHeight(),
+                    l_waveProp->getMomentumX(),
+                    g_config.is_2d ? l_waveProp->getMomentumY() : nullptr );
 
   std::cout << "finished time loop" << std::endl;
 

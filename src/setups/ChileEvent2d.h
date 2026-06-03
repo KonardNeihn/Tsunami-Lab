@@ -23,7 +23,7 @@ namespace tsunami_lab {
  **/
 class tsunami_lab::setups::ChileEvent2d: public Setup {
   private:
-    Config* config;
+    Config& g_config;
     
     std::vector<t_real> m_x;
     std::vector<t_real> m_y;
