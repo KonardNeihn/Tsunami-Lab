@@ -160,7 +160,17 @@ void NetCdfCheckpoint::write2DVariable(
     size_t start[2] = {0, 0};
     size_t count[2] = {ny, nx};
 
-    checkNcErr(nc_put_vara_float(ncid, varid, start, count, data), "write2D");
+    // ghost cells entfernen
+    const t_idx stride = nx + 2;
+    std::vector<t_real> flat(nx * ny);
+    for (t_idx y = 0; y < ny; y++) {
+        for (t_idx x = 0; x < nx; x++) {
+            flat[y * nx + x] =
+                data[(y + 1) * stride + (x + 1)];
+        }
+    }
+
+    checkNcErr(nc_put_vara_float(ncid, varid, start, count, flat.data()), "write2D");
 
     checkNcErr(nc_close(ncid), "close");
 }
