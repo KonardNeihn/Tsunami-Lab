@@ -133,7 +133,7 @@ int main( int   i_argc,
   // iterate over time
   while( l_simTime < g_config.endTime ) {
     if( l_timeStep % 25 == 0 ) {
-      std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
+      std::cout << "  simulation time: " << l_simTime << "/" << g_config.endTime << " time steps: " << l_timeStep << std::endl;
       std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
       // netCDF write

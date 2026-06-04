@@ -10,8 +10,6 @@
 #include "../setups/DamBreak2d.h"
 #include "../setups/ArtificialTsunami2d.h"
 #include "../setups/TsunamiEvent2d.h"
-#include "../setups/ChileEvent2d.h"
-#include "../setups/TohokuEvent2d.h"
 #include "../setups/Checkpoint2d.h"
 
 #include <iostream>
@@ -100,27 +98,24 @@ Setup* createSetup(Config& c) {
 
         else if (c.setup == "TsunamiEvent2d") {
             c.is_2d = true;
-            return new TsunamiEvent2d(
+            return new TsunamiEvent2d(c,
                 "src/NetCdf/artificialtsunami_bathymetry_1000.nc",
                 "src/NetCdf/artificialtsunami_displ_1000.nc"
             );
         }
 
         else if (c.setup == "ChileEvent2d") {
-            return new ChileEvent2d(c,
+            c.is_2d = true;
+            return new TsunamiEvent2d(c,
                                     "src/bathymetry/output/chile_gebco20_usgs_250m_bath_fixed.nc",
                                     "src/bathymetry/output/chile_gebco20_usgs_250m_displ_fixed.nc" );
         }
 
         else if (c.setup == "TohokuEvent2d") {
             c.is_2d = true;
-            c.ny = c.nx;
-            c.width = c.nx;
-            c.dxy = c.width / c.nx;
-            return new TohokuEvent2d(   "src/bathymetry/output/tohoku_gebco20_usgs_250m_bath.nc",
-                                        "src/bathymetry/output/tohoku_gebco20_usgs_250m_displ.nc",
-                                        c.nx, 
-                                        c.ny );
+            return new TsunamiEvent2d(c,
+                                    "src/bathymetry/output/tohoku_gebco20_usgs_250m_bath_fixed.nc",
+                                    "src/bathymetry/output/tohoku_gebco20_usgs_250m_displ_fixed.nc" );
         }
 
         else if (c.setup == "Checkpoint2d") {
