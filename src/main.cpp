@@ -54,6 +54,7 @@ int main( int   i_argc,
   std::cout << "  ends at time (sec):                    " << g_config.endTime << std::endl;
   std::cout << "  selected solver:                       " << g_config.solver << std::endl;
   std::cout << "  insanity:                              " << g_config.insanity << std::endl;
+  std::cout << "  coarseness:                            " << g_config.k << std::endl;
 
   // set output directory
   std::filesystem::path outDir = "solutions";

@@ -20,6 +20,7 @@ Config parseArgs(int argc, char** argv) {
         {DamBreak1d, RareRare1d, ShockShock1d, Bathymetry1d, SubcriticalFlow1d, \
         HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d, DamBreak2d, ArtificialTsunami2d, \
         TsunamiEvent2d, ChileEvent2d, TohokuEvent2d, Checkpoint2d}. Default is DamBreak1d");
+    app.add_option("-k,--coarse", c.k, "Set coarseness for the NetCdf-writer. The default is 1.");
 
     app.parse(argc, argv);
 
