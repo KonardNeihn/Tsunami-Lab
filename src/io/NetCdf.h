@@ -84,6 +84,9 @@ class tsunami_lab::io::NetCdf {
     //! true when the simulation is 2-D (m_ny > 1)
     bool m_is2D = true;
 
+    //! true if using checkpoint setup
+    bool m_isCheckpoint = false;
+
     /**
      * Checks a netCDF return code and aborts with a descriptive message on error.
      *
@@ -116,7 +119,8 @@ class tsunami_lab::io::NetCdf {
             tsunami_lab::t_real         i_dxy,
             tsunami_lab::t_idx          i_stride,
             const tsunami_lab::t_real  *i_b, 
-            tsunami_lab::t_idx          i_k = 1 // default 1 = no coarsening
+            tsunami_lab::t_idx          i_k = 1, // default 1 = no coarsening
+            bool                        i_isCheckpoint = false
           );  
 
     // Flushes pending writes and closes the netCDF file.

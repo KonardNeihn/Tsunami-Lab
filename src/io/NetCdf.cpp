@@ -28,23 +28,27 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
                                   tsunami_lab::t_real         i_dxy,
                                   tsunami_lab::t_idx          i_stride,
                                   const tsunami_lab::t_real  *i_b,
-                                  tsunami_lab::t_idx          i_k )
+                                  tsunami_lab::t_idx          i_k,
+                                  bool                        i_isCheckpoint)
   : m_nx( i_nx ),
     m_ny( i_ny ),
     m_stride( i_stride ),
     m_k( i_k ),
     m_nxOut( (i_nx + i_k - 1) / i_k ),
     m_nyOut( (i_ny + i_k - 1) / i_k ),
-    m_is2D( i_ny > 1 )
+    m_is2D( i_ny > 1 ),
+    m_isCheckpoint( i_isCheckpoint )
 {
   int l_status;
 
   // 1. Create the file (overwrite if it already exists (NC_CLOBBER), use classic format)
   // now with NC_SHuffle for Compression
-  l_status = nc_create( i_path.c_str(), NC_CLOBBER | NC_NETCDF4, &m_ncId );
-  checkNcErr( l_status, "nc_create" );
 
-  // 2. Global attributes (COARDS requires conventions)
+  if (!m_isCheckpoint) {
+    l_status = nc_create( i_path.c_str(), NC_CLOBBER | NC_NETCDF4, &m_ncId );
+    checkNcErr( l_status, "nc_create" );
+
+    // 2. Global attributes (COARDS requires conventions)
   const char *l_conventions = "COARDS";
   l_status = nc_put_att_text( m_ncId, NC_GLOBAL, "Conventions",
                                std::strlen( l_conventions ), l_conventions );
@@ -355,6 +359,36 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
     l_status = nc_put_var_float( m_ncId, m_varBId, l_buf.data() );
     checkNcErr( l_status, "put_var b" );
   }
+  } else {
+    l_status = nc_open( i_path.c_str(), NC_WRITE, &m_ncId );
+  checkNcErr( l_status, "nc_open" );
+
+  // 1. Lade die IDs der bereits existierenden Variablen
+  l_status = nc_inq_varid( m_ncId, "time", &m_varTimeId );
+  checkNcErr( l_status, "inq_varid time" );
+
+  l_status = nc_inq_varid( m_ncId, "h", &m_varHId );
+  checkNcErr( l_status, "inq_varid h" );
+
+  l_status = nc_inq_varid( m_ncId, "hu", &m_varHuId );
+  checkNcErr( l_status, "inq_varid hu" );
+
+  if( m_is2D ) {
+    l_status = nc_inq_varid( m_ncId, "hv", &m_varHvId );
+    checkNcErr( l_status, "inq_varid hv" );
+  }
+
+  // 2. Ermittle die bisherige Anzahl an Zeitschritten, um hinten anzuhängen
+  l_status = nc_inq_dimid( m_ncId, "time", &m_dimTimeId );
+  checkNcErr( l_status, "inq_dimid time" );
+  
+  size_t l_timeLen = 0;
+  l_status = nc_inq_dimlen( m_ncId, m_dimTimeId, &l_timeLen );
+  checkNcErr( l_status, "inq_dimlen time" );
+  
+  // Setze den internen Zähler auf die Länge der bisherigen Time-Dimension
+  m_timeStep = static_cast<tsunami_lab::t_idx>(l_timeLen);
+  }
 }
 
 // Destructor
@@ -374,6 +408,8 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
 
   // 1. Append the simulation time
   {
+    std::cout << "Time Step (Writer) is " << m_timeStep << std::endl;
+    std::cout << "Sim Time (Writer) is " << i_simTime << std::endl;
     size_t l_start[1] = { m_timeStep };
     size_t l_count[1] = { 1 };
     float  l_t        = static_cast<float>( i_simTime );
@@ -483,4 +519,6 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
 
   // 4. Advance record index
   ++m_timeStep;
+  l_status = nc_sync( m_ncId );
+  checkNcErr( l_status, "nc_sync" );
 }

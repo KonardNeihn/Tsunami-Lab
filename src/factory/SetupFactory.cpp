@@ -125,6 +125,7 @@ Setup* createSetup(Config& c) {
 
         else if (c.setup == "Checkpoint2d") {
             c.is_2d = true;
+            c.isCheckpoint = true;
             return new Checkpoint2d("solutions/checkpoint2.nc",
                                     c);
         }

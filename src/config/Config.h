@@ -38,6 +38,9 @@ struct Config {
 
   // current simulation time (important for checkpoint)
   tsunami_lab::t_real k = 1;
+
+  // is checkpoint setup
+  bool isCheckpoint = false;
 };
 
 Config parseArgs(int argc, char** argv);
