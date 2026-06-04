@@ -35,6 +35,9 @@ struct Config {
 
   // if setup is 2d
   bool is_2d = false;
+
+  // current simulation time (important for checkpoint)
+  tsunami_lab::t_real k = 1;
 };
 
 Config parseArgs(int argc, char** argv);

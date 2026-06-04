@@ -27,10 +27,14 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
                                   tsunami_lab::t_idx          i_ny,
                                   tsunami_lab::t_real         i_dxy,
                                   tsunami_lab::t_idx          i_stride,
-                                  const tsunami_lab::t_real  *i_b )
+                                  const tsunami_lab::t_real  *i_b,
+                                  tsunami_lab::t_idx          i_k )
   : m_nx( i_nx ),
     m_ny( i_ny ),
     m_stride( i_stride ),
+    m_k( i_k ),
+    m_nxOut( (i_nx + i_k - 1) / i_k ),
+    m_nyOut( (i_ny + i_k - 1) / i_k ),
     m_is2D( i_ny > 1 )
 {
   int l_status;
@@ -57,11 +61,11 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
   l_status = nc_def_dim( m_ncId, "time", NC_UNLIMITED, &m_dimTimeId );
   checkNcErr( l_status, "def_dim time" );
 
-  l_status = nc_def_dim( m_ncId, "x", static_cast<size_t>( i_nx ), &m_dimXId );
+  l_status = nc_def_dim( m_ncId, "x", static_cast<size_t>( m_nxOut ), &m_dimXId );
   checkNcErr( l_status, "def_dim x" );
 
   if( m_is2D ) {
-    l_status = nc_def_dim( m_ncId, "y", static_cast<size_t>( i_ny ), &m_dimYId );
+    l_status = nc_def_dim( m_ncId, "y", static_cast<size_t>( m_nyOut ), &m_dimYId );
     checkNcErr( l_status, "def_dim y" );
   }
 
@@ -185,11 +189,11 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
     size_t l_chunks[3];
     if (m_is2D) {
       l_chunks[0] = 1; 
-      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_ny));   
-      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nx));
+      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nyOut));   
+      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nxOut));
     } else {
       l_chunks[0] = 1;
-      l_chunks[1] = m_nx;
+      l_chunks[1] = m_nxOut;
     }
     l_status = nc_def_var_chunking(m_ncId, m_varHId, l_storage, l_chunks);
     checkNcErr(l_status, "def_var_chunking h");
@@ -220,11 +224,11 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
     size_t l_chunks[3];
     if (m_is2D) {
       l_chunks[0] = 1; 
-      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_ny));   
-      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nx));
+      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nyOut));   
+      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nxOut));
     } else {
       l_chunks[0] = 1;
-      l_chunks[1] = m_nx;
+      l_chunks[1] = m_nxOut;
     }
     l_status = nc_def_var_chunking(m_ncId, m_varHuId, l_storage, l_chunks);
     checkNcErr(l_status, "def_var_chunking hu");
@@ -255,11 +259,11 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
     size_t l_chunks[3];
     if (m_is2D) {
       l_chunks[0] = 1; 
-      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_ny));   
-      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nx));
+      l_chunks[1] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nyOut));   
+      l_chunks[2] = std::min(static_cast<size_t>(128), static_cast<size_t>(m_nxOut));
     } else {
       l_chunks[0] = 1;
-      l_chunks[1] = m_nx;
+      l_chunks[1] = m_nxOut;
     }
     l_status = nc_def_var_chunking(m_ncId, m_varHvId, l_storage, l_chunks);
     checkNcErr(l_status, "def_var_chunking hv");
@@ -284,43 +288,68 @@ tsunami_lab::io::NetCdf::NetCdf( const std::string          &i_path,
   checkNcErr( l_status, "nc_enddef" );
 
   // 7. Write coordinate arrays (x, y)
-  // x: cell centers at (ix + 0.5) * dxy  for ix in [0, nx)
+  // Each output cell ox spans solver cells [ox*k, (ox+1)*k).
+  // Its center is at ( ox*k + min((ox+1)*k, nx)/2.0 ) * dxy, which simplifies
+  // to (ox + 0.5) * k * dxy when the block is full — we use that approximation
+  // for all cells since the difference at the boundary is sub-cell.
   {
-    std::vector<float> l_xCoords( i_nx );
-    for( tsunami_lab::t_idx l_ix = 0; l_ix < i_nx; ++l_ix )
-      l_xCoords[l_ix] = static_cast<float>( (l_ix + 0.5) * i_dxy );
+    std::vector<float> l_xCoords( m_nxOut );
+    for( tsunami_lab::t_idx l_ox = 0; l_ox < m_nxOut; ++l_ox )
+      l_xCoords[l_ox] = static_cast<float>( (l_ox + 0.5) * m_k * i_dxy );
 
     l_status = nc_put_var_float( m_ncId, m_varXId, l_xCoords.data() );
     checkNcErr( l_status, "put_var x" );
   }
 
   if( m_is2D ) {
-    std::vector<float> l_yCoords( i_ny );
-    for( tsunami_lab::t_idx l_iy = 0; l_iy < i_ny; ++l_iy )
-      l_yCoords[l_iy] = static_cast<float>( (l_iy + 0.5) * i_dxy );
+    std::vector<float> l_yCoords( m_nyOut );
+    for( tsunami_lab::t_idx l_oy = 0; l_oy < m_nyOut; ++l_oy )
+      l_yCoords[l_oy] = static_cast<float>( (l_oy + 0.5) * m_k * i_dxy );
 
     l_status = nc_put_var_float( m_ncId, m_varYId, l_yCoords.data() );
     checkNcErr( l_status, "put_var y" );
   }
 
-  // 8. Write bathymetry (static – does not change over time)
-  //    The solver arrays are padded with ghost cells; we copy only interior cells.
+  // 8. Write bathymetry (static – averaged over each k×k block)
   {
-    // Interior cells: ix in [0, nx), iy in [0, ny)
-    // i_b points at the first interior cell of the solver array, with stride m_stride.
-    // For 1D (m_ny == 1) the inner loop runs once.
-    const size_t l_totalInterior = static_cast<size_t>( i_nx ) *
-                                   static_cast<size_t>( m_is2D ? i_ny : 1 );
-    std::vector<float> l_buf( l_totalInterior );
+    const size_t l_totalOut = static_cast<size_t>( m_nxOut ) *
+                              static_cast<size_t>( m_is2D ? m_nyOut : 1 );
+    std::vector<float> l_buf( l_totalOut, 0.0f );
 
     if( m_is2D ) {
-      for( tsunami_lab::t_idx l_iy = 0; l_iy < i_ny; ++l_iy )
-        for( tsunami_lab::t_idx l_ix = 0; l_ix < i_nx; ++l_ix )
-          l_buf[ l_iy * i_nx + l_ix ] =
-              static_cast<float>( i_b[ l_iy * m_stride + l_ix ] );
+      for( tsunami_lab::t_idx l_oy = 0; l_oy < m_nyOut; ++l_oy ) {
+        // solver rows covered by this output row
+        tsunami_lab::t_idx l_iyStart = l_oy * m_k;
+        tsunami_lab::t_idx l_iyEnd   = std::min( l_iyStart + m_k, m_ny );
+
+        for( tsunami_lab::t_idx l_ox = 0; l_ox < m_nxOut; ++l_ox ) {
+          tsunami_lab::t_idx l_ixStart = l_ox * m_k;
+          tsunami_lab::t_idx l_ixEnd   = std::min( l_ixStart + m_k, m_nx );
+
+          float      l_sum   = 0.0f;
+          t_idx      l_count = 0;
+          for( tsunami_lab::t_idx l_iy = l_iyStart; l_iy < l_iyEnd; ++l_iy )
+            for( tsunami_lab::t_idx l_ix = l_ixStart; l_ix < l_ixEnd; ++l_ix ) {
+              l_sum += static_cast<float>( i_b[ l_iy * m_stride + l_ix ] );
+              ++l_count;
+            }
+
+          l_buf[ l_oy * m_nxOut + l_ox ] = l_sum / static_cast<float>( l_count );
+        }
+      }
     } else {
-      for( tsunami_lab::t_idx l_ix = 0; l_ix < i_nx; ++l_ix )
-        l_buf[l_ix] = static_cast<float>( i_b[l_ix] );
+      for( tsunami_lab::t_idx l_ox = 0; l_ox < m_nxOut; ++l_ox ) {
+        tsunami_lab::t_idx l_ixStart = l_ox * m_k;
+        tsunami_lab::t_idx l_ixEnd   = std::min( l_ixStart + m_k, m_nx );
+
+        float l_sum   = 0.0f;
+        t_idx l_count = 0;
+        for( tsunami_lab::t_idx l_ix = l_ixStart; l_ix < l_ixEnd; ++l_ix ) {
+          l_sum += static_cast<float>( i_b[ l_ix ] );
+          ++l_count;
+        }
+        l_buf[ l_ox ] = l_sum / static_cast<float>( l_count );
+      }
     }
 
     l_status = nc_put_var_float( m_ncId, m_varBId, l_buf.data() );
@@ -336,60 +365,100 @@ tsunami_lab::io::NetCdf::~NetCdf() {
   }
 }
 
-// write() – appends one time record
+// write() – appends one averaged time record
 void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
                                       const tsunami_lab::t_real *i_h,
                                       const tsunami_lab::t_real *i_hu,
                                       const tsunami_lab::t_real *i_hv ) {
   int l_status;
 
-  // 1. Append the simulation time to the unlimited time variable
+  // 1. Append the simulation time
   {
     size_t l_start[1] = { m_timeStep };
     size_t l_count[1] = { 1 };
     float  l_t        = static_cast<float>( i_simTime );
-
     l_status = nc_put_vara_float( m_ncId, m_varTimeId, l_start, l_count, &l_t );
     checkNcErr( l_status, "put_vara time" );
   }
 
-  // 2. Pack interior cells into a contiguous buffer (without ghost cells)
-  const size_t l_nx  = static_cast<size_t>( m_nx );
-  const size_t l_ny  = static_cast<size_t>( m_is2D ? m_ny : 1 );
-  const size_t l_total = l_nx * l_ny;
+  // 2. Average k×k blocks of interior solver cells into output cells.
+  //
+  //    For output cell (ox, oy) the contributing solver cells are:
+  //      ix in [ ox*k , min((ox+1)*k, nx) )
+  //      iy in [ oy*k , min((oy+1)*k, ny) )
+  //
+  //    At interior boundaries (when nx or ny is not divisible by k) the last
+  //    block is smaller than k×k — we divide by the actual cell count so the
+  //    average is still correct.
+  const size_t l_nxOut  = static_cast<size_t>( m_nxOut );
+  const size_t l_nyOut  = static_cast<size_t>( m_is2D ? m_nyOut : 1 );
+  const size_t l_total  = l_nxOut * l_nyOut;
 
-  std::vector<float> l_hBuf ( l_total );
-  std::vector<float> l_huBuf( l_total );
+  std::vector<float> l_hBuf ( l_total, 0.0f );
+  std::vector<float> l_huBuf( l_total, 0.0f );
   std::vector<float> l_hvBuf;
   if( m_is2D && i_hv != nullptr )
-    l_hvBuf.resize( l_total );
+    l_hvBuf.assign( l_total, 0.0f );
 
   if( m_is2D ) {
-    for( size_t l_iy = 0; l_iy < l_ny; ++l_iy ) {
-      for( size_t l_ix = 0; l_ix < l_nx; ++l_ix ) {
-        const size_t l_solverIdx = l_iy * m_stride + l_ix;
-        const size_t l_bufIdx    = l_iy * l_nx + l_ix;
+    for( tsunami_lab::t_idx l_oy = 0; l_oy < m_nyOut; ++l_oy ) {
+      tsunami_lab::t_idx l_iyStart = l_oy * m_k;
+      tsunami_lab::t_idx l_iyEnd   = std::min( l_iyStart + m_k, m_ny );
 
-        l_hBuf [l_bufIdx] = static_cast<float>( i_h [ l_solverIdx ] );
-        l_huBuf[l_bufIdx] = static_cast<float>( i_hu[ l_solverIdx ] );
+      for( tsunami_lab::t_idx l_ox = 0; l_ox < m_nxOut; ++l_ox ) {
+        tsunami_lab::t_idx l_ixStart = l_ox * m_k;
+        tsunami_lab::t_idx l_ixEnd   = std::min( l_ixStart + m_k, m_nx );
+
+        float l_sumH  = 0.0f;
+        float l_sumHu = 0.0f;
+        float l_sumHv = 0.0f;
+        int   l_count = 0;
+
+        for( tsunami_lab::t_idx l_iy = l_iyStart; l_iy < l_iyEnd; ++l_iy ) {
+          for( tsunami_lab::t_idx l_ix = l_ixStart; l_ix < l_ixEnd; ++l_ix ) {
+            size_t l_idx = static_cast<size_t>( l_iy ) * m_stride +
+                           static_cast<size_t>( l_ix );
+            l_sumH  += static_cast<float>( i_h [ l_idx ] );
+            l_sumHu += static_cast<float>( i_hu[ l_idx ] );
+            if( !l_hvBuf.empty() )
+              l_sumHv += static_cast<float>( i_hv[ l_idx ] );
+            ++l_count;
+          }
+        }
+
+        size_t l_outIdx = static_cast<size_t>( l_oy ) * l_nxOut +
+                          static_cast<size_t>( l_ox );
+        float l_inv     = 1.0f / static_cast<float>( l_count );
+        l_hBuf [ l_outIdx ] = l_sumH  * l_inv;
+        l_huBuf[ l_outIdx ] = l_sumHu * l_inv;
         if( !l_hvBuf.empty() )
-          l_hvBuf[l_bufIdx] = static_cast<float>( i_hv[ l_solverIdx ] );
+          l_hvBuf[ l_outIdx ] = l_sumHv * l_inv;
       }
     }
   } else {
-    // 1D: single row, stride is irrelevant for the copy
-    for( size_t l_ix = 0; l_ix < l_nx; ++l_ix ) {
-      l_hBuf [l_ix] = static_cast<float>( i_h [ l_ix ] );
-      l_huBuf[l_ix] = static_cast<float>( i_hu[ l_ix ] );
+    // 1D: only average along x
+    for( tsunami_lab::t_idx l_ox = 0; l_ox < m_nxOut; ++l_ox ) {
+      tsunami_lab::t_idx l_ixStart = l_ox * m_k;
+      tsunami_lab::t_idx l_ixEnd   = std::min( l_ixStart + m_k, m_nx );
+
+      float l_sumH  = 0.0f;
+      float l_sumHu = 0.0f;
+      int   l_count = 0;
+      for( tsunami_lab::t_idx l_ix = l_ixStart; l_ix < l_ixEnd; ++l_ix ) {
+        l_sumH  += static_cast<float>( i_h [ l_ix ] );
+        l_sumHu += static_cast<float>( i_hu[ l_ix ] );
+        ++l_count;
+      }
+      float l_inv     = 1.0f / static_cast<float>( l_count );
+      l_hBuf [ l_ox ] = l_sumH  * l_inv;
+      l_huBuf[ l_ox ] = l_sumHu * l_inv;
     }
   }
 
-  // 3. Write the current record into the netCDF file
-  //    For 2D: start = {timeStep, 0, 0}, count = {1, ny, nx}
-  //    For 1D: start = {timeStep, 0},    count = {1, nx}
+  // 3. Write the averaged record
   if( m_is2D ) {
     size_t l_start[3] = { m_timeStep, 0, 0 };
-    size_t l_count[3] = { 1, l_ny, l_nx };
+    size_t l_count[3] = { 1, l_nyOut, l_nxOut };
 
     l_status = nc_put_vara_float( m_ncId, m_varHId,  l_start, l_count, l_hBuf.data() );
     checkNcErr( l_status, "put_vara h (2D)" );
@@ -403,7 +472,7 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
     }
   } else {
     size_t l_start[2] = { m_timeStep, 0 };
-    size_t l_count[2] = { 1, l_nx };
+    size_t l_count[2] = { 1, l_nxOut };
 
     l_status = nc_put_vara_float( m_ncId, m_varHId,  l_start, l_count, l_hBuf.data() );
     checkNcErr( l_status, "put_vara h (1D)" );
@@ -412,6 +481,6 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
     checkNcErr( l_status, "put_vara hu (1D)" );
   }
 
-  // 4. Advance the record index
+  // 4. Advance record index
   ++m_timeStep;
 }
