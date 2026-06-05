@@ -7,18 +7,14 @@
 #include "Checkpoint2d.h"
 
 tsunami_lab::setups::Checkpoint2d::Checkpoint2d(
-    std::string checkpoint,
    Config& config)
 : g_config(config)
 {
-    std::string l_checkpointFolder = "";
-    m_checkpointPath = l_checkpointFolder + checkpoint;
+    m_checkpointPath = "solutions/checkpoint" + std::to_string(g_config.latestCheckpoint) + ".nc";
 
     tsunami_lab::io::NetCdfCheckpoint l_checkpointReader(g_config);
     
-    l_checkpointReader.readCheckpointAndSetParameters(
-        m_checkpointPath
-    );
+    l_checkpointReader.readCheckpointAndSetParameters( m_checkpointPath );
 
     m_2dBathymetry = l_checkpointReader.read2DVariable(m_checkpointPath, "bathymetry");
     m_2dDisplacement = l_checkpointReader.read2DVariable(m_checkpointPath, "height");

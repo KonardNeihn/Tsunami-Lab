@@ -22,11 +22,13 @@
 #include "factory/SetupFactory.h"
 #include "core/Initializer.h"
 #include "io/OutputManager.h"
+#include <algorithm>
 
 int is_number(char* input);
 
 int main( int   i_argc,
           char *i_argv[] ) {
+ tsunami_lab::patches::WavePropagation *l_waveProp;
 
   std::cout << "####################################" << std::endl;
   std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -36,6 +38,43 @@ int main( int   i_argc,
 
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
+
+  // delete incomplete checkpoints
+  for (const auto& entry : std::filesystem::directory_iterator("solutions")) {
+        std::string name = entry.path().filename().string();
+
+        if (entry.path().extension() == ".tmp") {
+            std::filesystem::remove(entry.path());
+        }
+    } 
+
+  // detect last checkpoint
+  if (g_config.setup == "Checkpoint2d") {
+    std::vector<int> ids;
+
+    for (const auto& entry : std::filesystem::directory_iterator("solutions"))
+    {
+        std::string name = entry.path().filename().string();
+
+        if (name.substr(0, 10) == "checkpoint" && entry.path().extension() == ".nc")
+        {
+            std::string number =
+                name.substr(
+                    std::string("checkpoint").size(),
+                    name.size()
+                    - std::string("checkpoint").size()
+                    - 3); // ".nc"
+
+            ids.push_back(std::stoi(number));
+        }
+    }
+
+    if (ids.empty()) {
+        throw std::runtime_error("No checkpoint found");
+    }
+    std::sort(ids.begin(), ids.end());
+    g_config.latestCheckpoint = ids.back();
+  }
 
   // construct setup
   auto setup = createSetup(g_config);
@@ -80,7 +119,6 @@ int main( int   i_argc,
   std::string l_ncPath = "solutions/netcdf_output.nc";   
 
  // construct solver
- tsunami_lab::patches::WavePropagation *l_waveProp;
   if( g_config.is_2d ) {
     l_waveProp = new tsunami_lab::patches::WavePropagation2d( g_config.nx, g_config.ny );
   } else {
@@ -130,6 +168,11 @@ int main( int   i_argc,
   }
 
   tsunami_lab::OutputManager output(g_config, l_waveProp);
+
+  if (g_config.setup != "Checkpoint2d") {
+    output.deleteCheckpoints();
+  }
+
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {

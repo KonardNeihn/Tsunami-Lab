@@ -16,16 +16,18 @@ public:
     void writeStep(t_real simTime);
     void writeCheckpoint(t_real simTime);
     void updateStations();
+    void deleteCheckpoints();
+    void detectLatestCheckpoint();
+    void deleteUncompletedCheckpoints();
 
 private:
-    const Config& g_config;
+    Config& g_config;
     patches::WavePropagation* g_solver;
 
     std::string m_ncPath;
     io::NetCdfCheckpoint m_checkpoint;
     io::NetCdf m_ncWriter;
 
-    t_idx m_lastCheckpointId = 2;
     // t_idx k = 4  // currently disabled
 
 };

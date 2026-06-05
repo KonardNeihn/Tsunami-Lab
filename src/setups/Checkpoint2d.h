@@ -36,7 +36,7 @@ class tsunami_lab::setups::Checkpoint2d: public Setup {
     /**
      * Constructor.
      **/
-    Checkpoint2d(std::string checkpoint, Config& config);
+    Checkpoint2d(Config& config);
 
     /**
      * Gets the water height at a given point.
