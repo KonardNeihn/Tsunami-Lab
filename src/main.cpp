@@ -39,14 +39,23 @@ int main( int   i_argc,
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
 
-  // delete incomplete checkpoints
-  for (const auto& entry : std::filesystem::directory_iterator("solutions")) {
-        std::string name = entry.path().filename().string();
 
-        if (entry.path().extension() == ".tmp") {
-            std::filesystem::remove(entry.path());
-        }
+  std::cout << "check0.1" << std::endl;
+
+  // delete incomplete checkpoints
+  if (std::filesystem::exists("solutions"))
+  {
+    for (const auto& entry : std::filesystem::directory_iterator("solutions")) {
+      std::string name = entry.path().filename().string();
+
+      if (entry.path().extension() == ".tmp") {
+        std::filesystem::remove(entry.path());
+      }
     } 
+  }
+
+
+  std::cout << "check1" << std::endl;
 
   // detect last checkpoint
   if (g_config.setup == "Checkpoint2d") {
@@ -75,6 +84,9 @@ int main( int   i_argc,
     std::sort(ids.begin(), ids.end());
     g_config.latestCheckpoint = ids.back();
   }
+
+
+  std::cout << "check100" << std::endl;
 
   // construct setup
   auto setup = createSetup(g_config);
