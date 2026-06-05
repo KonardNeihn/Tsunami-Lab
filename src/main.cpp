@@ -39,9 +39,6 @@ int main( int   i_argc,
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
 
-
-  std::cout << "check0.1" << std::endl;
-
   // delete incomplete checkpoints
   if (std::filesystem::exists("solutions"))
   {
@@ -53,9 +50,6 @@ int main( int   i_argc,
       }
     } 
   }
-
-
-  std::cout << "check1" << std::endl;
 
   // detect last checkpoint
   if (g_config.setup == "Checkpoint2d") {
@@ -85,8 +79,6 @@ int main( int   i_argc,
     g_config.latestCheckpoint = ids.back();
   }
 
-
-  std::cout << "check100" << std::endl;
 
   // construct setup
   auto setup = createSetup(g_config);
@@ -194,7 +186,9 @@ int main( int   i_argc,
 
       // netCDF write
       output.writeStep(l_simTime);
-      output.writeCheckpoint(l_simTime);
+      if (g_config.is_2d) {
+        output.writeCheckpoint(l_simTime);
+      }
     }                                                                   
 
     // New setup for ghost-cells with false defaults in the setup.h
