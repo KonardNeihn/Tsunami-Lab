@@ -39,6 +39,9 @@ struct Config {
   // 
   tsunami_lab::t_real k = 1;
 
+  // is checkpoint setup
+  bool isCheckpoint = false;
+
   // latest checkpoint
   tsunami_lab::t_idx latestCheckpoint = 0;
 };
