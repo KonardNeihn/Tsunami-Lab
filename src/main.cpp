@@ -23,6 +23,7 @@
 #include "core/Initializer.h"
 #include "io/OutputManager.h"
 #include <algorithm>
+#include <chrono>
 
 int is_number(char* input);
 
@@ -177,6 +178,11 @@ int main( int   i_argc,
     output.deleteCheckpoints();
   }
 
+  // time for entire loop
+  auto l_loopStart = std::chrono::high_resolution_clock::now();
+
+  // variable for solver time (added up)
+  double l_solverTotalDuration = 0.0;
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {
@@ -199,7 +205,15 @@ int main( int   i_argc,
       setup->isTopBoundaryReflecting()
     );
 
+    // start seperate timer for only the solver
+    auto l_solverStart = std::chrono::high_resolution_clock::now();
+    
     l_waveProp->timeStep(l_scaling);
+    
+    auto l_solverEnd = std::chrono::high_resolution_clock::now();
+    // calculate difference and then add it to the total
+    std::chrono::duration<double> l_solverDiff = l_solverEnd - l_solverStart;
+    l_solverTotalDuration += l_solverDiff.count();
 
     // Station Updates
     for (auto& station : stations) {
@@ -215,6 +229,18 @@ int main( int   i_argc,
   output.writeStep(l_simTime);
 
   std::cout << "finished time loop" << std::endl;
+
+  // take time for the entire loop
+  auto l_loopEnd = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> l_loopTotalDuration = l_loopEnd - l_loopStart;
+
+  // write times to terminal
+  std::cout << "Entire loop time " << l_loopTotalDuration.count() << " Seconds" << std::endl;
+  std::cout << "Only Solver-time (l_waveProp): " << l_solverTotalDuration << " Seconds" << std::endl;
+  if (l_loopTotalDuration.count() > 0) {
+      std::cout << "Percentage of Solver-time for comparison: " 
+                << (l_solverTotalDuration / l_loopTotalDuration.count()) * 100.0 << " %" << std::endl;
+  }
 
   // free memory
   std::cout << "freeing memory" << std::endl;
