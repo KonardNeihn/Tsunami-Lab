@@ -75,6 +75,12 @@ echo "===================================================="
         - kompiliert pugixml.cpp
     - ar rcs libpugixml.a pugixml.o
         - packt die kompilierteDatei in ein Archiv, das der Linker finden sollte
+    - nano /home/xe46wam/Tsunami-Lab/SConstruct
+        - bearbeitet die Sconstruct Datei direkt
+        - hier unter den anderen env.Append einfügen (dann mit strg+o speichern und dann mit strg+x schließen):
+env.Append(CXXFLAGS=['-std=c++17'])
+env.Append(LIBS=['stdc++fs'])
+        - jetzt sollte es bereit sein um kompilieren können
 
 Kompilieren sollte man auch auf dem Login-Knoten:
     - cd Tsunani-Lab
