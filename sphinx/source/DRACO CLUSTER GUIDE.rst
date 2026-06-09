@@ -8,7 +8,7 @@ Im cmd oder in powershell:
 LOGIN:  ssh *username*@login1.draco.uni-jena.de  - alternativ login2 für anderen login-knoten
         password: uni-passwort zum jeweiligen account
 
-Noch auf dem Login-Knoten:
+Noch auf dem Login-Knoten (nur einmalig):
     - git clone https://github.com/KonardNeihn/Tsunami-Lab.git
         - klont das Github auf das draco-cluster, Login-Knoten und Arbeitsknoten teilen sich den Speicher
     - wget https://cloud.uni-jena.de/s/CqrDBqiMyKComPc/download/data_in.tar.xz -O tsunami_lab_data_in.tar.xz
@@ -31,11 +31,56 @@ Noch auf dem Login-Knoten:
 
     vorerst ignoriert?
 
+    - nano setup_env.sh
+        - dann folgenden Text einfügen:
+
+#!/bin/bash
+
+# 1. Benötigte Module des Draco-Clusters laden
+module load compiler/gcc/12.2.0
+module load tools/python/3.8
+module load libs/hdf5/1.10.7-gcc-10.2.1
+
+# 2. Umgebungsvariablen für SCons setzen (da wir keine nix-shell nutzen)
+# Auf Almalinux liegen globale Entwickler-Bibliotheken standardmäßig in /usr
+export PUGIXML_INCLUDE="/home/xe46wam/Tsunami-Lab/thirdparty/pugixml"
+export PUGIXML_LIB="/home/xe46wam/Tsunami-Lab/thirdparty/pugixml"
+export NETCDF_INCLUDE="/usr/include"
+export NETCDF_LIB="/usr/lib64"
+
+# 3. Compiler zwingen, C++17 zu nutzen und die Filesystem-Bibliothek zu linken, funktioniert aber anscheinend nicht
+export CXXFLAGS="-std=c++17"
+export LINKFLAGS="-std=c++17 -lstdc++fs"
+export SHLINKFLAGS="-std=c++17 -lstdc++fs"
+
+echo "===================================================="
+echo "  Tsunami-Lab Umgebung erfolgreich geladen!"
+echo "  Compiler, Python und NetCDF Module sind aktiv."
+echo "===================================================="
+
+        - dann mit strg+o schreiben, namen der Datei mit Enter bestätigen und mit strg+x Texteditor wieder verlassen (^ bei den Befehlen steht für die Taste strg)
+
+    Da das immernoch alles viel zu wenig aufwand war, ist PugiXML ist anscheinend nicht vorinstalliert und muss nachträglich zugefüggt werden:
+    - mkdir -p /home/xe46wam/Tsunami-Lab/thirdparty/pugixml
+        - erstellt Ordner für PugiXML Dateien
+    - cd /home/xe46wam/Tsunami-Lab/thirdparty/pugixml
+        - geht in den erstellten Ordner
+    - wget https://raw.githubusercontent.com/zeux/pugixml/master/src/pugixml.hpp
+    - wget https://raw.githubusercontent.com/zeux/pugixml/master/src/pugiconfig.hpp
+    - wget https://raw.githubusercontent.com/zeux/pugixml/master/src/pugixml.cpp
+        - downloadet direkt unsere benötigten Dateien für das setup environment, diese muss jetzt aber noch gebaut werden
+    - cd /home/xe46wam/Tsunami-Lab/thirdparty/pugixml
+        - wieder im richtigen Ordner
+    - g++ -O3 -c pugixml.cpp -o pugixml.o
+        - kompiliert pugixml.cpp
+    - ar rcs libpugixml.a pugixml.o
+        - packt die kompilierteDatei in ein Archiv, das der Linker finden sollte
+
 Kompilieren sollte man auch auf dem Login-Knoten:
     - cd Tsunani-Lab
         - geht in den Projektordner
-    - nix-shell
-        - erstellt die nix.shell wie gewöhnlich
+    - source setup_env.sh
+        - erstellt den Ersatz für die nix.shell
     - scons 
         - kompiliert, NICHT AUF LOGIN-KNOTEN AUSFÜHREN
 
@@ -48,7 +93,7 @@ Weiterleitung zu Arbeitsknoten (interaktives testen):
 
 Alternativ zum interaktiven Testen; Batch Jobs:
     - nano job_tsunami.sh
-        - legt Textdatei an, die folgenden Text enthalten soll:
+        - legt Textdatei an, die folgenden Text enthalten soll (einfach dann einfügen):
 
 #!/bin/bash
 #SBATCH --partition=short
@@ -64,8 +109,8 @@ Alternativ zum interaktiven Testen; Batch Jobs:
 # 1. In den richtigen Projektordner wechseln (wichtig!)
 cd /home/*username*/Tsunami-Lab
 
-# 2. Die Software-Umgebung laden (evtl- unnötig)
-module load tools/python/3.8
+# 2. Die Software-Umgebung laden
+source setup_env.sh
 
 # 3. Die eigentliche Simulation mit srun starten
 srun ./*Setup + Parameter*
@@ -73,6 +118,7 @@ srun ./*Setup + Parameter*
 Danach
     - sbatch job_tsunami.sh
         - führt das angelegte skript aus sobald die Ressourcen im cluster frei sind und schreibt den output bzw. errors
+        - die NetCdf-output-Datei sollte genau dort erstellt werden wo sie immer erstellt wird (in solutions)
 
 
 
