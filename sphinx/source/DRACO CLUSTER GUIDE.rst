@@ -47,6 +47,7 @@ export PUGIXML_INCLUDE="/home/xe46wam/Tsunami-Lab/thirdparty/pugixml"
 export PUGIXML_LIB="/home/xe46wam/Tsunami-Lab/thirdparty/pugixml"
 export NETCDF_INCLUDE="/usr/include"
 export NETCDF_LIB="/usr/lib64"
+export HDF5_DISABLE_VERSION_CHECK=1
 
 # 3. Compiler zwingen, C++17 zu nutzen und die Filesystem-Bibliothek zu linken, funktioniert aber anscheinend nicht
 export CXXFLAGS="-std=c++17"
@@ -60,7 +61,7 @@ echo "===================================================="
 
         - dann mit strg+o schreiben, namen der Datei mit Enter bestätigen und mit strg+x Texteditor wieder verlassen (^ bei den Befehlen steht für die Taste strg)
 
-    Da das immernoch alles viel zu wenig aufwand war, ist PugiXML ist anscheinend nicht vorinstalliert und muss nachträglich zugefüggt werden:
+    Da das immernoch alles viel zu wenig aufwand war, ist PugiXML ist anscheinend nicht vorinstalliert und muss nachträglich zugefügt werden:
     - mkdir -p /home/xe46wam/Tsunami-Lab/thirdparty/pugixml
         - erstellt Ordner für PugiXML Dateien
     - cd /home/xe46wam/Tsunami-Lab/thirdparty/pugixml
@@ -119,7 +120,7 @@ cd /home/*username*/Tsunami-Lab
 source setup_env.sh
 
 # 3. Die eigentliche Simulation mit srun starten
-srun ./*Setup + Parameter*
+srun ./build/tsunami_lab -S ChileEvent2d -n 12000 -t 90
     
 Danach
     - sbatch job_tsunami.sh
