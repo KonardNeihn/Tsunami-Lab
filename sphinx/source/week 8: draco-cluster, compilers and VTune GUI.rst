@@ -43,7 +43,8 @@ Which gives us:
 
 With these measurements, the elaine-pc is much faster which probably has to do with the fact that the simulation itself is not really
 parallelized yet and therefore doesn't really benefit from the large amount of cores that are the clusters strength. It takes almost three times
-as long on the cluster node.
+as long on the cluster node. Furthermore the overhead time is quite large (almost half the runtime) and is at least partially due to very 
+cautious checkpointing.
 
 Compilers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,11 +61,44 @@ To add generic compiler support for our build script we need to implement a smal
 This enables us to choose the compiler when building with scons (for example: CXX=clang++ scons).
 
 Since Clang is more strict when it comes to syntax, we needed to do some adjustments to various parts of the code ranging from *override declarations*
-and *clean initialization of empty arrays* to *fixing tests that used preprocessing workarounds*.
+and *clean initialization of empty arrays* to *fixing tests that used preprocessing workarounds*. The build script needed numerous adjustments aswell.
 
-To compare runtime of the compilers we run them with different setups and optimisations:
+To compare runtime of the compilers we run them with different setups and optimisations and since clang++ is not available as a module on the draco-cluster,
+we instead use *intel/oneapi/2025.0.0* since it is apparently based on clang. This leads to more necessary adjustments like GLIBCXX-errors that needed to be dealt with.
+We reuse the same setup to compare the times (srun ./build/tsunami_lab -S ChileEvent2d -n 8000 -t 90).
 
+The standard compiler-setup used for 8.1 is g++ with -O2:
+   - entire loop time: 451.856 seconds
+   - solver-time: 286.352 seconds
+   - 63.3724 % of time is solver-time
 
+Next we test g++ with -O3:
+   - entire loop time: 386.543 seconds
+   - solver-time: 218.309 seconds
+   - 56.4775 % of time is solver-time
+
+And finally g++ with -Ofast:
+   - entire loop time: 337.375 seconds
+   - solver-time: 175.314 seconds
+   - 51.9641 % of time is solver-time
+
+And for comparison we use Intel ipcx, first with -O2:
+   - entire loop time: 377.524 seconds
+   - solver-time: 208.445 seconds
+   - 55.2137 % of time is solver-time
+
+Then icpx with -O3:
+   - entire loop time: 372.157 seconds
+   - solver-time: 203.142 seconds
+   - 54.5851 % of time is solver-time
+
+and finally icpx with -Ofast:
+   - entire loop time: 333.413 seconds
+   - solver-time: 177.019 seconds
+   - 53.019 % of time is solver-time
+
+As we can see, higher optimisation levels lead to faster runtimes. As expected this is true for both compilers, but the difference between icpx with -O2 and -O3 is rather small.
+More interestingly the icpx compiler is generally slightly faster than g++ and the percentage of solver time decreases, meaning that the solver is benefitting more from the optimisation.
 
 When using -Ofast the compiler heavily relies on using FMA (fused-multiply-add) operations and enables certain out-of-order executions
 (since floating point operations round after every calculation, the order matters even with associative operations) which can negatively impact accuracy in later decimal places.
