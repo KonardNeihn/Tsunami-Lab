@@ -8,6 +8,9 @@ Im cmd oder in powershell:
 LOGIN:  ssh *username*@login1.draco.uni-jena.de  - alternativ login2 für anderen login-knoten
         password: uni-passwort zum jeweiligen account
 
+SETUP 
+~~~~~~~~~~~
+
 Noch auf dem Login-Knoten (nur einmalig):
     - git clone https://github.com/KonardNeihn/Tsunami-Lab.git
         - klont das Github auf das draco-cluster, Login-Knoten und Arbeitsknoten teilen sich den Speicher
@@ -91,6 +94,8 @@ Kompilieren sollte man auch auf dem Login-Knoten:
     - scons 
         - kompiliert, NICHT AUF LOGIN-KNOTEN AUSFÜHREN
 
+TESTING 
+~~~~~~~~~~~
 
 Weiterleitung zu Arbeitsknoten (interaktives testen):
     - salloc --partition=short  
@@ -119,8 +124,8 @@ cd /home/*username*/Tsunami-Lab
 # 2. Die Software-Umgebung laden
 source setup_env.sh
 
-# 3. Die eigentliche Simulation mit srun starten
-srun ./build/tsunami_lab -S ChileEvent2d -n 12000 -t 90
+# 3. Die eigentliche Simulation mit srun starten z.B.
+srun ./build/tsunami_lab -S ChileEvent2d -n 8000 -t 90
     
 Danach
     - sbatch job_tsunami.sh
@@ -128,6 +133,13 @@ Danach
         - die NetCdf-output-Datei sollte genau dort erstellt werden wo sie immer erstellt wird (in solutions)
 
 
+UPDATE Github
+~~~~~~~~~~~~~~~~
+
+UPDATES vom Github ausführen mit:
+    - git stash
+    - git pull
+    - git stash pop 
 
     
 
