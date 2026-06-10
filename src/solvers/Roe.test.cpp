@@ -5,9 +5,23 @@
  * Unit tests of the Roe Riemann solver.
  **/
 #include <catch2/catch.hpp>
-#define private public
 #include "Roe.h"
-#undef public
+
+// Clang-compliant 
+struct RoeTestAccessor {
+  static void waveSpeeds(tsunami_lab::t_real i_hL, tsunami_lab::t_real i_hR, 
+                         tsunami_lab::t_real i_uL, tsunami_lab::t_real i_uR, 
+                         tsunami_lab::t_real &o_waveSpeedL, tsunami_lab::t_real &o_waveSpeedR) {
+    tsunami_lab::solvers::Roe::waveSpeeds(i_hL, i_hR, i_uL, i_uR, o_waveSpeedL, o_waveSpeedR);
+  }
+
+  static void waveStrengths(tsunami_lab::t_real i_hL, tsunami_lab::t_real i_hR, 
+                            tsunami_lab::t_real i_huL, tsunami_lab::t_real i_huR, 
+                            tsunami_lab::t_real i_waveSpeedL, tsunami_lab::t_real i_waveSpeedR, 
+                            tsunami_lab::t_real &o_strengthL, tsunami_lab::t_real &o_strengthR) {
+    tsunami_lab::solvers::Roe::waveStrengths(i_hL, i_hR, i_huL, i_huR, i_waveSpeedL, i_waveSpeedR, o_strengthL, o_strengthR);
+  }
+};
 
 TEST_CASE( "Test the derivation of the Roe speeds.", "[RoeSpeeds]" ) {
    /*
@@ -23,7 +37,7 @@ TEST_CASE( "Test the derivation of the Roe speeds.", "[RoeSpeeds]" ) {
     */
   float l_waveSpeedL = 0;
   float l_waveSpeedR = 0;
-  tsunami_lab::solvers::Roe::waveSpeeds( 10,
+  RoeTestAccessor::waveSpeeds( 10,
                                          9,
                                          -3,
                                          3,
@@ -69,7 +83,7 @@ TEST_CASE( "Test the derivation of the Roe wave speeds.", "[RoeStrengths]" ) {
   float l_strengthL = 0;
   float l_strengthR = 0;
 
-  tsunami_lab::solvers::Roe::waveStrengths( 10,
+  RoeTestAccessor::waveStrengths( 10,
                                             9,
                                             -30,
                                             27,

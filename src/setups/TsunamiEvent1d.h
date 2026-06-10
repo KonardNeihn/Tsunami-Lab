@@ -113,7 +113,7 @@ public:
   tsunami_lab::t_real getBathymetry( tsunami_lab::t_real i_x,
                                      tsunami_lab::t_real i_y ) const override;
                                      
-  tsunami_lab::t_real getDomainWidth() const {
+  tsunami_lab::t_real getDomainWidth() const override {
       return m_bathyX.back() - m_bathyX.front();
   }
   // and optionally the start offset:

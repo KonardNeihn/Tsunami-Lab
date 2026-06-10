@@ -48,8 +48,26 @@ as long on the cluster node.
 Compilers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+To add generic compiler support for our build script we need to implement a small change directly after creating the environment:
+
+.. code-block:: text
+   # add envitonment variables for compilers
+   env['ENV'] = os.environ
+
+   # CXX with fallback g++
+   env['CXX'] = os.environ.get('CXX', 'g++')
+
+This enables us to choose the compiler when building with scons (for example: CXX=clang++ scons).
+
+Since Clang is more strict when it comes to syntax, we needed to do some adjustments to various parts of the code ranging from *override declarations*
+and *clean initialization of empty arrays* to *fixing tests that used preprocessing workarounds*.
+
+To compare runtime of the compilers we run them with different setups and optimisations:
 
 
+
+When using -Ofast the compiler heavily relies on using FMA (fused-multiply-add) operations and enables certain out-of-order executions
+(since floating point operations round after every calculation, the order matters even with associative operations) which can negatively impact accuracy in later decimal places.
 
 
 VTune GUI

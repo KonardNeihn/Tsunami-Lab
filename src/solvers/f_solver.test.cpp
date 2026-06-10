@@ -5,9 +5,23 @@
  * Unit tests of the f_wave solver.
  **/
 #include <catch2/catch.hpp>
-#define private public
 #include "f_solver.h"
-#undef public
+
+// Clang-compliant testing
+struct FWaveTestAccessor {
+  static void waveSpeeds(tsunami_lab::t_real i_hL, tsunami_lab::t_real i_hR, 
+                         tsunami_lab::t_real i_uL, tsunami_lab::t_real i_uR, 
+                         tsunami_lab::t_real &o_waveSpeedL, tsunami_lab::t_real &o_waveSpeedR) {
+    tsunami_lab::solvers::f_wave::waveSpeeds(i_hL, i_hR, i_uL, i_uR, o_waveSpeedL, o_waveSpeedR);
+  }
+
+  static void waveFlux(tsunami_lab::t_real i_hL, tsunami_lab::t_real i_hR, 
+                       tsunami_lab::t_real i_huL, tsunami_lab::t_real i_huR, 
+                       tsunami_lab::t_real i_bL, tsunami_lab::t_real i_bR, 
+                       tsunami_lab::t_real &o_fluxL, tsunami_lab::t_real &o_fluxR) {
+    tsunami_lab::solvers::f_wave::waveFlux(i_hL, i_hR, i_huL, i_huR, i_bL, i_bR, o_fluxL, o_fluxR);
+  }
+};
 
 TEST_CASE( "Test the derivation of the f-wave speeds.", "[FWaveSpeeds]" ) {
    /*
@@ -25,7 +39,7 @@ TEST_CASE( "Test the derivation of the f-wave speeds.", "[FWaveSpeeds]" ) {
     */
   float l_waveSpeedL = 0;
   float l_waveSpeedR = 0;
-  tsunami_lab::solvers::f_wave::waveSpeeds( 10,
+  FWaveTestAccessor::waveSpeeds( 10,
                                          9,
                                          -3,
                                          3,
@@ -55,7 +69,7 @@ TEST_CASE( "Test the F-WaveFlux.", "[FWaveFlux]" ) {
   float l_fluxdiffH = 0;
   float l_fluxdiffHu = 0;
 
-  tsunami_lab::solvers::f_wave::waveFlux(10,
+  FWaveTestAccessor::waveFlux(10,
                                         8,
                                         0,
                                         0,

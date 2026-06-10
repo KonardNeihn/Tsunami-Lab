@@ -71,9 +71,9 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
     t_real getBathymetry( t_real i_x,
                           t_real i_y ) const override; 
 
-    t_real getDomainWidth() const;
+    t_real getDomainWidth() const override;
 
-    t_real getDomainLength() const;
+    t_real getDomainLength() const override;
 };
 
 #endif

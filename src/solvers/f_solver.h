@@ -9,6 +9,9 @@
 
 #include "../constants.h"
 
+// forward declaration for later use
+struct FWaveTestAccessor;
+
 namespace tsunami_lab {
   namespace solvers {
     class f_wave;
@@ -16,6 +19,10 @@ namespace tsunami_lab {
 }
 
 class tsunami_lab::solvers::f_wave {
+
+  // declare Catch2-Testcases as friends, to make clang content
+  friend struct ::FWaveTestAccessor;
+
   private:
     //! square root of gravity
     static t_real constexpr m_gSqrt = 3.131557121;

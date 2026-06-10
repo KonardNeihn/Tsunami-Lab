@@ -7,9 +7,7 @@
 #include <catch2/catch.hpp>
 #include "../constants.h"
 #include <sstream>
-#define private public
 #include "Csv.h"
-#undef public
 
 TEST_CASE( "Test the CSV-writer for 1D settings.", "[CsvWrite1d]" ) {
   // define a simple example
