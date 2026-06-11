@@ -133,26 +133,30 @@ void tsunami_lab::solvers::f_wave::netUpdates( t_real i_hL,
   l_zR[1] = l_alphaR * l_sR;  
 
   // set net-updates depending on direction (A-ΔQ is left and A+ΔQ is right)
-  for( unsigned short l_qt = 0; l_qt < 2; l_qt++ ) {
-    // init
-    o_netUpdateL[l_qt] = 0;
-    o_netUpdateR[l_qt] = 0;
+  if( l_sL < 0 ) {
+    o_netUpdateL[0] = l_zL[0];
+    o_netUpdateL[1] = l_zL[1];
 
-    // speed goes from left-to-right and negative speed means waves going right-to-left
-    // 1st wave (from left column of water)
-    if( l_sL < 0 ) {      
-      o_netUpdateL[l_qt] += l_zL[l_qt];   // A-ΔQ or left
-    }
-    else {
-      o_netUpdateR[l_qt] += l_zL[l_qt];   // A+ΔQ or right
-    }
-
-    // 2nd wave (from right column of water)
     if( l_sR > 0 ) {
-      o_netUpdateR[l_qt] += l_zR[l_qt];   // A+ΔQ or right
+      o_netUpdateR[0] = l_zR[0];
+      o_netUpdateR[1] = l_zR[1];
     }
     else {
-      o_netUpdateL[l_qt] += l_zR[l_qt];   // A-ΔQ or left
+      o_netUpdateL[0] += l_zR[0];
+      o_netUpdateL[1] += l_zR[1];
     }
+  }
+  else {
+    o_netUpdateR[0] = l_zL[0];
+    o_netUpdateR[1] = l_zL[1];
+
+    if( l_sR > 0 ) {
+      o_netUpdateR[0] += l_zR[0];
+      o_netUpdateR[1] += l_zR[1];
+    }
+    else {
+      o_netUpdateL[0] = l_zR[0];
+      o_netUpdateL[1] = l_zR[1];
+    }  
   }
 }
