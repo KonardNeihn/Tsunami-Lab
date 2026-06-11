@@ -99,10 +99,28 @@ and finally icpx with -Ofast:
 
 As we can see, higher optimisation levels lead to faster runtimes. As expected this is true for both compilers, but the difference between icpx with -O2 and -O3 is rather small.
 More interestingly the icpx compiler is generally slightly faster than g++ and the percentage of solver time decreases, meaning that the solver is benefitting more from the optimisation.
+Also worth mentioning is that when we look at raw solver-time, then g++ is slightly faster with -Ofast enabled.
 
 When using -Ofast the compiler heavily relies on using FMA (fused-multiply-add) operations and enables certain out-of-order executions
 (since floating point operations round after every calculation, the order matters even with associative operations) which can negatively impact accuracy in later decimal places.
 
+To complete this task we need to look at a otimisation report (generated with: scons cxx=icpx opt=O3 mode=release native=yes > optimization_report.txt 2>&1).
+The report itself contains ~1.2 million lines, but relevant for our task are 2 things: inlined f-wave solver and code vectorisation.
+
+.. code-block:: text
+   build/src/solvers/f_solver.cpp:91:3: remark: '_ZN11tsunami_lab7solvers6f_wave10waveSpeedsEffffRfS2_' inlined into '_ZN11tsunami_lab7solvers6f_wave10netUpdatesEffffffPfS2_' with (cost=5, threshold=375) at callsite netUpdates:24:3; [-Rpass=inline]
+      91 |   waveSpeeds( i_hL,
+         |   ^
+   build/src/solvers/f_solver.cpp:102:3: remark: '_ZN11tsunami_lab7solvers6f_wave8waveFluxEffffffRfS2_' inlined into '_ZN11tsunami_lab7solvers6f_wave10netUpdatesEffffffPfS2_' with (cost=10, threshold=375) at callsite netUpdates:35:3; [-Rpass=inline]
+     102 |   waveFlux( i_hL,
+         |   ^
+
+Here are two examples of inlining for the f-wave solver.
+
+When it comes to vectorisation there ar hundreds of remarks like this: remark: *Stores SLP vectorized with cost -2 and with tree size 2 [-Rpass=slp-vectorizer]*
+but these are superword-level-parallelism and seem to relate to an external header-file.  
+Unfortunately there also seems to be no mention of "loop-vectorize" or "vectorized loop".
+I am also unsure how to correctly identify time-consuming parts, when the report contains more than 20000 mentions of "-Rpass-missed".
 
 VTune GUI
 ~~~~~~~~~
