@@ -78,7 +78,7 @@ env.Append( CXXFLAGS = [ '-std=c++17',
 
 # flexible optimisation
 if 'debug' in env['mode']:
-  env.Append( CXXFLAGS = [ '-g', '-O0' ] )
+  env.Append( CXXFLAGS = [ '-g', '-Og' ] )
 else:
   # instead of -O2, use given variable
   env.Append( CXXFLAGS = [ f"-{env['opt']}" ] )
