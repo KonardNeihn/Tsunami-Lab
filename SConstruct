@@ -76,18 +76,25 @@ env.Append( CXXFLAGS = [ '-std=c++17',
                          '-Wextra',
                          '-Wpedantic' ] )
 
-# 3. FLEXIBLE OPTIMIERUNG EINBAUEN
+# flexible optimisation
 if 'debug' in env['mode']:
-  env.Append( CXXFLAGS = [ '-g', '-O0' ] )
+  env.Append( CXXFLAGS = [ '-g', '-Og' ] )
 else:
-  # Statt hart '-O2' nutzen wir jetzt die Variable aus 'opt'
+  # instead of -O2, use given variable
   env.Append( CXXFLAGS = [ f"-{env['opt']}" ] )
   
-  # NEU: Falls native=yes gewählt wurde, Flag anhängen
+  # Clang-Optimisationreports
+  #env.Append( CXXFLAGS = [
+  #  '-Rpass=.*',
+  #  '-Rpass-missed=.*',
+  #  '-Rpass-analysis=.*'
+  #])
+  
+  # append flag if native=yes 
   if env['native'] == 'yes':
       env.Append( CXXFLAGS = [ '-march=native' ] )
 
-# add sanitizers (Bleibt unverändert)
+# add sanitizers
 if 'san' in env['mode']:
   env.Append( CXXFLAGS =  [ '-g',
                             '-fsanitize=float-divide-by-zero',
