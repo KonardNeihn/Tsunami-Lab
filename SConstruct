@@ -84,11 +84,11 @@ else:
   env.Append( CXXFLAGS = [ f"-{env['opt']}" ] )
   
   # Clang-Optimisationreports
-  env.Append( CXXFLAGS = [
-    '-Rpass=.*',
-    '-Rpass-missed=.*',
-    '-Rpass-analysis=.*'
-  ])
+  #env.Append( CXXFLAGS = [
+  #  '-Rpass=.*',
+  #  '-Rpass-missed=.*',
+  #  '-Rpass-analysis=.*'
+  #])
   
   # append flag if native=yes 
   if env['native'] == 'yes':
