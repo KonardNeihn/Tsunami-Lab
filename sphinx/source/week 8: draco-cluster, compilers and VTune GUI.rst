@@ -51,7 +51,8 @@ Compilers
 
 To add generic compiler support for our build script we need to implement a small change directly after creating the environment:
 
-.. code-block:: text
+.. code-block:: bash
+   
    # add envitonment variables for compilers
    env['ENV'] = os.environ
 
@@ -107,7 +108,8 @@ When using -Ofast the compiler heavily relies on using FMA (fused-multiply-add) 
 To complete this task we need to look at a otimisation report (generated with: scons cxx=icpx opt=O3 mode=release native=yes > optimization_report.txt 2>&1).
 The report itself contains ~1.2 million lines, but relevant for our task are 2 things: inlined f-wave solver and code vectorisation.
 
-.. code-block:: text
+.. code-block:: bash
+
    build/src/solvers/f_solver.cpp:91:3: remark: '_ZN11tsunami_lab7solvers6f_wave10waveSpeedsEffffRfS2_' inlined into '_ZN11tsunami_lab7solvers6f_wave10netUpdatesEffffffPfS2_' with (cost=5, threshold=375) at callsite netUpdates:24:3; [-Rpass=inline]
       91 |   waveSpeeds( i_hL,
          |   ^

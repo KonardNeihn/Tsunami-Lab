@@ -40,4 +40,5 @@ To generate the Documentation in Sphinx:
    week 6: real tsunami simulation
    week 7: checkpoints and coarseness
    week 8: draco-cluster, compilers and VTune GUI
+   week 9: parallelization and grace
 
