@@ -7,6 +7,7 @@
 #include "WavePropagation2d.h"
 #include "../solvers/f_solver.h"
 #include <iostream>
+// #include <omp.h>
 
 tsunami_lab::patches::WavePropagation2d::WavePropagation2d( t_idx i_nCellsX,
                                                              t_idx i_nCellsY ) {
@@ -62,7 +63,11 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
 
   // Copy interior cell values from old to new buffer as the starting point.
   // Ghost cells are excluded since they are set by setGhostCells().
+
+  // #pragma omp parallel for
   for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
+
+    // #pragma omp parallel for
     for( t_idx l_ix = 1; l_ix <= m_nCellsX; l_ix++ ) {
       t_idx l_ce   = idx(l_ix, l_iy);
       l_hNew[l_ce]  = l_hOld[l_ce];
@@ -74,8 +79,12 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
   // X-sweep: iterates over all vertical edges  x_{i-1/2, j}
   // Each edge is shared by cell (i-1, j) on the left and cell (i, j) on the right.
   // The f-wave solver does not change the y-direction-momentum.
+
+  // #pragma omp parallel for
   for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
     // l_ix = 0 gives the edge between the left ghost-cell and the first interior cell and l_ix = m_nCellsX gives the edge between the last and the right ghost-cell.
+    
+    // #pragma omp parallel for
     for( t_idx l_ix = 0; l_ix <= m_nCellsX; l_ix++ ) {
       t_idx l_ceL = idx(l_ix,     l_iy);   // left  cell of vertical edge
       t_idx l_ceR = idx(l_ix + 1, l_iy);   // right cell of vertical edge
@@ -128,7 +137,11 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
   //
   // IMPORTANT: we read from the OLD buffers (l_hOld / l_hvOld), not from the intermediate result of the x-sweep.
   // Both sweeps therefore see the same Q^n state, and their net-updates are added independently into l_hNew / l_hvNew.
+
+  // #pragma omp parallel for
   for( t_idx l_iy = 0; l_iy <= m_nCellsY; l_iy++ ) {
+
+    // #pragma omp parallel for
     for( t_idx l_ix = 1; l_ix <= m_nCellsX; l_ix++ ) {
       t_idx l_ceB = idx(l_ix, l_iy);       // bottom cell of horizontal edge
       t_idx l_ceT = idx(l_ix, l_iy + 1);   // top    cell of horizontal edge
@@ -165,7 +178,11 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
     }
   }
   // CLAMP: after both sweeps, zero out any cells that went dry
+
+  // #pragma omp parallel for
   for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
+
+    // #pragma omp parallel for
     for( t_idx l_ix = 1; l_ix <= m_nCellsX; l_ix++ ) {
       t_idx l_ce = idx(l_ix, l_iy);
       if( l_hNew[l_ce] <= m_dryThreshold ) {
