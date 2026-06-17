@@ -20,11 +20,14 @@ Inner vs Outer Loop Parallelization
    :header-rows: 1
 
    * - Strategy
-     - Runtime (s)
+     - Runtime
    * - **Outer Loop**
      - 679.933
    * - **Inner Loop**
      - 1167.130
+
+Parallelizing the outer loop provides better performance because entire inner loops are distributed among the available threads. When the inner loop is parallelized, its iterations have to be distributed among the threads for every iteration of the outer loop, leading to increased synchronization and scheduling overhead.
+
      
 
 .. toctree::
