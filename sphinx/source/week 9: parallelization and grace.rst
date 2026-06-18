@@ -51,7 +51,7 @@ Using the same simulation benchmark from last week to measure performance, but w
       - solver-time: 123.146 seconds
       - solver percentage of time: 56.5469 %
    
-   -On 10 cores:                                   with less written (after 100 instead of 25)        without writing at all
+   - On 10 cores:                                   with less written (after 100 instead of 25)        without writing at all
       - loop-time: 159.642 seconds                 66.6028     108.768                                28.3084
       - solver-time: 73.8167 seconds               29.2687     48.1565                                12.7496
       - solver percentage of time: 46.2388 %       43.9452     44.2745                                45.0382
@@ -77,7 +77,6 @@ Inner vs Outer Loop Parallelization
 
 Parallelizing the outer loop provides better performance because entire inner loops are distributed among the available threads. When the inner loop is parallelized, its iterations have to be distributed among the threads for every iteration of the outer loop, leading to increased synchronization and scheduling overhead.
 
-    
 
 Scheduling Strategies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,7 +146,9 @@ This should make sure that each thread "owns" the values it later uses in its ca
 
 One final testrun:
 ....................
+
 *with interesting? results*
+
 +-----------------+-----------------+-----------------+
 | Cores / Pinning | Close           | Spread          |
 +=================+=================+=================+

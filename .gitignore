@@ -33,6 +33,7 @@ src/bathymetry/
 !src/bathymetry/output/03_dem_01.ps
 !src/bathymetry/output/03_dem_02.csv
 !src/bathymetry/output/03_dem_03.csv
+<<<<<<< Updated upstream
 
 #ignore more cluster changes
 job_tsunami.sh
@@ -47,3 +48,4 @@ benchmark_results_dynamic.txt
 submit.sh
 benchmark_result_NUMA2.txt
 benchmark_result_NUMA.txt
+sphinx/source/optimization_report.txt
