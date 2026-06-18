@@ -59,14 +59,19 @@ else:
     env['CXX'] = os.environ.get('CXX', 'g++')
 
 # support for pugixml
-env.Append(CPPPATH=['#thirdparty/pugixml'])
+#env.Append(CPPPATH=['#thirdparty/pugixml'])
 
 # reading paths with fallbacks
-netcdf_inc = os.environ.get("NETCDF_INCLUDE", "/usr/include")
-netcdf_lib = os.environ.get("NETCDF_LIB", "/usr/lib64")
+#netcdf_inc = os.environ.get("NETCDF_INCLUDE", "/usr/include")
+#netcdf_lib = os.environ.get("NETCDF_LIB", "/usr/lib64")
 
-env.Append(CPPPATH=[netcdf_inc])
-env.Append(LIBPATH=[netcdf_lib])
+# keep existing paths
+env.Append(CPPPATH=[f"{os.environ['PUGIXML_INCLUDE']}"])
+env.Append(LIBPATH=[f"{os.environ['PUGIXML_LIB']}"])
+env.Append(LIBS=["pugixml"])
+
+#env.Append(CPPPATH=[netcdf_inc])
+#env.Append(LIBPATH=[netcdf_lib])
 env.Append(LIBS=["netcdf"])
 env.Append(LIBS=['stdc++fs'])
 
@@ -140,7 +145,7 @@ sources, tests, standalone = SConscript(
     #env.Append(LINKFLAGS=[f"-Wl,-rpath,{gcc_lib64}", f"-Wl,-rpath,{os.environ['CMPLR_ROOT']}/linux/lib"])
 
 # additional dependecies for pugixml
-env.Program( target = 'build/tsunami_lab', source = sources + standalone + ['thirdparty/pugixml/pugixml.cpp'] )
-env.Program( target = 'build/tests', source = sources + tests + ['thirdparty/pugixml/pugixml.cpp'] )
+env.Program( target = 'build/tsunami_lab', source = sources + standalone) # + ['thirdparty/pugixml/pugixml.cpp'] )
+env.Program( target = 'build/tests', source = sources + tests) # + ['thirdparty/pugixml/pugixml.cpp'] )
 
 print("SOURCES:", sources)
