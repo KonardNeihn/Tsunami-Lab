@@ -7,7 +7,7 @@
 #include "WavePropagation2d.h"
 #include "../solvers/f_solver.h"
 #include <iostream>
-// #include <omp.h>
+#include <omp.h>
 
 tsunami_lab::patches::WavePropagation2d::WavePropagation2d( t_idx i_nCellsX,
                                                              t_idx i_nCellsY ) {
@@ -26,16 +26,26 @@ tsunami_lab::patches::WavePropagation2d::WavePropagation2d( t_idx i_nCellsX,
   // allocate single bathymetry array (floor height is time-invariant)
   m_b = new t_real[l_size];
 
-  // initialise all arrays to zero
+  // initialise all arrays to zero, now with the same scheduling as the simulation itself to use the First-Touch-Policy correctly
   for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
-    for( t_idx l_ce = 0; l_ce < l_size; l_ce++ ) {
-      m_h[l_st][l_ce]  = 0;
-      m_hu[l_st][l_ce] = 0;
-      m_hv[l_st][l_ce] = 0;
+    #pragma omp parallel for schedule(static)
+    for( t_idx l_iy = 0; l_iy < m_nCellsY + 2; l_iy++ ) {
+      for( t_idx l_ix = 0; l_ix < m_nCellsX + 2; l_ix++ ) {
+        t_idx l_ce = idx(l_ix, l_iy);
+        m_h[l_st][l_ce]  = 0;  // First Touch by threads
+        m_hu[l_st][l_ce] = 0;
+        m_hv[l_st][l_ce] = 0;
+      }
     }
   }
-  for( t_idx l_ce = 0; l_ce < l_size; l_ce++ ) {
-    m_b[l_ce] = 0;
+
+  // bathymetry values also need the same initialization
+  #pragma omp parallel for schedule(static)
+  for( t_idx l_iy = 0; l_iy < m_nCellsY + 2; l_iy++ ) {
+    for( t_idx l_ix = 0; l_ix < m_nCellsX + 2; l_ix++ ) {
+      t_idx l_ce = idx(l_ix, l_iy);
+      m_b[l_ce] = 0;
+    }
   }
 }
 
@@ -63,8 +73,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
 
   // Copy interior cell values from old to new buffer as the starting point.
   // Ghost cells are excluded since they are set by setGhostCells().
-
-  // #pragma omp parallel for
+  #pragma omp parallel for schedule(static)   // parallelization
   for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
 
     // #pragma omp parallel for
@@ -79,8 +88,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
   // X-sweep: iterates over all vertical edges  x_{i-1/2, j}
   // Each edge is shared by cell (i-1, j) on the left and cell (i, j) on the right.
   // The f-wave solver does not change the y-direction-momentum.
-
-  // #pragma omp parallel for
+  #pragma omp parallel for schedule(static)   // parallelization
   for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
     // l_ix = 0 gives the edge between the left ghost-cell and the first interior cell and l_ix = m_nCellsX gives the edge between the last and the right ghost-cell.
     
@@ -137,11 +145,9 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
   //
   // IMPORTANT: we read from the OLD buffers (l_hOld / l_hvOld), not from the intermediate result of the x-sweep.
   // Both sweeps therefore see the same Q^n state, and their net-updates are added independently into l_hNew / l_hvNew.
-
-  // #pragma omp parallel for
+  #pragma omp parallel for schedule(static) 
   for( t_idx l_iy = 0; l_iy <= m_nCellsY; l_iy++ ) {
-
-    // #pragma omp parallel for
+    //#pragma omp parallel for schedule(static)
     for( t_idx l_ix = 1; l_ix <= m_nCellsX; l_ix++ ) {
       t_idx l_ceB = idx(l_ix, l_iy);       // bottom cell of horizontal edge
       t_idx l_ceT = idx(l_ix, l_iy + 1);   // top    cell of horizontal edge
@@ -161,13 +167,18 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
                                     l_netUpdates[1]
       );
 
+      // new atomic operators to prevent race-conditions
       if( l_iy > 0 ) {
+        #pragma omp atomic
         l_hNew[l_ceB]  -= i_scaling * l_netUpdates[0][0];
+        #pragma omp atomic
         l_hvNew[l_ceB] -= i_scaling * l_netUpdates[0][1];
       }
 
       if( l_iy < m_nCellsY ) {
+        #pragma omp atomic
         l_hNew[l_ceT]  -= i_scaling * l_netUpdates[1][0];
+        #pragma omp atomic
         l_hvNew[l_ceT] -= i_scaling * l_netUpdates[1][1];
       }
 
@@ -178,8 +189,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ) {
     }
   }
   // CLAMP: after both sweeps, zero out any cells that went dry
-
-  // #pragma omp parallel for
+  #pragma omp parallel for schedule(static)   // parallelization
   for( t_idx l_iy = 1; l_iy <= m_nCellsY; l_iy++ ) {
 
     // #pragma omp parallel for

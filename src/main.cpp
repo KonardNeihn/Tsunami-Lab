@@ -186,15 +186,15 @@ int main( int   i_argc,
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {
-    if( l_timeStep % 25 == 0 ) {
+    if( l_timeStep % 25 == 0 ) {    
       std::cout << "  simulation time: " << l_simTime << "/" << g_config.endTime << " time steps: " << l_timeStep << std::endl;
       std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
       // netCDF write
       output.writeStep(l_simTime);
-      if (g_config.is_2d) {
-        output.writeCheckpoint(l_simTime);
-      }
+      //if (g_config.is_2d) {       // checkpoints commented out for testing
+      //  output.writeCheckpoint(l_simTime);
+      //}
     }                                                                   
 
     // New setup for ghost-cells with false defaults in the setup.h

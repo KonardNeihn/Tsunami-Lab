@@ -28,7 +28,22 @@ src/data_tmp
 src/bathymetry/gmt.history
 src/bathymetry/data_tmp
 src/bathymetry/
+
 # aber diese Dateien NICHT ignorieren
 !src/bathymetry/output/03_dem_01.ps
 !src/bathymetry/output/03_dem_02.csv
 !src/bathymetry/output/03_dem_03.csv
+
+#ignore more cluster changes
+job_tsunami.sh
+optimization_report.txt
+setup_env.sh
+thirdparty/pugixml/pugiconfig.hpp
+thirdparty/pugixml/pugixml.cpp
+thirdparty/pugixml/pugixml.o
+thirdparty/pugixml/pugixml.hpp
+benchmark_results.txt
+benchmark_results_dynamic.txt
+submit.sh
+benchmark_result_NUMA2.txt
+benchmark_result_NUMA.txt

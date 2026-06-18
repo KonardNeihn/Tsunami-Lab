@@ -58,14 +58,20 @@ if env.get('cxx'):
 else:
     env['CXX'] = os.environ.get('CXX', 'g++')
 
-# keep existing paths
-env.Append(CPPPATH=[f"{os.environ['PUGIXML_INCLUDE']}"])
-env.Append(LIBPATH=[f"{os.environ['PUGIXML_LIB']}"])
-env.Append(LIBS=["pugixml"])
+# support for pugixml
+env.Append(CPPPATH=['#thirdparty/pugixml'])
 
-env.Append(CPPPATH=[os.environ["NETCDF_INCLUDE"]])
-env.Append(LIBPATH=[os.environ["NETCDF_LIB"]])
+# reading paths with fallbacks
+netcdf_inc = os.environ.get("NETCDF_INCLUDE", "/usr/include")
+netcdf_lib = os.environ.get("NETCDF_LIB", "/usr/lib64")
+
+env.Append(CPPPATH=[netcdf_inc])
+env.Append(LIBPATH=[netcdf_lib])
 env.Append(LIBS=["netcdf"])
+env.Append(LIBS=['stdc++fs'])
+
+#env.ParseConfig("pkg-config --cflags --libs pugixml")
+#env.ParseConfig("pkg-config --cflags --libs netcdf"
 
 # generate help message
 Help( vars.GenerateHelpText( env ) )
@@ -74,7 +80,11 @@ Help( vars.GenerateHelpText( env ) )
 env.Append( CXXFLAGS = [ '-std=c++17',
                          '-Wall',
                          '-Wextra',
-                         '-Wpedantic' ] )
+                         '-Wpedantic',
+                         '-fopenmp' ] )
+
+
+env.Append( LINKFLAGS = [ '-fopenmp' ] )
 
 # flexible optimisation
 if 'debug' in env['mode']:
@@ -123,7 +133,14 @@ sources, tests, standalone = SConscript(
     exports='env'
 )
 
-env.Program( target = 'build/tsunami_lab', source = sources + standalone )
-env.Program( target = 'build/tests', source = sources + tests )
+# RPATH für das Cluster setzen, damit die richtige libstdc++ fest im Binary verankert ist
+#if os.environ.get('CMPLR_ROOT'):
+    # Pfad zur Intel-eigenen libstdc++ beziehungsweise GCC-Bibliothek
+    #gcc_lib64 = "/cluster/spack/v0.19/opt/spack/linux-almalinux8-x86_64_v3/gcc-8.5.0/gcc-12.2.0-ithezm6tiwdinin3jketpzd5wfvdtjny/lib64"
+    #env.Append(LINKFLAGS=[f"-Wl,-rpath,{gcc_lib64}", f"-Wl,-rpath,{os.environ['CMPLR_ROOT']}/linux/lib"])
+
+# additional dependecies for pugixml
+env.Program( target = 'build/tsunami_lab', source = sources + standalone + ['thirdparty/pugixml/pugixml.cpp'] )
+env.Program( target = 'build/tests', source = sources + tests + ['thirdparty/pugixml/pugixml.cpp'] )
 
 print("SOURCES:", sources)
