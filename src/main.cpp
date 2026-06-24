@@ -25,11 +25,10 @@
 #include <algorithm>
 #include <chrono>
 
-int is_number(char* input);
-
 int main( int   i_argc,
           char *i_argv[] ) {
- tsunami_lab::patches::WavePropagation *l_waveProp;
+  std::vector<std::vector<tsunami_lab::t_idx>> l_gridResolution;
+  tsunami_lab::patches::WavePropagation *l_waveProp;
 
   std::cout << "####################################" << std::endl;
   std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -84,6 +83,7 @@ int main( int   i_argc,
   // construct setup
   auto setup = createSetup(g_config);
 
+  tsunami_lab::determineGridResolution(setup, g_config, l_gridResolution);
 
   // current simulation time
   tsunami_lab::t_real l_simTime = g_config.simTime;
