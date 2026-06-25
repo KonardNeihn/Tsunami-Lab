@@ -99,6 +99,10 @@ int main( int   i_argc,
   std::cout << "  insanity:                              " << g_config.insanity << std::endl;
   std::cout << "  coarseness:                            " << g_config.k << std::endl;
 
+
+  //calculate actual number of cells in simulation
+  tsunami_lab::t_real l_cellAmount = (g_config.nx * g_config.ny);
+
   // set output directory
   std::filesystem::path outDir = "solutions";
 
@@ -257,6 +261,8 @@ int main( int   i_argc,
   if (l_loopTotalDuration.count() > 0) {
       std::cout << "Percentage of Solver-time for comparison: " 
                 << (l_solverTotalDuration / l_loopTotalDuration.count()) * 100.0 << " %" << std::endl;
+      std::cout << "Average time per cell in nanoseconds: " 
+                << (l_solverTotalDuration / l_cellAmount ) * 1000000000 << " ns" << std::endl;
   }
 
   // free memory
