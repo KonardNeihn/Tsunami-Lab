@@ -31,9 +31,11 @@ void initialize(
 
 // Funktion, um die Gitterauflösung basierend auf Wassertiefe zu bestimmen
 void determineGridResolution(
+    t_real i_hMax,  // wie viel eine Zelle maximal unterteilt werden kann
+    t_idx i_resMax, // die maximale wassertiefe
     setups::Setup* setup,
     const Config& g_config,
-    std::vector<std::vector<t_idx>>& o_gridResolution  // Ausgabe: Gitterauflösung pro Zelle
+    std::vector<std::vector<t_idx>>& o_gridResolution  // Ausgabe: gewünschte vergrößerung pro Zelle
     ) {
 
     o_gridResolution.resize(g_config.ny, std::vector<t_idx>(g_config.nx, 0)); // Initialisierung
@@ -44,12 +46,12 @@ void determineGridResolution(
         for (t_idx l_solverCellX = 0; l_solverCellX < g_config.nx; l_solverCellX++) {
             t_real l_h  = setup->getHeight(l_solverCellX, l_solverCellY);
             t_idx resolution;
-            if (l_h < 100.0) resolution = 2;  // Feines Gitter (Level 2)
-            else if (l_h < 1000.0) resolution = 1;  // Mittelfeines Gitter (Level 1)
-            else resolution = 0;  // Grobes Gitter (Level 0)
+            resolution = i_resMax - ((l_h - 1) * ((i_resMax - 1) / i_hMax)); // absolute crazy rechnung. stimmt aber
 
             o_gridResolution[l_solverCellY][l_solverCellX] = resolution;
+            std::cout << resolution;
         }
+        std::cout << std::endl;
     }
 }
 

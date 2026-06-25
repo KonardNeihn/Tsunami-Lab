@@ -84,8 +84,6 @@ int main( int   i_argc,
   // construct setup
   auto setup = createSetup(g_config);
 
-  tsunami_lab::determineGridResolution(setup, g_config, l_gridResolution);
-
   // current simulation time
   tsunami_lab::t_real l_simTime = g_config.simTime;
 
@@ -156,6 +154,8 @@ int main( int   i_argc,
         l_hMax
     );
 }
+
+  tsunami_lab::determineGridResolution(l_hMax, 9, setup, g_config, l_gridResolution);
 
   // derive maximum wave speed in setup; the momentum is ignored
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
