@@ -74,6 +74,8 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
     t_real getDomainWidth() const override;
 
     t_real getDomainLength() const override;
+
+    t_idx getResolution(t_real, t_real) const override;
 };
 
 #endif

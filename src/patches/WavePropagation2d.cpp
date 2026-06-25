@@ -13,6 +13,7 @@ tsunami_lab::patches::WavePropagation2d::WavePropagation2d( t_idx i_nCellsX,
                                                              t_idx i_nCellsY ) {
   m_nCellsX = i_nCellsX;
   m_nCellsY = i_nCellsY;
+  m_step = 0;
 
   t_idx l_size = (m_nCellsX + 2) * (m_nCellsY + 2);
 

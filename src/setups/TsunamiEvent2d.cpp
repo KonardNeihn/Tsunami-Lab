@@ -119,3 +119,12 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getDomainWidth() const 
 tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getDomainLength() const {
     return std::min(m_y.back(), m_yd.back()) - std::max(m_y.front(), m_yd.front());
 }
+
+tsunami_lab::t_idx tsunami_lab::setups::TsunamiEvent2d::getResolution(tsunami_lab::t_real i_x, tsunami_lab::t_real) const {
+    tsunami_lab::t_real center = g_config.domainStartX + (g_config.width / 2.0);
+    if (i_x > center) {
+        return 2;
+    }
+
+    return 1;
+}

@@ -4,6 +4,7 @@
  * @section DESCRIPTION
  * Entry-point for simulations.
  **/
+#include "patches/WavePropagationAdaptiveGrid2d.h"
 #include "patches/WavePropagation1d.h"
 #include "patches/WavePropagation2d.h"
 #include "io/Csv.h"
@@ -123,22 +124,38 @@ int main( int   i_argc,
   // set output path for NetCdf
   std::string l_ncPath = "solutions/netcdf_output.nc";   
 
- // construct solver
-  if( g_config.is_2d ) {
-    l_waveProp = new tsunami_lab::patches::WavePropagation2d( g_config.nx, g_config.ny );
-  } else {
-    l_waveProp = new tsunami_lab::patches::WavePropagation1d( g_config.nx, g_config.solver );
-  }
-
   // maximum observed height during setup
   tsunami_lab::t_real l_hMax = 0;
 
-  tsunami_lab::initialize(
-    l_waveProp,
-    setup,
-    g_config,
-    l_hMax
-  );
+ // construct solver
+ if( g_config.is_2d ) {
+    l_waveProp =
+      new tsunami_lab::patches::WavePropagationAdaptiveGrid2d(
+          g_config.nx,
+          g_config.ny
+      );
+
+    tsunami_lab::initializeAdaptiveGrid(
+        l_waveProp,
+        setup,
+        g_config,
+        l_hMax
+      );
+
+} else {
+    l_waveProp =
+      new tsunami_lab::patches::WavePropagation1d(
+          g_config.nx,
+          g_config.solver
+      );
+
+    tsunami_lab::initialize(
+        l_waveProp,
+        setup,
+        g_config,
+        l_hMax
+    );
+}
 
   // derive maximum wave speed in setup; the momentum is ignored
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );

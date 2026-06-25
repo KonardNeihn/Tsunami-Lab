@@ -90,6 +90,14 @@ class tsunami_lab::setups::Setup {
     virtual bool isBottomBoundaryReflecting() const { return false; }
     virtual bool isTopBoundaryReflecting()    const { return false; }
           
+    /**
+    * Gets resolution for cells for Adaptive Grids
+    **/
+    virtual t_idx getResolution(t_real,
+                                t_real) const {
+                                  // default 1, so old setups still work
+                                  return 1;
+    }
 };
 
 #endif

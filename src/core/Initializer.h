@@ -14,6 +14,12 @@ void initialize(
     t_real& o_hMax
 );
 
+void initializeAdaptiveGrid(
+    patches::WavePropagation* solver,
+    setups::Setup* setup,
+    const Config& g_config,
+    t_real& o_hMax
+);
 void determineGridResolution(
     setups::Setup* setup,
     const Config& g_config,

@@ -410,6 +410,13 @@ void tsunami_lab::io::NetCdf::write( tsunami_lab::t_real        i_simTime,
   {
     std::cout << "Time Step (Writer) is " << m_timeStep << std::endl;
     std::cout << "Sim Time (Writer) is " << i_simTime << std::endl;
+    std::cout << "m_ncId: " << m_ncId << std::endl;
+    std::cout << "m_varTimeId: " << m_varTimeId << std::endl;
+    std::cout << "m_timeStep: " << m_timeStep << std::endl;
+    std::cout << "h ptr: " << i_h << std::endl;
+    std::cout << "hu ptr: " << i_hu << std::endl;
+    std::cout << "hv ptr: " << i_hv << std::endl;
+    std::cout << "Sim Time: " << i_simTime << std::endl;
     size_t l_start[1] = { m_timeStep };
     size_t l_count[1] = { 1 };
     float  l_t        = static_cast<float>( i_simTime );
