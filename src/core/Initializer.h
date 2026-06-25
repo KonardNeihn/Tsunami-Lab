@@ -3,7 +3,9 @@
 #include "../config/Config.h"
 #include "../setups/Setup.h"
 #include "../patches/WavePropagation.h"
+#include "../patches/WavePropagationAdaptiveGrid2d.h"
 #include <vector>
+#include <iostream>
 
 namespace tsunami_lab {
 

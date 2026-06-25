@@ -118,7 +118,8 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      **/
     void setHeight( t_idx  i_ix,
                     t_idx,
-                    t_real i_h ) override {
+                    t_real i_h,
+                    [[maybe_unused]] setups::Setup* i_setup = nullptr ) override {
       m_h[m_step][i_ix+1] = i_h;
     }
 
@@ -149,7 +150,8 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
      **/
     void setBathymetry( t_idx  i_ix,
                         t_idx,
-                        t_real i_b ) override {
+                        t_real i_b,
+                        [[maybe_unused]] setups::Setup* i_setup = nullptr ) override {
       m_b[i_ix+1] = i_b;
     }
 

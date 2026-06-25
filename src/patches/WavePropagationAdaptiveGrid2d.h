@@ -10,6 +10,7 @@
 #include "../constants.h"
 #include "WavePropagation.h"
 #include "WavePropagation2d.h"
+#include "../setups/Setup.h"
 #include <map>
 #include <set>
 #include <array>
@@ -120,7 +121,7 @@ namespace tsunami_lab {
       /**
        * Sets height at coarse cell (routes to appropriate grid)
        **/
-      void setHeight(t_idx i_ix, t_idx i_iy, t_real i_h) override;
+      void setHeight(t_idx i_ix, t_idx i_iy, t_real i_h, setups::Setup* i_setup) override;
       
       /**
        * Sets momentum x at coarse cell (routes to appropriate grid)
@@ -135,7 +136,7 @@ namespace tsunami_lab {
       /**
        * Sets bathymetry at coarse cell (routes to appropriate grid)
        **/
-      void setBathymetry(t_idx i_ix, t_idx i_iy, t_real i_b) override;
+      void setBathymetry(t_idx i_ix, t_idx i_iy, t_real i_b, setups::Setup* i_setup) override;
 
       /**
        * Gets refinement factor for a coarse cell

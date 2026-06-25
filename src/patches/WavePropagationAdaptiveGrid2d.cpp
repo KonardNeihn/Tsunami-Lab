@@ -62,27 +62,50 @@ void WavePropagationAdaptiveGrid2d::coarseToFineIndices(t_idx i_coarseX, t_idx i
 }
 
 void WavePropagationAdaptiveGrid2d::interpolateBoundaries(t_idx i_refinement) {
-    t_real const* coarseH = m_coarseGrid->getHeight();
+    t_real const* coarseH  = m_coarseGrid->getHeight();
+    t_real const* coarseB  = m_coarseGrid->getBathymetry();
     t_real const* coarseHU = m_coarseGrid->getMomentumX();
     t_real const* coarseHV = m_coarseGrid->getMomentumY();
+    t_idx coarseStride     = m_coarseGrid->getStride();
+
     WavePropagation2d* fineGrid = m_fineGrids[i_refinement];
-    t_idx coarseStride = m_coarseGrid->getStride();
+    //t_idx fineStride            = fineGrid->getStride();
+    auto& bounds                = m_refinedBounds[i_refinement];
 
-    for (auto& [coarsePos, level] : m_refinementMap) {
-        if (level != i_refinement) continue;
-        auto [coarseX, coarseY] = coarsePos;
-        t_real h_coarse = coarseH[coarseY * coarseStride + coarseX];
-        t_real hu_coarse = coarseHU[coarseY * coarseStride + coarseX];
-        t_real hv_coarse = coarseHV[coarseY * coarseStride + coarseX];
-        t_idx fineX0, fineY0;
-        coarseToFineIndices(coarseX, coarseY, i_refinement, fineX0, fineY0);
+    // Instead of looping over the whole map, we only loop over the COARSE CELLS 
+    // immediately surrounding the refined bounding box (the halo ring)
+    for (t_idx cx = bounds[0] - 1; cx <= bounds[2] + 1; cx++) {
+        for (t_idx cy = bounds[1] - 1; cy <= bounds[3] + 1; cy++) {
+            
+            // Skip if this coarse cell is actually INSIDE the fine grid interior
+            if (cx >= bounds[0] && cx <= bounds[2] && cy >= bounds[1] && cy <= bounds[3]) {
+                continue; 
+            }
 
-        // set values for fine grid
-        for (t_idx fi = 0; fi < i_refinement; fi++) {
-            for (t_idx fj = 0; fj < i_refinement; fj++) {
-                fineGrid->setHeight(fineX0 + fi, fineY0 + fj, h_coarse);
-                fineGrid->setMomentumX(fineX0 + fi, fineY0 + fj, hu_coarse);
-                fineGrid->setMomentumY(fineX0 + fi, fineY0 + fj, hv_coarse);
+            t_idx coarseIdx  = cy * coarseStride + cx;
+            t_real h_coarse  = coarseH[coarseIdx];
+            t_real b_coarse  = coarseB[coarseIdx];
+            t_real hu_coarse = coarseHU[coarseIdx];
+            t_real hv_coarse = coarseHV[coarseIdx];
+            t_real eta_coarse = h_coarse + b_coarse;
+
+            // Map these surrounding coarse cells directly into the fine grid's GHOST layers
+            t_idx fineX0 = (cx - bounds[0]) * i_refinement;
+            t_idx fineY0 = (cy - bounds[1]) * i_refinement;
+
+            for (t_idx fi = 0; fi < i_refinement; fi++) {
+                for (t_idx fj = 0; fj < i_refinement; fj++) {
+                    // This naturally targets indices like -1, -2 or fineNx, fineNx+1
+                    t_idx fX = fineX0 + fi;
+                    t_idx fY = fineY0 + fj;
+                    
+                    // Direct pointer write to fine grid ghost cells, bypassing standard setters
+                    // assuming your WavePropagation2d exposes a way to write to ghost cells,
+                    // or your setters accept negative/overflow boundary indices.
+                    fineGrid->setHeight(fX, fY, std::max<t_real>(eta_coarse - b_coarse, 0.0));
+                    fineGrid->setMomentumX(fX, fY, hu_coarse);
+                    fineGrid->setMomentumY(fX, fY, hv_coarse);
+                }
             }
         }
     }
@@ -115,14 +138,30 @@ void WavePropagationAdaptiveGrid2d::restrictBoundary(t_idx i_refinement) {
 }
 
 void WavePropagationAdaptiveGrid2d::timeStep(t_real i_scaling) {
+    // 1. Advance coarse grid
     m_coarseGrid->setGhostCells(m_leftReflecting, m_rightReflecting, m_bottomReflecting, m_topReflecting);
     m_coarseGrid->timeStep(i_scaling);
+
+    // 2. Advance fine grids
     for (auto& [refinement, fineGrid] : m_fineGrids) {
-        interpolateBoundaries(refinement);
+        t_real fine_dt = i_scaling / static_cast<t_real>(refinement);
+
         for (t_idx subcycle = 0; subcycle < refinement; subcycle++) {
-            fineGrid->setGhostCells(m_leftReflecting, m_rightReflecting, m_bottomReflecting, m_topReflecting);
-            fineGrid->timeStep(i_scaling);
+            // Re-interpolate coarse data into fine ghost cells EVERY subcycle step
+            interpolateBoundaries(refinement);
+            
+            // CRITICAL: Only apply global boundary conditions if the fine grid actually touches the domain edge!
+            auto& bounds = m_refinedBounds[refinement];
+            bool left   = (bounds[0] == 0) ? m_leftReflecting   : false;
+            bool right  = (bounds[2] == m_nCellsX - 1) ? m_rightReflecting  : false;
+            bool bottom = (bounds[1] == 0) ? m_bottomReflecting : false;
+            bool top    = (bounds[3] == m_nCellsY - 1) ? m_topReflecting    : false;
+            
+            fineGrid->setGhostCells(left, right, bottom, top);
+            fineGrid->timeStep(fine_dt);
         }
+        
+        // 3. Average fine data back up to coarse grid
         restrictBoundary(refinement);
     }
 }
@@ -140,26 +179,40 @@ t_real const* WavePropagationAdaptiveGrid2d::getMomentumX() { return m_coarseGri
 t_real const* WavePropagationAdaptiveGrid2d::getMomentumY() { return m_coarseGrid->getMomentumY(); }
 t_real const* WavePropagationAdaptiveGrid2d::getBathymetry() { return m_coarseGrid->getBathymetry(); }
 
-void tsunami_lab::patches::WavePropagationAdaptiveGrid2d::setHeight(t_idx i_ix, t_idx i_iy, t_real i_h) {
-    // 1. Immer das Coarse-Grid aktualisieren (als Base-Layer)
+void tsunami_lab::patches::WavePropagationAdaptiveGrid2d::setHeight(t_idx i_ix, t_idx i_iy, t_real i_h, setups::Setup* i_setup) {
     m_coarseGrid->setHeight(i_ix, i_iy, i_h);
 
-    // 2. Falls refined, zusätzlich das Fine-Grid aktualisieren
     if (isRefined(i_ix, i_iy)) {
         t_idx refinement = getRefinement(i_ix, i_iy);
         WavePropagation2d* fineGrid = m_fineGrids[refinement];
         t_idx fineX0, fineY0;
         coarseToFineIndices(i_ix, i_iy, refinement, fineX0, fineY0);
         
+        t_real fineCellSize = (1.0 / refinement);
+
         for (t_idx fi = 0; fi < refinement; fi++) {
             for (t_idx fj = 0; fj < refinement; fj++) {
-                fineGrid->setHeight(fineX0 + fi, fineY0 + fj, i_h);
+                /*
+                * -0.5 -> cancle out center shift from Setup and replace offset by fine offset = fineCellSize/2
+                * fineCellSize * fi (or fj) is between 0 and 1 and represent the position of a fine cell inside its coarse cell
+                */
+                t_real x = i_ix - 0.5 + fineCellSize * fi + fineCellSize / 2;
+                t_real y = i_iy - 0.5 + fineCellSize * fj + fineCellSize / 2;
+                t_real height = i_setup->getHeight(x, y);
+                if (std::isnan(height)) {
+                    std::cerr << "CRITICAL: Height NaN detected at cell (" << i_ix << "|" << i_iy << ")" 
+                            << " for coordinates x=" << x << ", y=" << y << std::endl;
+                    exit(1); 
+                }
+                fineGrid->setHeight(fineX0 + fi, fineY0 + fj, height);
             }
         }
     }
 }
 
 void WavePropagationAdaptiveGrid2d::setMomentumX(t_idx i_ix, t_idx i_iy, t_real i_hu) {
+    m_coarseGrid->setMomentumX(i_ix, i_iy, i_hu);
+
     if (isRefined(i_ix, i_iy)) {
         t_idx refinement = getRefinement(i_ix, i_iy);
         WavePropagation2d* fineGrid = m_fineGrids[refinement];
@@ -172,6 +225,8 @@ void WavePropagationAdaptiveGrid2d::setMomentumX(t_idx i_ix, t_idx i_iy, t_real 
 }
 
 void WavePropagationAdaptiveGrid2d::setMomentumY(t_idx i_ix, t_idx i_iy, t_real i_hv) {
+    m_coarseGrid->setMomentumY(i_ix, i_iy, i_hv);
+
     if (isRefined(i_ix, i_iy)) {
         t_idx refinement = getRefinement(i_ix, i_iy);
         WavePropagation2d* fineGrid = m_fineGrids[refinement];
@@ -183,7 +238,7 @@ void WavePropagationAdaptiveGrid2d::setMomentumY(t_idx i_ix, t_idx i_iy, t_real 
     } else m_coarseGrid->setMomentumY(i_ix, i_iy, i_hv);
 }
 
-void WavePropagationAdaptiveGrid2d::setBathymetry(t_idx i_ix, t_idx i_iy, t_real i_b) {
+void WavePropagationAdaptiveGrid2d::setBathymetry(t_idx i_ix, t_idx i_iy, t_real i_b, setups::Setup* i_setup) {
     m_coarseGrid->setBathymetry(i_ix, i_iy, i_b);
 
     if (isRefined(i_ix, i_iy)) {
@@ -191,9 +246,25 @@ void WavePropagationAdaptiveGrid2d::setBathymetry(t_idx i_ix, t_idx i_iy, t_real
         WavePropagation2d* fineGrid = m_fineGrids[refinement];
         t_idx fineX0, fineY0;
         coarseToFineIndices(i_ix, i_iy, refinement, fineX0, fineY0);
+
+        t_real fineCellSize = (1.0 / refinement);
+
         for (t_idx fi = 0; fi < refinement; fi++)
-            for (t_idx fj = 0; fj < refinement; fj++)
-                fineGrid->setBathymetry(fineX0 + fi, fineY0 + fj, i_b);
+            for (t_idx fj = 0; fj < refinement; fj++) {
+                /*
+                * -0.5 -> cancle out center shift from Setup and replace offset by fine offset = fineCellSize/2
+                * fineCellSize * fi (or fj) is between 0 and 1 and represent the position of a fine cell inside its coarse cell
+                */
+                t_real x = i_ix - 0.5 + fineCellSize * fi + fineCellSize / 2;
+                t_real y = i_iy - 0.5 + fineCellSize * fj + fineCellSize / 2;
+                t_real bathy = i_setup->getBathymetry(x, y);
+                if (std::isnan(bathy)) {
+                    std::cerr << "CRITICAL: Bathymetry NaN detected at cell (" << i_ix << "|" << i_iy << ")" 
+                            << " for coordinates x=" << x << ", y=" << y << std::endl;
+                    exit(1); 
+                }
+                fineGrid->setBathymetry(fineX0 + fi, fineY0 + fj, bathy);
+            }
     } else m_coarseGrid->setBathymetry(i_ix, i_iy, i_b);
 }
 

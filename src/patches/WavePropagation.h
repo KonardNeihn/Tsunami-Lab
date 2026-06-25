@@ -8,6 +8,7 @@
 #define TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION
 
 #include "../constants.h"
+#include "../setups/Setup.h"
 
 namespace tsunami_lab {
   namespace patches {
@@ -83,7 +84,8 @@ class tsunami_lab::patches::WavePropagation {
      **/
     virtual void setHeight( t_idx  i_ix,
                             t_idx  i_iy,
-                            t_real i_h ) = 0;
+                            t_real i_h,
+                            [[maybe_unused]] setups::Setup* i_setup = nullptr) = 0;
 
     /**
      * Sets the momentum in x-direction to the given value.
@@ -117,7 +119,8 @@ class tsunami_lab::patches::WavePropagation {
 
     virtual void setBathymetry( t_idx  i_ix,
                                 t_idx  i_iy,
-                                t_real i_b ) = 0;
+                                t_real i_b,
+                                [[maybe_unused]] setups::Setup* i_setup = nullptr)  = 0;
 };
 
 #endif

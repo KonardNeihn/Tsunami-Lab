@@ -81,6 +81,9 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getHeight(t_real solver
     std::size_t existingPhysicalX = std::distance(m_xd.begin(), itX);
     std::size_t existingPhysicalY = std::distance(m_yd.begin(), itY);
 
+    if (existingPhysicalX >= m_xd.size()) existingPhysicalX = m_xd.size() - 1;
+    if (existingPhysicalY >= m_yd.size()) existingPhysicalY = m_yd.size() - 1;
+
     t_real b = getBathymetry(solverX, solverY);
     t_real h = m_2dDisplacement[existingPhysicalY][existingPhysicalX];
 
@@ -107,6 +110,9 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getBathymetry(t_real so
     std::size_t existingPhysicalX = std::distance(m_x.begin(), itX);
     std::size_t existingPhysicalY = std::distance(m_y.begin(), itY);
 
+    if (existingPhysicalX >= m_xd.size()) existingPhysicalX = m_xd.size() - 1;
+    if (existingPhysicalY >= m_yd.size()) existingPhysicalY = m_yd.size() - 1;
+
     t_real b = m_2dBathymetry[existingPhysicalY][existingPhysicalX];
 
     return b;
@@ -123,7 +129,7 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getDomainLength() const
 tsunami_lab::t_idx tsunami_lab::setups::TsunamiEvent2d::getResolution(tsunami_lab::t_real i_x, tsunami_lab::t_real) const {
     tsunami_lab::t_real center = g_config.domainStartX + (g_config.width / 2.0);
     if (i_x > center) {
-        return 2;
+        return 16;
     }
 
     return 1;

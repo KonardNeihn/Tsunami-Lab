@@ -9,6 +9,8 @@ void initialize(
     t_real& o_hMax
 ) {
 
+    tsunami_lab::patches::WavePropagationAdaptiveGrid2d* solver2 = dynamic_cast<tsunami_lab::patches::WavePropagationAdaptiveGrid2d*>(solver);
+
     // iterating over ny cells
     for (t_idx l_solverCellY = 0; l_solverCellY < g_config.ny; l_solverCellY++) {
         // iterating over nx cells
@@ -20,6 +22,14 @@ void initialize(
             t_real l_b  = setup->getBathymetry(l_solverCellX, l_solverCellY);
 
             o_hMax = std::max(o_hMax, l_h);
+
+            if (solver2) {
+                solver2->setHeight(l_solverCellX, l_solverCellY, l_h, setup);
+                solver2->setMomentumX(l_solverCellX, l_solverCellY, l_hu);
+                solver2->setMomentumY(l_solverCellX, l_solverCellY, l_hv);
+                solver2->setBathymetry(l_solverCellX, l_solverCellY, l_b, setup);
+                continue;
+            }
 
             solver->setHeight(l_solverCellX, l_solverCellY, l_h);
             solver->setMomentumX(l_solverCellX, l_solverCellY, l_hu);
