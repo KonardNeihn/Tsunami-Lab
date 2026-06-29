@@ -18,7 +18,7 @@ OutputManager::OutputManager(Config& config,
                 g_solver->getStride(),                          
                 g_solver->getBathymetry(), 
                 g_config.k,                  // currently disabled  
-                g_config.isCheckpoint             
+                g_config.isCheckpoint
   )   
 {}
 
