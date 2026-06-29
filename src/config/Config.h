@@ -30,6 +30,9 @@ struct Config {
   // selected setup
   std::string setup = "DamBreak1d";
 
+  // maximale auflösung einer einzelnen zelle
+  tsunami_lab::t_idx maximalCellResolution;
+
   // possible insanity
   bool insanity = false;
 
