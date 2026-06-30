@@ -24,7 +24,6 @@ void initializeAdaptiveGrid(
 );
 void determineGridResolution(
     t_real i_hMax,
-    t_idx i_resMax,
     setups::Setup* setup,
     const Config& g_config,
     std::vector<std::vector<t_idx>>& o_gridResolution);

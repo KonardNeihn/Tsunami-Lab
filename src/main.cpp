@@ -28,7 +28,7 @@
 
 int main( int   i_argc,
           char *i_argv[] ) {
-  std::vector<std::vector<tsunami_lab::t_idx>> l_gridResolution;
+  std::vector<std::vector<tsunami_lab::t_idx>> l_neededGridResolution;
   tsunami_lab::patches::WavePropagation *l_waveProp;
 
   std::cout << "####################################" << std::endl;
@@ -39,6 +39,7 @@ int main( int   i_argc,
 
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
+  g_config.maximalCellResolution = 9;
 
   // delete incomplete checkpoints
   if (std::filesystem::exists("solutions"))
@@ -159,7 +160,7 @@ int main( int   i_argc,
     );
 }
 
-  tsunami_lab::determineGridResolution(l_hMax, 9, setup, g_config, l_gridResolution);
+  tsunami_lab::determineGridResolution(l_hMax, setup, g_config, l_neededGridResolution);
 
   // derive maximum wave speed in setup; the momentum is ignored
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
