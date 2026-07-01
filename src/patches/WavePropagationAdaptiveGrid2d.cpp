@@ -112,8 +112,15 @@ void WavePropagationAdaptiveGrid2d::interpolateBoundaries(t_idx i_refinement) {
                     // or your setters accept negative/overflow boundary indices.
                     fineGrid->setBathymetry(fX, fY, b_coarse);
                     fineGrid->setHeight(fX, fY, std::max<t_real>(eta_coarse - b_coarse, 0.0));
-                    fineGrid->setMomentumX(fX, fY, hu_coarse);
-                    fineGrid->setMomentumY(fX, fY, hv_coarse);
+
+                    t_real newHFine = std::max<t_real>(eta_coarse - b_coarse, 0.0);
+                    if (newHFine <= 1e-7) {
+                        fineGrid->setMomentumX(fX, fY, 0.0);
+                        fineGrid->setMomentumY(fX, fY, 0.0);
+                    } else {
+                        fineGrid->setMomentumX(fX, fY, hu_coarse);
+                        fineGrid->setMomentumY(fX, fY, hv_coarse);
+                    }
                 }
             }
         }
@@ -169,8 +176,14 @@ void WavePropagationAdaptiveGrid2d::restrictBoundary(t_idx i_refinement) {
         
         // Werte zurück auf das grobe Gitter schreiben
         m_coarseGrid->setHeight(coarseX, coarseY, newHCoarse);
-        m_coarseGrid->setMomentumX(coarseX, coarseY, avgHU * factor);
-        m_coarseGrid->setMomentumY(coarseX, coarseY, avgHV * factor);
+
+        if (newHCoarse <= 1e-7) {
+            m_coarseGrid->setMomentumX(coarseX, coarseY, 0.0);
+            m_coarseGrid->setMomentumY(coarseX, coarseY, 0.0);
+        } else {
+            m_coarseGrid->setMomentumX(coarseX, coarseY, avgHU * factor);
+            m_coarseGrid->setMomentumY(coarseX, coarseY, avgHV * factor);
+        }
     }
 }
 
