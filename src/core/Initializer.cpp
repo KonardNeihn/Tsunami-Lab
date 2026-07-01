@@ -1,4 +1,6 @@
 #include "Initializer.h"
+#include <cmath>      // std::round
+#include <algorithm>  // std::clamp
 
 namespace tsunami_lab {
 
@@ -41,11 +43,18 @@ void initialize(
 
 // Funktion, um die Gitterauflösung basierend auf Wassertiefe zu bestimmen
 void determineGridResolution(
-    t_real i_hMax,  // die maximale wassertiefe
     setups::Setup* setup,
     const Config& g_config,
     std::vector<std::vector<t_idx>>& o_gridResolution  // Ausgabe: gewünschte vergrößerung pro Zelle
     ) {
+    t_real l_hMax = 0;
+    //get l_hMax
+    for (t_idx l_solverCellY = 0; l_solverCellY < g_config.ny; l_solverCellY++) {
+        for (t_idx l_solverCellX = 0; l_solverCellX < g_config.nx; l_solverCellX++) {
+            t_real l_h  = setup->getHeight(l_solverCellX, l_solverCellY);
+            l_hMax = std::max(l_hMax, l_h);
+        }
+    }
 
     o_gridResolution.resize(g_config.ny, std::vector<t_idx>(g_config.nx, 0)); // Initialisierung
 
@@ -53,10 +62,22 @@ void determineGridResolution(
     for (t_idx l_solverCellY = 0; l_solverCellY < g_config.ny; l_solverCellY++) {
         // iterating over nx cells
         for (t_idx l_solverCellX = 0; l_solverCellX < g_config.nx; l_solverCellX++) {
+
             t_real l_h  = setup->getHeight(l_solverCellX, l_solverCellY);
             t_idx resolution;
-            resolution = g_config.maximalCellResolution - ((l_h - 1) * ((g_config.maximalCellResolution - 1) / i_hMax)); // absolute crazy rechnung. stimmt aber
+            resolution = g_config.maximalCellResolution - ((l_h - 1) * ((g_config.maximalCellResolution - 1) / l_hMax)); // absolute crazy rechnung. stimmt aber
             
+            double alpha = l_h / l_hMax;
+
+            t_idx level = std::clamp(
+                static_cast<t_idx>(std::round(alpha * g_config.maximalCellResolution)),
+                t_idx(0),
+                g_config.maximalCellResolution
+            );
+
+            // so there are just 2^x values
+            resolution = 1 << level;
+
             // on land
             if (l_h == 0) resolution = 1;
 

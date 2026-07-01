@@ -14,6 +14,7 @@
 #include <map>
 #include <set>
 #include <array>
+#include <vector>
 
 namespace tsunami_lab {
   namespace patches {
@@ -142,6 +143,15 @@ namespace tsunami_lab {
        * Gets refinement factor for a coarse cell
        **/
       t_idx getRefinement(t_idx i_ix, t_idx i_iy) const;
+
+      void exportUniformGrid(
+          t_idx i_maxResolution,
+          std::vector<t_real>& o_b,
+          std::vector<t_real>& o_h,
+          std::vector<t_real>& o_hu,
+          std::vector<t_real>& o_hv
+      ) const;
+
     };
   }
 }

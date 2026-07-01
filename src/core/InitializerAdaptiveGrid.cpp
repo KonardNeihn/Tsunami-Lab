@@ -8,7 +8,8 @@ void tsunami_lab::initializeAdaptiveGrid(
     patches::WavePropagation* solver,
     setups::Setup* setup,
     const Config& g_config,
-    [[maybe_unused]] t_real& o_hMax) {
+    [[maybe_unused]] t_real& o_hMax,
+    std::vector<std::vector<t_idx>>& i_gridResolution) {
   
   // Query setup for resolution at each cell
   std::map<std::pair<t_idx, t_idx>, t_idx> refinementMap;
@@ -17,11 +18,11 @@ void tsunami_lab::initializeAdaptiveGrid(
     for (t_idx ix = 0; ix < g_config.nx; ix++) {
       // Convert grid index to physical coordinates
       // Assuming domain starts at (0, 0)
-      t_real x = ix * g_config.dxy;
-      t_real y = iy * g_config.dxy;
+      //t_real x = ix * g_config.dxy;
+      //t_real y = iy * g_config.dxy;
       
       // Query setup for resolution at this location
-      t_idx resolution = setup->getResolution(x, y);
+      t_idx resolution = i_gridResolution[iy][ix];
       refinementMap[{ix, iy}] = resolution;
     }
   }

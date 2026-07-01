@@ -19,22 +19,30 @@ WavePropagationAdaptiveGrid2d::~WavePropagationAdaptiveGrid2d() {
 
 void WavePropagationAdaptiveGrid2d::setRefinementMap(const std::map<std::pair<t_idx, t_idx>, t_idx>& i_refinementMap) {
     m_refinementMap = i_refinementMap;
+
+    // Berechne die Bounds für jedes Level > 1
     std::map<t_idx, std::array<t_idx, 4>> levelBounds;
     for (auto& [pos, level] : m_refinementMap) {
-        if (level == 1) continue;
+        if (level == 1) continue;  // Level 1 = kein feines Gitter
         auto [ix, iy] = pos;
-        if (levelBounds.find(level) == levelBounds.end()) levelBounds[level] = {ix, iy, ix, iy};
-        else {
+
+        // Aktualisiere die Bounds für dieses Level
+        if (levelBounds.find(level) == levelBounds.end()) {
+            levelBounds[level] = {ix, iy, ix, iy};  // {min_x, min_y, max_x, max_y}
+        } else {
             auto& bounds = levelBounds[level];
-            bounds[0] = std::min(bounds[0], ix);
-            bounds[1] = std::min(bounds[1], iy);
-            bounds[2] = std::max(bounds[2], ix);
-            bounds[3] = std::max(bounds[3], iy);
+            bounds[0] = std::min(bounds[0], ix);  // min_x
+            bounds[1] = std::min(bounds[1], iy);  // min_y
+            bounds[2] = std::max(bounds[2], ix);  // max_x
+            bounds[3] = std::max(bounds[3], iy);  // max_y
         }
     }
+    // Erstelle die feinen Gitter für jedes Level > 1
     for (auto& [level, bounds] : levelBounds) {
+        // Berechne die Größe des feinen Gitters:
         t_idx fineNx = (bounds[2] - bounds[0] + 1) * level;
         t_idx fineNy = (bounds[3] - bounds[1] + 1) * level;
+
         m_fineGrids[level] = new WavePropagation2d(fineNx, fineNy);
         m_refinedBounds[level] = bounds;
     }
@@ -297,5 +305,114 @@ void WavePropagationAdaptiveGrid2d::setBathymetry(t_idx i_ix, t_idx i_iy, t_real
     } else m_coarseGrid->setBathymetry(i_ix, i_iy, i_b);
 }
 
-  }
+void tsunami_lab::patches::WavePropagationAdaptiveGrid2d::exportUniformGrid(
+        t_idx i_maxResolution,
+    std::vector<t_real>& o_b,
+    std::vector<t_real>& o_h,
+    std::vector<t_real>& o_hu,
+    std::vector<t_real>& o_hv
+) const {
+
+    t_idx nxOut = m_nCellsX * i_maxResolution;
+    t_idx nyOut = m_nCellsY * i_maxResolution;
+
+    o_b .assign(nxOut * nyOut, 0);
+    o_h .assign(nxOut * nyOut, 0);
+    o_hu.assign(nxOut * nyOut, 0);
+    o_hv.assign(nxOut * nyOut, 0);
+
+    //------------------------------------------------------------
+    // 1. komplettes coarse grid aufblasen
+    //------------------------------------------------------------
+
+    auto const* b  = m_coarseGrid->getBathymetry();
+    auto const* h  = m_coarseGrid->getHeight();
+    auto const* hu = m_coarseGrid->getMomentumX();
+    auto const* hv = m_coarseGrid->getMomentumY();
+
+    t_idx coarseStride = m_coarseGrid->getStride();
+
+    for (t_idx cy = 0; cy < m_nCellsY; ++cy) {
+        for (t_idx cx = 0; cx < m_nCellsX; ++cx) {
+
+            t_idx idx = cy * coarseStride + cx;
+
+            for (t_idx fy = 0; fy < i_maxResolution; ++fy) {
+                for (t_idx fx = 0; fx < i_maxResolution; ++fx) {
+
+                    t_idx ox = cx * i_maxResolution + fx;
+                    t_idx oy = cy * i_maxResolution + fy;
+
+                    t_idx out = oy * nxOut + ox;
+
+                    o_b[out]  = b[idx];
+                    o_h[out]  = h[idx];
+                    o_hu[out] = hu[idx];
+                    o_hv[out] = hv[idx];
+                }
+            }
+        }
+    }
+
+    //------------------------------------------------------------
+    // 2. echte feine Daten überschreiben
+    //------------------------------------------------------------
+
+    for (auto const& [level, fineGrid] : m_fineGrids) {
+
+        auto bounds = m_refinedBounds.at(level);
+
+        auto const* fb  = fineGrid->getBathymetry();
+        auto const* fh  = fineGrid->getHeight();
+        auto const* fhu = fineGrid->getMomentumX();
+        auto const* fhv = fineGrid->getMomentumY();
+
+        t_idx fineStride = fineGrid->getStride();
+
+        t_idx block = i_maxResolution / level;
+
+        for (t_idx cy = bounds[1]; cy <= bounds[3]; ++cy) {
+            for (t_idx cx = bounds[0]; cx <= bounds[2]; ++cx) {
+                if (getRefinement(cx, cy) != level)
+                    continue;
+
+                t_idx fineX0, fineY0;
+                coarseToFineIndices(cx, cy, level, fineX0, fineY0);
+
+                for (t_idx fy = 0; fy < level; ++fy) {
+                    for (t_idx fx = 0; fx < level; ++fx) {
+
+                        t_idx fineIdx =
+                            (fineY0 + fy) * fineStride +
+                            (fineX0 + fx);
+
+                        t_idx ox =
+                            cx * i_maxResolution +
+                            fx * block;
+
+                        t_idx oy =
+                            cy * i_maxResolution +
+                            fy * block;
+
+                        for (t_idx by = 0; by < block; ++by) {
+                            for (t_idx bx = 0; bx < block; ++bx) {
+
+                                t_idx out =
+                                    (oy + by) * nxOut +
+                                    (ox + bx);
+
+                                o_b[out]  = fb[fineIdx];
+                                o_h[out]  = fh[fineIdx];
+                                o_hu[out] = fhu[fineIdx];
+                                o_hv[out] = fhv[fineIdx];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+}
 }

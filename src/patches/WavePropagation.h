@@ -121,6 +121,6 @@ class tsunami_lab::patches::WavePropagation {
                                 t_idx  i_iy,
                                 t_real i_b,
                                 [[maybe_unused]] setups::Setup* i_setup = nullptr)  = 0;
-};
+    };
 
 #endif

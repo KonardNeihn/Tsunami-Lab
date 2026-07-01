@@ -20,10 +20,10 @@ void initializeAdaptiveGrid(
     patches::WavePropagation* solver,
     setups::Setup* setup,
     const Config& g_config,
-    t_real& o_hMax
+    t_real& o_hMax,
+    std::vector<std::vector<t_idx>>& i_gridResolution
 );
 void determineGridResolution(
-    t_real i_hMax,
     setups::Setup* setup,
     const Config& g_config,
     std::vector<std::vector<t_idx>>& o_gridResolution);

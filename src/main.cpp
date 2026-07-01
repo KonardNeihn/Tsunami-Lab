@@ -39,7 +39,7 @@ int main( int   i_argc,
 
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
-  g_config.maximalCellResolution = 9;
+  g_config.maximalCellResolution = 2; // 2^(x-1) also 1 ist normal, 2 ist 2, 3 ist 4
 
   // delete incomplete checkpoints
   if (std::filesystem::exists("solutions"))
@@ -130,37 +130,39 @@ int main( int   i_argc,
   // maximum observed height during setup
   tsunami_lab::t_real l_hMax = 0;
 
- // construct solver
- if( g_config.is_2d ) {
+  // construct solver
+  if( g_config.is_2d ) {
     l_waveProp =
       new tsunami_lab::patches::WavePropagationAdaptiveGrid2d(
           g_config.nx,
           g_config.ny
       );
+      
+    // determine grid reolution
+    tsunami_lab::determineGridResolution(setup, g_config, l_neededGridResolution);
 
     tsunami_lab::initializeAdaptiveGrid(
         l_waveProp,
         setup,
         g_config,
-        l_hMax
+        l_hMax,
+        l_neededGridResolution
       );
 
-} else {
-    l_waveProp =
-      new tsunami_lab::patches::WavePropagation1d(
-          g_config.nx,
-          g_config.solver
+  } else {
+      l_waveProp =
+        new tsunami_lab::patches::WavePropagation1d(
+            g_config.nx,
+            g_config.solver
+        );
+
+      tsunami_lab::initialize(
+          l_waveProp,
+          setup,
+          g_config,
+          l_hMax
       );
-
-    tsunami_lab::initialize(
-        l_waveProp,
-        setup,
-        g_config,
-        l_hMax
-    );
-}
-
-  tsunami_lab::determineGridResolution(l_hMax, setup, g_config, l_neededGridResolution);
+  }
 
   // derive maximum wave speed in setup; the momentum is ignored
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
@@ -208,7 +210,7 @@ int main( int   i_argc,
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {
-    if( l_timeStep % 25 == 0 ) {    
+    if( l_timeStep % 1 == 0 ) {    
       std::cout << "  simulation time: " << l_simTime << "/" << g_config.endTime << " time steps: " << l_timeStep << std::endl;
       std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
