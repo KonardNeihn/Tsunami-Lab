@@ -56,6 +56,9 @@ void determineGridResolution(
             t_real l_h  = setup->getHeight(l_solverCellX, l_solverCellY);
             t_idx resolution;
             resolution = g_config.maximalCellResolution - ((l_h - 1) * ((g_config.maximalCellResolution - 1) / i_hMax)); // absolute crazy rechnung. stimmt aber
+            
+            // on land
+            if (l_h == 0) resolution = 1;
 
             o_gridResolution[l_solverCellY][l_solverCellX] = resolution;
             std::cout << resolution;
