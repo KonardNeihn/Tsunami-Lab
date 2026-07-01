@@ -102,6 +102,7 @@ void WavePropagationAdaptiveGrid2d::interpolateBoundaries(t_idx i_refinement) {
                     // Direct pointer write to fine grid ghost cells, bypassing standard setters
                     // assuming your WavePropagation2d exposes a way to write to ghost cells,
                     // or your setters accept negative/overflow boundary indices.
+                    fineGrid->setBathymetry(fX, fY, b_coarse);
                     fineGrid->setHeight(fX, fY, std::max<t_real>(eta_coarse - b_coarse, 0.0));
                     fineGrid->setMomentumX(fX, fY, hu_coarse);
                     fineGrid->setMomentumY(fX, fY, hv_coarse);
@@ -112,26 +113,54 @@ void WavePropagationAdaptiveGrid2d::interpolateBoundaries(t_idx i_refinement) {
 }
 
 void WavePropagationAdaptiveGrid2d::restrictBoundary(t_idx i_refinement) {
-    t_real const* fineH = m_fineGrids[i_refinement]->getHeight();
+    // Feine Datenpointer laden
+    t_real const* fineH  = m_fineGrids[i_refinement]->getHeight();
+    t_real const* fineB  = m_fineGrids[i_refinement]->getBathymetry(); // NEU: Feine Bathymetrie
     t_real const* fineHU = m_fineGrids[i_refinement]->getMomentumX();
     t_real const* fineHV = m_fineGrids[i_refinement]->getMomentumY();
-    t_idx fineStride = m_fineGrids[i_refinement]->getStride();
+    t_idx fineStride     = m_fineGrids[i_refinement]->getStride();
+
+    // Grobe Datenpointer für die korrekte Verrechnung der lokalen Bathymetrie laden
+    t_real const* coarseB = m_coarseGrid->getBathymetry();             // NEU: Grobe Bathymetrie
+    t_idx coarseStride    = m_coarseGrid->getStride();                 // NEU: Grober Stride für Indexierung
+
     for (auto& [coarsePos, level] : m_refinementMap) {
         if (level != i_refinement) continue;
         auto [coarseX, coarseY] = coarsePos;
+        
         t_idx fineX0, fineY0;
         coarseToFineIndices(coarseX, coarseY, i_refinement, fineX0, fineY0);
-        t_real avgH = 0, avgHU = 0, avgHV = 0;
+        
+        t_real avgEta = 0; // WICHTIG: Wir summieren hier eta = h + b auf, nicht h!
+        t_real avgHU  = 0;
+        t_real avgHV  = 0;
+        
+        // Schleife über alle feinen Zellen, die zu dieser einen groben Zelle gehören
         for (t_idx fi = 0; fi < i_refinement; fi++) {
             for (t_idx fj = 0; fj < i_refinement; fj++) {
                 t_idx fineIdx = (fineY0 + fj) * fineStride + (fineX0 + fi);
-                avgH += fineH[fineIdx];
-                avgHU += fineHU[fineIdx];
-                avgHV += fineHV[fineIdx];
+                
+                avgEta += (fineH[fineIdx] + fineB[fineIdx]); // η_fine = h_fine + b_fine
+                avgHU  += fineHU[fineIdx];
+                avgHV  += fineHV[fineIdx];
             }
         }
+        
         t_real factor = 1.0 / (static_cast<t_real>(i_refinement) * i_refinement);
-        m_coarseGrid->setHeight(coarseX, coarseY, avgH * factor);
+        
+        // 1. Berechne die gemittelte absolute Wasseroberfläche (eta)
+        t_real newEtaCoarse = avgEta * factor;
+        
+        // 2. Hole die exakte Bathymetrie der aktuellen Grobgitterzelle
+        t_idx coarseIdx = coarseY * coarseStride + coarseX;
+        t_real b_coarse = coarseB[coarseIdx];
+        
+        // 3. Berechne die neue grobe Wasserhöhe: h_coarse = eta_coarse - b_coarse
+        // std::max schützt davor, dass h durch Rundungsfehler oder an steilen Küsten negativ wird
+        t_real newHCoarse = std::max<t_real>(newEtaCoarse - b_coarse, 0.0);
+        
+        // Werte zurück auf das grobe Gitter schreiben
+        m_coarseGrid->setHeight(coarseX, coarseY, newHCoarse);
         m_coarseGrid->setMomentumX(coarseX, coarseY, avgHU * factor);
         m_coarseGrid->setMomentumY(coarseX, coarseY, avgHV * factor);
     }
