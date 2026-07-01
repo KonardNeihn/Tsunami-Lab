@@ -5,21 +5,23 @@
 
 namespace tsunami_lab {
 
-OutputManager::OutputManager(Config& config,
-                             patches::WavePropagation* solver)
+OutputManager::OutputManager(   Config& config,
+                                patches::WavePropagation* solver,
+                                const std::vector<std::vector<tsunami_lab::t_idx>>& gridResolutionLevels)
 : g_config(config),
   g_solver(solver),
   m_ncPath("solutions/netcdf_output.nc"),
   m_checkpoint(config),
   m_ncWriter( m_ncPath,                                         
-                g_config.nx,                                             
-                g_config.is_2d ? g_config.ny : 1,          // pass 1 for 1D runs
+                g_config.nx,
+                g_config.ny,                                             
                 g_config.dxy,                                            
                 g_solver->getStride(),                          
                 g_solver->getBathymetry(), 
-                g_config.k,                  // currently disabled  
+                gridResolutionLevels,
                 g_config.isCheckpoint
-  )   
+  ),
+   m_gridResolutionLevels(gridResolutionLevels) 
 {}
 
 void OutputManager::writeStep(t_real simTime)

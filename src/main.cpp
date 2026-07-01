@@ -194,7 +194,7 @@ int main( int   i_argc,
     }
   }
 
-  tsunami_lab::OutputManager output(g_config, l_waveProp);
+  tsunami_lab::OutputManager output(g_config, l_waveProp, l_neededGridResolution);
 
   if (g_config.setup != "Checkpoint2d") {
     output.deleteCheckpoints();

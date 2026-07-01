@@ -36,7 +36,8 @@ l_sources = [ 'solvers/Roe.cpp',
               'factory/SetupFactory.cpp',
               'core/Initializer.cpp',
               'core/InitializerAdaptiveGrid.cpp',
-              'io/OutputManager.cpp']
+              'io/OutputManager.cpp',
+              'io/NetCdfAdaptiveGrid.cpp']
 
 sources = [env.Object(s) for s in l_sources]
 
