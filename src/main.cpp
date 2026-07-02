@@ -39,7 +39,7 @@ int main( int   i_argc,
 
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
-  g_config.maximalCellResolution = 2; // 2^(x-1) also 1 ist normal, 2 ist 2, 3 ist 4
+  g_config.maximalCellResolution = 3; // 2^(x-1) also 1 ist normal, 2 ist 2, 3 ist 4
 
   // delete incomplete checkpoints
   if (std::filesystem::exists("solutions"))
