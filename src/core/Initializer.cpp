@@ -72,7 +72,7 @@ void determineGridResolution(
             // just to be sure its in the right range
             level = std::clamp(
                 static_cast<t_idx>(level),
-                t_idx(0),
+                t_idx(1),
                 g_config.maximalCellResolution
             );
 
