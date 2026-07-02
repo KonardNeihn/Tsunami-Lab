@@ -39,7 +39,7 @@ int main( int   i_argc,
 
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
-  g_config.maximalCellResolution = 3; // 2^(x-1) also 1 ist normal, 2 ist 2, 3 ist 4
+  g_config.maximalCellResolution = 3; // 2^(x-1) also 1 ist normal, 2 ist 2, 3 ist 4, 4 is 8, 5 is 16
 
   // delete incomplete checkpoints
   if (std::filesystem::exists("solutions"))
@@ -184,6 +184,7 @@ int main( int   i_argc,
   std::string stationsXmlPath = "src/io/stations.xml";
   tsunami_lab::io::loadXmlConfig(stationsXmlPath, stationConfigs, outputConfig);
   std::vector<tsunami_lab::io::Station> stations;
+
   if(g_config.is_2d) {
     for (const auto& stationConfig : stationConfigs) {
       // construct Object directly into vector
@@ -219,8 +220,7 @@ int main( int   i_argc,
       //if (g_config.is_2d) {       // checkpoints commented out for testing
       //  output.writeCheckpoint(l_simTime);
       //}
-    }                                                                   
-
+    }
     // New setup for ghost-cells with false defaults in the setup.h
     l_waveProp->setGhostCells(
       setup->isLeftBoundaryReflecting(),

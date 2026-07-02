@@ -65,7 +65,7 @@ m_isCheckpoint(i_isCheckpoint)
             strlen(conv),
             conv),
         "Conventions");
-
+    
     //----------------------------------------------------------
     // dimensions
     //----------------------------------------------------------
@@ -294,6 +294,14 @@ m_isCheckpoint(i_isCheckpoint)
                             "time y x"),
             "hv coords");
     }
+
+    std::cout << "nx=" << m_nxOut << " ny=" << m_nyOut << std::endl;
+    std::cout
+    << "expected b = "
+    << (size_t)m_nxOut * m_nyOut
+    << "\nactual b = "
+    << i_b.size()
+    << std::endl;
 
     //----------------------------------------------------------
     // leave define mode

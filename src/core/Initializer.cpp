@@ -1,6 +1,7 @@
 #include "Initializer.h"
 #include <cmath>      // std::round
 #include <algorithm>  // std::clamp
+#include <iomanip>  // std::fixed und setprecision
 
 namespace tsunami_lab {
 
@@ -67,7 +68,8 @@ void determineGridResolution(
 
             //t_idx level = g_config.maximalCellResolution - ((l_h - 1) * ((g_config.maximalCellResolution - 1) / l_hMax)); // absolute crazy rechnung. stimmt aber
 
-            t_idx level = g_config.maximalCellResolution - ((l_h) * ((g_config.maximalCellResolution) / l_hMax)); // absolute crazy rechnung. stimmt aber
+            t_idx level = g_config.maximalCellResolution - ((l_h) * ((g_config.maximalCellResolution) / l_hMax)) + 0.1; // absolute crazy rechnung. stimmt aber
+            //t_real level2 = g_config.maximalCellResolution - ((l_h) * ((g_config.maximalCellResolution) / l_hMax)) + 0.5; // absolute crazy rechnung. stimmt aber
 
             // just to be sure its in the right range
             level = std::clamp(
@@ -77,13 +79,13 @@ void determineGridResolution(
             );
 
             // so there are just 2^x values
-            t_idx resolution = 1 << level;
+            t_idx resolution = 1 << (level - 1);
 
             // on land
             //if (l_h == 0) resolution = 1;
 
             o_gridResolution[l_solverCellY][l_solverCellX] = resolution;
-            std::cout << level;
+            std::cout << std::fixed << std::setprecision(2) << resolution << "";
         }
         std::cout << std::endl;
     }
