@@ -64,22 +64,23 @@ void determineGridResolution(
         for (t_idx l_solverCellX = 0; l_solverCellX < g_config.nx; l_solverCellX++) {
 
             t_real l_h  = setup->getHeight(l_solverCellX, l_solverCellY);
-            t_idx resolution;
-            resolution = g_config.maximalCellResolution - ((l_h - 1) * ((g_config.maximalCellResolution - 1) / l_hMax)); // absolute crazy rechnung. stimmt aber
-            
-            double alpha = l_h / l_hMax;
 
-            t_idx level = std::clamp(
-                static_cast<t_idx>(std::round(alpha * g_config.maximalCellResolution)),
+            //t_idx level = g_config.maximalCellResolution - ((l_h - 1) * ((g_config.maximalCellResolution - 1) / l_hMax)); // absolute crazy rechnung. stimmt aber
+
+            t_idx level = g_config.maximalCellResolution - ((l_h) * ((g_config.maximalCellResolution) / l_hMax)); // absolute crazy rechnung. stimmt aber
+
+            // just to be sure its in the right range
+            level = std::clamp(
+                static_cast<t_idx>(level),
                 t_idx(0),
                 g_config.maximalCellResolution
             );
 
             // so there are just 2^x values
-            resolution = 1 << level;
+            t_idx resolution = 1 << level;
 
             // on land
-            if (l_h == 0) resolution = 1;
+            //if (l_h == 0) resolution = 1;
 
             o_gridResolution[l_solverCellY][l_solverCellX] = resolution;
             std::cout << resolution;

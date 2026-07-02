@@ -210,7 +210,7 @@ int main( int   i_argc,
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {
-    if( l_timeStep % 1 == 0 ) {    
+    if( l_timeStep % 25 == 0 ) {    
       std::cout << "  simulation time: " << l_simTime << "/" << g_config.endTime << " time steps: " << l_timeStep << std::endl;
       std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
@@ -231,7 +231,7 @@ int main( int   i_argc,
 
     // start seperate timer for only the solver
     auto l_solverStart = std::chrono::high_resolution_clock::now();
-    
+
     l_waveProp->timeStep(l_scaling);
     
     auto l_solverEnd = std::chrono::high_resolution_clock::now();
