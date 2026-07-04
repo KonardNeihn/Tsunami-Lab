@@ -48,7 +48,7 @@ m_isCheckpoint(i_isCheckpoint)
     checkNcErr(
         nc_create(
             i_path.c_str(),
-            NC_CLOBBER,
+            NC_NETCDF4 | NC_CLOBBER,
             &m_ncId),
         "nc_create");
 

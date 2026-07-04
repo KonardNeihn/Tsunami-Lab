@@ -85,9 +85,9 @@ void determineGridResolution(
             //if (l_h == 0) resolution = 1;
 
             o_gridResolution[l_solverCellY][l_solverCellX] = resolution;
-            std::cout << std::fixed << std::setprecision(2) << resolution << "";
+            //std::cout << std::fixed << std::setprecision(2) << resolution << "";
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 }
 
