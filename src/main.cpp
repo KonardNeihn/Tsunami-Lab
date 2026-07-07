@@ -28,8 +28,9 @@
 
 int main( int   i_argc,
           char *i_argv[] ) {
+  // Grid resolution structure required ONLY for adaptive grids 
   std::vector<std::vector<tsunami_lab::t_idx>> l_neededGridResolution;
-  tsunami_lab::patches::WavePropagation *l_waveProp;
+  tsunami_lab::patches::WavePropagation *l_waveProp = nullptr;
 
   std::cout << "####################################" << std::endl;
   std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -39,6 +40,10 @@ int main( int   i_argc,
 
   // Handling input options
   Config g_config = parseArgs(i_argc, i_argv);
+  
+  // Example: Defaulting or forcing based on setup if not parsed dynamically
+  // g_config.use_adaptive_grid = true/false;
+  
   g_config.maximalCellResolution = 3; // 2^(x-1) also 1 ist normal, 2 ist 2, 3 ist 4, 4 is 8, 5 is 16
 
   // delete incomplete checkpoints
@@ -91,6 +96,7 @@ int main( int   i_argc,
   // notify user about selectet configuration
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  selected setup:                        " << g_config.setup << std::endl;
+  std::cout << "  grid type:                             " << (g_config.is_2d ? (g_config.use_adaptive_grid ? "Adaptive Mesh" : "Static Grid") : "1D Grid") << std::endl;
   std::cout << "  number of solver cells in x-direction: " << g_config.nx << std::endl;
   std::cout << "  number of solver cells in y-direction: " << g_config.ny << std::endl;
   std::cout << "  cell size in meters:                   " << g_config.dxy << std::endl;
@@ -130,39 +136,41 @@ int main( int   i_argc,
   // maximum observed height during setup
   tsunami_lab::t_real l_hMax = 0;
 
-  // construct solver
+// construct solver
   if( g_config.is_2d ) {
-    l_waveProp =
-      new tsunami_lab::patches::WavePropagationAdaptiveGrid2d(
-          g_config.nx,
-          g_config.ny
-      );
+    if ( g_config.use_adaptive_grid ) {
+      // Adaptive Mesh Initialization
+      l_waveProp = new tsunami_lab::patches::WavePropagationAdaptiveGrid2d(g_config.nx, g_config.ny);
       
-    // determine grid reolution
-    tsunami_lab::determineGridResolution(setup, g_config, l_neededGridResolution);
-
-    tsunami_lab::initializeAdaptiveGrid(
-        l_waveProp,
-        setup,
-        g_config,
-        l_hMax,
-        l_neededGridResolution
-      );
-
-  } else {
-      l_waveProp =
-        new tsunami_lab::patches::WavePropagation1d(
-            g_config.nx,
-            g_config.solver
-        );
-
-      tsunami_lab::initialize(
-          l_waveProp,
-          setup,
-          g_config,
-          l_hMax
-      );
+      tsunami_lab::determineGridResolution(setup, g_config, l_neededGridResolution);
+      tsunami_lab::initializeAdaptiveGrid(l_waveProp, setup, g_config, l_hMax, l_neededGridResolution);
+    } 
+    else {
+      // Standard Mesh Initialization
+      l_waveProp = new tsunami_lab::patches::WavePropagation2d(g_config.nx, g_config.ny);
+      
+      tsunami_lab::initialize(l_waveProp, setup, g_config, l_hMax);
+    }
+  } 
+  else {
+      // 1D Stanard Initialization
+      l_waveProp = new tsunami_lab::patches::WavePropagation1d(g_config.nx, g_config.solver);
+      
+      tsunami_lab::initialize(l_waveProp, setup, g_config, l_hMax);
   }
+
+  // Extract the total real cells manually
+  tsunami_lab::t_real l_totalRealCells = 0;
+  if (g_config.is_2d && g_config.use_adaptive_grid) {
+    for (const auto& row : l_neededGridResolution) {              // for each cell -row in the simulation
+        for (tsunami_lab::t_idx res : row) {                                   // step through each cell in a row
+            l_totalRealCells += (static_cast<size_t>(res) * res); // ADD the 2D subdivision (res * res)
+        }
+    }
+  } else {
+    l_totalRealCells = l_cellAmount; // Static 2D or 1D fallback
+  }
+  std::cout << "Total simulation cells: " << l_totalRealCells << std::endl;
 
   // derive maximum wave speed in setup; the momentum is ignored
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
@@ -264,8 +272,10 @@ int main( int   i_argc,
   if (l_loopTotalDuration.count() > 0) {
       std::cout << "Percentage of Solver-time for comparison: " 
                 << (l_solverTotalDuration / l_loopTotalDuration.count()) * 100.0 << " %" << std::endl;
-      std::cout << "Average time per cell in nanoseconds: " 
+      std::cout << "Average time per original cell in nanoseconds: " 
                 << (l_solverTotalDuration / l_cellAmount ) * 1000000000 << " ns" << std::endl;
+      std::cout << "Average time per adaptive (finer) cell in nanoseconds: " 
+                << (l_solverTotalDuration / l_totalRealCells ) * 1000000000 << " ns" << std::endl;
   }
 
   // free memory

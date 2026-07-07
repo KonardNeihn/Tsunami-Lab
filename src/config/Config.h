@@ -47,6 +47,9 @@ struct Config {
 
   // latest checkpoint
   tsunami_lab::t_idx latestCheckpoint = 0;
+
+  // Toggle between Adaptive Mesh Refinement (AMR) and a normal static grid
+  bool use_adaptive_grid = true;
 };
 
 Config parseArgs(int argc, char** argv);

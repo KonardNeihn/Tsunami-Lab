@@ -8,6 +8,7 @@ Config parseArgs(int argc, char** argv) {
     CLI::App app{"Tsunami Lab"};
 
     std::vector<int> dims;
+    std::string gridType = "adaptive"; // initialize gridType here
 
     app.add_option("-n,--ncells", dims, "Set number of cells. Defaults: x = 100, (y=1). 1d and 2d is possible.")
         ->expected(1, 2);
@@ -21,8 +22,18 @@ Config parseArgs(int argc, char** argv) {
         HydraulicJump1d, TsunamiEvent1d, CircularDamBreak2d, DamBreak2d, ArtificialTsunami2d, \
         TsunamiEvent2d, ChileEvent2d, TohokuEvent2d, Checkpoint2d}. Default is DamBreak1d");
     app.add_option("-k,--coarse", c.k, "Set coarseness for the NetCdf-writer. The default is 1.");
+    // gridtype option
+    app.add_option("-g,--gridtype", gridType, "Select grid type {adaptive, static}. Default is adaptive.")
+        ->check(CLI::IsMember({"adaptive", "static"}));
 
     app.parse(argc, argv);
+
+    // Evaluate the grid selection
+    if (gridType == "static") {
+        c.use_adaptive_grid = false;
+    } else {
+        c.use_adaptive_grid = true;
+    }
 
     if(!dims.empty())
         c.nx = dims[0];
