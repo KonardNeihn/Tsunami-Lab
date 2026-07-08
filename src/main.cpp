@@ -273,9 +273,9 @@ int main( int   i_argc,
       std::cout << "Percentage of Solver-time for comparison: " 
                 << (l_solverTotalDuration / l_loopTotalDuration.count()) * 100.0 << " %" << std::endl;
       std::cout << "Average time per original cell in nanoseconds: " 
-                << (l_solverTotalDuration / l_cellAmount ) * 1000000000 << " ns" << std::endl;
+                << (l_solverTotalDuration / (l_cellAmount * l_timeStep) ) * 1000000000 << " ns" << std::endl;
       std::cout << "Average time per adaptive (finer) cell in nanoseconds: " 
-                << (l_solverTotalDuration / l_totalRealCells ) * 1000000000 << " ns" << std::endl;
+                << (l_solverTotalDuration / (l_totalRealCells * l_timeStep) ) * 1000000000 << " ns" << std::endl;
   }
 
   // free memory
