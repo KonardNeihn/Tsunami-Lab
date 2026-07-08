@@ -37,6 +37,12 @@ tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(
 
     g_config.width = getDomainWidth();
     g_config.dxy = getDomainWidth() / g_config.nx;
+
+    if (g_config.use_adaptive_grid) {
+        tsunami_lab::t_idx maxRes = 1 << (g_config.maximalCellResolution - 1);
+        g_config.dxy = g_config.dxy / maxRes;
+    }
+
     g_config.domainStartX = std::min(m_x.front(), dx.front());
     g_config.domainStartY = std::min(m_y.front(), dy.front());
 
