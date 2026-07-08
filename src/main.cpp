@@ -176,7 +176,7 @@ int main( int   i_argc,
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
 
   // derive constant time step; changes at simulation time are ignored
-  tsunami_lab::t_real l_dt = 0.5 * g_config.dxy / l_speedMax;
+  tsunami_lab::t_real l_dt = (0.5 * g_config.dxy / l_speedMax);
 
   // derive scaling for a time step
   tsunami_lab::t_real l_scaling = l_dt / g_config.dxy;
@@ -219,7 +219,7 @@ int main( int   i_argc,
 
   // iterate over time
   while( l_simTime < g_config.endTime ) {
-    if( l_timeStep % 25 == 0 ) {    
+    if( l_timeStep % (25) == 0 ) {    
       std::cout << "  simulation time: " << l_simTime << "/" << g_config.endTime << " time steps: " << l_timeStep << std::endl;
       std::cout << "  writing wave field to " << l_ncPath << std::endl;
 
@@ -254,7 +254,7 @@ int main( int   i_argc,
     }
 
     l_timeStep++;
-    l_simTime += l_dt;
+    l_simTime += (l_dt * static_cast<double>(1.0 / std::pow(2, (g_config.maximalCellResolution-1))));
   }
   //saving one last time
   std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;
