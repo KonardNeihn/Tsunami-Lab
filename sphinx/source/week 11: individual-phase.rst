@@ -40,6 +40,22 @@ Another critical error became visible at the coastlines (the wet/dry boundaries)
 **The Fix:**
 To solve this, we introduced a strict wet/dry safety check. Whenever a cell's water height drops below a very small threshold, its momentum is explicitly forced to ``0.0``. This ensures that dry land remains physically still and prevents the velocity calculations from being incorrect.
 
+The Main Funktion
+^^^^^^^^^^^^^^^^^
+During the development process the main funktion outsourced a lot of code into helper classes and functions.
+
+The instance config/Config g_config exists only once. It holds parameters like amount of cell in x/y direction, size of one cell, selected setup, weather its 2d or 1d etc.. 
+It is created at the beginning by processing all arguments passed by the user. 
+This helps to send configurational parameters to other classes like the setup, output manager or the solver it self.
+
+The the function createSetup from class factory/SetupFactory is processing the input parameters, creating and returning the wanted setup class.
+
+The class core/Initializer holds the funktions initialize which sets up the the solver. 
+And the funktion determineGridresolution determines the needed grid resolution.
+
+The class output manager holds several functions to manage i/o.
+
+
 
 .. toctree::
    :maxdepth: 2
