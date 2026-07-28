@@ -9,6 +9,9 @@
 
 namespace tsunami_lab {
 
+/*
+* initializes the selected setup for a wavepropagation
+*/
 void initialize(
     patches::WavePropagation* solver,
     setups::Setup* setup,
@@ -16,6 +19,9 @@ void initialize(
     t_real& o_hMax
 );
 
+/*
+* helps initialize the wavepropagation with adaptive grids
+*/
 void initializeAdaptiveGrid(
     patches::WavePropagation* solver,
     setups::Setup* setup,
@@ -23,6 +29,10 @@ void initializeAdaptiveGrid(
     t_real& o_hMax,
     std::vector<std::vector<t_idx>>& i_gridResolution
 );
+
+/*
+* Determines a grid with different sized subcells
+*/ 
 void determineGridResolution(
     setups::Setup* setup,
     const Config& g_config,

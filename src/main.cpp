@@ -176,7 +176,7 @@ int main( int   i_argc,
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
 
   // derive constant time step; changes at simulation time are ignored
-  tsunami_lab::t_real l_dt = (0.5 * g_config.dxy / l_speedMax);
+  tsunami_lab::t_real l_dt = (0.25 * g_config.dxy / l_speedMax);
 
   // derive scaling for a time step
   tsunami_lab::t_real l_scaling = l_dt / g_config.dxy;
@@ -254,7 +254,7 @@ int main( int   i_argc,
     }
 
     l_timeStep++;
-    l_simTime += (l_dt * static_cast<double>(1.0 / std::pow(2, (g_config.maximalCellResolution-1))));
+    l_simTime += l_dt;
   }
   //saving one last time
   std::cout << "  simulation time: " << l_simTime << " time steps: " << l_timeStep << std::endl;

@@ -56,12 +56,22 @@ namespace tsunami_lab {
       /**
        * Interpolate coarse boundaries to fine ghost cells
        **/
-      void interpolateBoundaries(t_idx i_refinement);
+      void interpolateBoundaries(t_idx i_refinement, t_real i_theta);
       
       /**
        * Restrict fine interior cells back to coarse grid
        **/
       void restrictBoundary(t_idx i_refinement);
+
+      /**
+       * Snapshots the coarse grid's state (eta, h, hu, hv), incl. ghost ring,
+       * before the coarse time step -- needed for the linear time
+       * interpolation of the fine boundary values during subcycling
+       **/
+      void snapshotCoarse();
+
+      //! Snapshot of the coarse grid's eta/h/hu/hv taken before the coarse time step
+      std::vector<t_real> m_snapEta, m_snapH, m_snapHu, m_snapHv;
 
     public:
       /**
@@ -144,6 +154,16 @@ namespace tsunami_lab {
        **/
       t_idx getRefinement(t_idx i_ix, t_idx i_iy) const;
 
+      /**
+       * Exports the whole domain at a single uniform resolution, filling in
+       * upsampled coarse data first and overwriting it with the true fine
+       * grid data wherever a refined region covers that area
+       * @param i_maxResolution target resolution, in cells per coarse cell
+       * @param o_b   output bathymetry
+       * @param o_h   output water height
+       * @param o_hu  output momentum in x-direction
+       * @param o_hv  output momentum in y-direction
+       **/
       void exportUniformGrid(
           t_idx i_maxResolution,
           std::vector<t_real>& o_b,
@@ -151,6 +171,13 @@ namespace tsunami_lab {
           std::vector<t_real>& o_hu,
           std::vector<t_real>& o_hv
       ) const;
+
+      /**
+       * Syncs each refined coarse cell's bathymetry/height/momentum with the
+       * (wet-averaged) state of its fine subcells; call once after setup,
+       * before the first time step
+       **/
+      void syncCoarseBathymetry();
 
     };
   }

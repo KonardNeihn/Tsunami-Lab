@@ -41,7 +41,7 @@ class tsunami_lab::patches::WavePropagation2d: public WavePropagation {
     t_real * m_b = nullptr;
 
     //! temporary static threshold for dry-state purposes
-    static constexpr t_real m_dryThreshold = 1e-4;
+    static constexpr t_real m_dryThreshold = 0.01;
 
     /**
      * Computes the flat 1-D array index for cell (i_ix, i_iy) in the
