@@ -43,4 +43,5 @@ To generate the Documentation in Sphinx:
    week 9: parallelization and grace
    week 10: individual-phase
    week 11: individual-phase
+   Final
 
