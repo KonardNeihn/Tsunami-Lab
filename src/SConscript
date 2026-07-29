@@ -49,12 +49,17 @@ l_tests = [ 'tests.cpp',
             'patches/WavePropagation2d.test.cpp',
             'io/Csv.test.cpp',
             'setups/DamBreak1d.test.cpp',
+            'setups/DamBreak2d.test.cpp',
+            'setups/CircularDamBreak2d.test.cpp',
             'setups/ShockShock1d.test.cpp',
             'setups/RareRare1d.test.cpp',
+            'setups/Checkpoint2d.test.cpp',
             'setups/Bathymetry1d.test.cpp',
             'setups/SubcriticalFlow1d.test.cpp',
             'setups/HydraulicJump1d.test.cpp',
-            'setups/TsunamiEvent1d.test.cpp',]
+            'setups/TsunamiEvent1d.test.cpp',
+            'setups/TsunamiEvent2d.test.cpp',
+            'setups/ArtificialTsunami2d.test.cpp',]
 
 tests = [env.Object(s) for s in l_tests]
 

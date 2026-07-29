@@ -87,8 +87,8 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getHeight(t_real solver
     std::size_t existingPhysicalX = std::distance(m_xd.begin(), itX);
     std::size_t existingPhysicalY = std::distance(m_yd.begin(), itY);
 
-    if (existingPhysicalX >= m_xd.size()) existingPhysicalX = m_xd.size() - 1;
-    if (existingPhysicalY >= m_yd.size()) existingPhysicalY = m_yd.size() - 1;
+    if (existingPhysicalX >= m_x.size()) existingPhysicalX = m_x.size() - 1;
+    if (existingPhysicalY >= m_y.size()) existingPhysicalY = m_y.size() - 1;
 
     t_real b = getBathymetry(solverX, solverY);
     t_real h = m_2dDisplacement[existingPhysicalY][existingPhysicalX];

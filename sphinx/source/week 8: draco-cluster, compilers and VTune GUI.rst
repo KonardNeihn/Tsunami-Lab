@@ -238,3 +238,5 @@ WavePropagation2d
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   DRACO CLUSTER GUIDE

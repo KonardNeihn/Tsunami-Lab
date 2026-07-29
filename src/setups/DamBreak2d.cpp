@@ -1,5 +1,4 @@
 /**
- * @author 
  *
  * @section DESCRIPTION
  * One-dimensional dam break problem.

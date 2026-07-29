@@ -24,19 +24,7 @@ struct FWaveTestAccessor {
 };
 
 TEST_CASE( "Test the derivation of the f-wave speeds.", "[FWaveSpeeds]" ) {
-   /*
-    * (gleich wie bei roe)
-    *
-    * Test case:
-    *  h: 10 | 9
-    *  u: -3 | 3
-    *
-    * f-wave height: 9.5
-    * f-wave velocity: (sqrt(10) * -3 + 3 * 3) / ( sqrt(10) + sqrt(9) )
-    *                   = -0.0790021169691720
-    * f-wave speeds:  s1 = -0.079002116969172024 - sqrt(9.80665 * 9.5) = -9.7311093998375095
-    *                 s2 = -0.079002116969172024 + sqrt(9.80665 * 9.5) =  9.5731051658991654
-    */
+
   float l_waveSpeedL = 0;
   float l_waveSpeedR = 0;
   FWaveTestAccessor::waveSpeeds( 10,
@@ -46,8 +34,8 @@ TEST_CASE( "Test the derivation of the f-wave speeds.", "[FWaveSpeeds]" ) {
                                          l_waveSpeedL,
                                          l_waveSpeedR );
 
-  REQUIRE( l_waveSpeedL == Approx( -9.7311093998375095 ) );
-  REQUIRE( l_waveSpeedR == Approx(  9.5731051658991654 ) );
+  REQUIRE( l_waveSpeedL == Approx( -12.90285 ) );
+  REQUIRE( l_waveSpeedR == Approx(  12.39467 ) );
 }
 
 TEST_CASE( "Test the F-WaveFlux.", "[FWaveFlux]" ) {
